@@ -1,0 +1,82 @@
+.form-title {
+    text-align: center;
+    margin-top: 60px;
+    font-size: 2.5em;
+    color: #0c3b25;
+    font-weight: 700;
+    user-select: none;
+}
+
+.form-subtitle {
+    text-align: center;
+    font-size: 1.1em;
+    color: #5b5b5b;
+    margin-bottom: 30px;
+    user-select: none;
+}
+
+/* Form container box */
+.form-container {
+    background-color: rgb(237, 253, 243);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 3px 10px rgba(0, 71, 0, 0.2);
+    max-width: 700px;
+    margin: 0 auto 60px auto;
+}
+
+/* Entire form uses flex column */
+form{
+    color:rgb(41, 51, 41);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    user-select: none;
+}
+
+/* Input + Select styling */
+form input[type="text"],
+form select{
+    outline-color: rgb(41, 51, 41);
+    padding: 12px 15px;
+    border: none;
+    border-radius: 30px;
+    background-color: #fff;
+    font-size: 1em;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
+}
+
+input[type="radio"]{
+    accent-color: rgb(60, 161, 131);
+}
+
+/* Radio buttons row */
+.radio-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.button-container{
+    margin-top: 20px;
+    display:flex;
+    justify-content: center;
+}
+
+button[type="submit"] {
+    width: 50%;
+    padding: 12px 30px;
+    border: none;
+    background-color: rgb(79, 189, 156);
+    color: white;
+    font-size: 1em;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: rgb(36, 154, 118);
+}
