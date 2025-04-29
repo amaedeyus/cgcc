@@ -1,0 +1,157 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    height: 100%;
+    width: 100%;
+}
+
+.login {
+    margin-top: -100px;
+    font-family: 'Poppins', sans-serif;
+    background-color: rgb(243, 255, 243);
+    box-shadow: 5px 0px 25px 15px rgba(2, 41, 15, 0.568);
+    grid-column: 1;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+}
+
+.login-header {
+    color: rgb(2, 55, 2);
+    display: flex;
+    flex-direction: column;
+    font-size: 5vh;
+    grid-row: 2;
+    grid-column: 2/4;
+}
+
+.login-sub {
+    font-size: 2.5vh;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    padding-left: 50px; /* Replace transform with padding */
+    margin-top: -150px;
+    grid-row: 3;
+    grid-column: 2/5;
+    font-size: 2.3vh;
+    gap: 10px;
+    width: 100%; /* Ensure full width */
+}
+
+input[type="text"], input[type="password"] {
+    background-color: #fff;
+    outline-color: rgb(41, 51, 41);
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 1vh;
+    width: 75%;
+    margin: 10px 0;
+    font-size: 0.75em;
+}
+
+input[type="submit"] {
+    background-color: rgb(79, 189, 156);
+    font-size: 2vh;
+    color: white;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    border: none;
+    margin-left: 15%;
+    margin-top: 30px;
+    padding: 1vh;
+    width: 50%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1), 
+                0 1px 2px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.2s ease; /* Smooth transition for hover effect */
+}
+
+input[type="submit"]:hover {
+    background-color: rgb(36, 154, 118);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15), 
+                0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.image {
+    background-image: url("../Media/lasalle.png");
+    background-size: cover;
+    background-position: center;
+    grid-column: 2;
+    z-index: 0;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(83% - 50px); /* Adjust width to account for padding */
+    margin: 25px 0; /* Remove auto margins */
+    color: #999;
+    font-size: 1.8vh;
+    font-weight: normal;
+    letter-spacing: 1px;
+}
+
+.divider::before,
+.divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background-color: #ccc;
+    margin: 0 10px;
+}
+
+.divider span {
+    flex-shrink: 0; /* Keep "or" centered */
+}
+
+.google-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background-color: #ffffff;
+    color: rgb(35, 51, 45);
+    text-decoration: none;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 2vh;
+    margin-left: 15%;
+    margin-top: 30px;
+    padding: 1vh; /* Changed to auto for horizontal centering */
+    cursor: pointer;
+    width: 50%; /* Keep original width */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1), 
+                0 1px 2px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.2s ease; /* Smooth transition for hover effect */
+}
+
+.google-button img {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+
+.google-button:hover {
+    color: rgb(35, 51, 45);
+    background-color: #e0e0e0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15), 
+                0 2px 4px rgba(0, 0, 0, 0.1);
+}

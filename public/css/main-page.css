@@ -24,7 +24,7 @@
 
 .page-left::before {
     content: "";
-    background-image: url("Media/lasalle.png");
+    background-image: url("../Media/lasalle.png");
     background-size: cover;
     background-position: 20% center;
     opacity: 0.3; /* Set opacity for the background */
@@ -50,7 +50,7 @@
 }
 
 .profile-picture{
-    background-image: url("Media/user.jpg");
+    background-image: url("../Media/user.jpg");
     background-size: cover;
     background-position: center;
     width: 7vw;
