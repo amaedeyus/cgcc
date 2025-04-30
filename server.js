@@ -11,12 +11,15 @@ console.log('Server startup env check:', {
   NODE_ENV: process.env.NODE_ENV || 'development'
 });
 
+
 // ===== 2. Load dependencies =====
 const express = require('express');
 const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const session = require('express-session');
 const morgan = require('morgan');
 const flash = require('connect-flash'); // For flash messages
+const pool = require('./backend/config/dbconnect'); // This should export the `pool`
 
 // ===== 3. Initialize app =====
 const app = express();
@@ -33,6 +36,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+
 // Session configuration
 app.use(session({
   secret: process.env.SESSION_SECRET || 'keyboard-cat',
@@ -48,9 +52,56 @@ app.use(session({
 // Flash messages (must come after session)
 app.use(flash());
 
+
 // Passport initialization
 app.use(passport.initialize());
 app.use(passport.session());
+
+const allowedTestEmails = ['amybalion533@gmail.com', 'balionamaya01@gmail.com'];
+
+passport.serializeUser((user, done) => {
+  done(null, user);
+});
+
+passport.deserializeUser((obj, done) => {
+  done(null, obj);
+});
+
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: "/auth/google/callback"
+}, async (accessToken, refreshToken, profile, done) => {
+  try {
+    const email = profile.emails[0].value;
+
+    if (!email.endsWith('@dlsl.edu.ph') && !allowedTestEmails.includes(email)) {
+      return done(null, false, { message: 'Unauthorized email domain.' });
+    }
+
+    const connection = await pool.getConnection();
+    const [rows] = await connection.execute(
+      'SELECT id, email, type FROM users WHERE email = ?',
+      [email]
+    );
+    connection.release();
+
+    if (rows.length === 0) {
+      return done(null, false, { message: 'User not found in database.' });
+    }
+
+    const user = rows[0];
+    return done(null, {
+      id: user.id,
+      email: user.email,
+      type: user.type,
+      name: profile.displayName
+    });
+  } catch (err) {
+    console.error('Error during Google auth:', err);
+    return done(err);
+  }
+}));
 
 // ===== 5. Load auth config =====
 require('./backend/config/auth');
