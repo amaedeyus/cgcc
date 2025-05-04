@@ -119,7 +119,7 @@
 .page-right{
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: 1fr 0.5fr 1fr 0.5fr repeat(3, 1fr);
+    grid-template-rows: auto auto auto auto auto auto; /* More control */
     grid-column-gap: 0px;
     grid-row-gap: 15px;
     position: relative;
@@ -206,10 +206,10 @@
   }
   
   .section-title {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     font-weight: 700;
     margin-bottom: 1rem;
-    color: #2c3e50;
+    color:rgb(2, 55, 2);
   }
   
   .cards-grid {
@@ -220,7 +220,7 @@
   }
   
   .form-card {
-    background-color: #ffffff;
+    background-color: rgb(237, 253, 243);
     border: 1px solid #dbe2ef;
     border-radius: 8px;
     padding: 1.25rem;
@@ -257,4 +257,11 @@
     transform: translateY(-4px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
   }
+
+  .form-cards-section {
+  grid-column: 2/5; /* Span from column 2 to end */
+  grid-row: 3;        /* Place it after .greetings */
+  max-width: 900px;   /* 👈 optional max width */
+
+}
 
