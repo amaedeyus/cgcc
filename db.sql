@@ -3,15 +3,14 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 30, 2025 at 09:51 AM
+-- Generation Time: May 04, 2025 at 07:20 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
-CREATE DATABASE IF NOT EXISTS `form_builder`;
-USE `form_builder`;
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
+
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -23,7 +22,8 @@ SET time_zone = "+00:00";
 --
 
 -- --------------------------------------------------------
-
+CREATE DATABASE IF NOT EXISTS `form_builder`;
+USE `form_builder`;
 --
 -- Table structure for table `answers`
 --
@@ -53,7 +53,12 @@ CREATE TABLE `choices` (
 --
 
 INSERT INTO `choices` (`Choice_ID`, `Main_Question_ID`, `Choice_Text`) VALUES
-(1, 2, 'fsdfsdfdfsdf');
+(18, 14, 'fsdfdsfdsf1'),
+(19, 14, 'sdfsdfsdfsdfs1'),
+(26, 24, 'dasdsdasdsa111'),
+(27, 24, 'afafsfsda333122'),
+(28, 25, 'dasdsdasdsa111'),
+(29, 25, 'afafsfsda333122');
 
 -- --------------------------------------------------------
 
@@ -73,8 +78,9 @@ CREATE TABLE `forms` (
 --
 
 INSERT INTO `forms` (`Form_ID`, `Form_Name`, `Description`, `Time_Created`) VALUES
-(1, 'sfdsf', 'fsdf', '2025-04-30 05:28:30'),
-(2, 'fsdfsdfs', 'fsdfsdfsdf', '2025-04-30 12:25:24');
+(5, 'Amaya', 'hi hello', '2025-05-01 06:35:57'),
+(6, 'fdsfsdfds1', 'fsdfsdf1', '2025-05-01 06:36:40'),
+(7, 'Amaya 2', 'hi hello mememememe', '2025-05-04 13:19:13');
 
 -- --------------------------------------------------------
 
@@ -109,8 +115,9 @@ CREATE TABLE `main_questions` (
 --
 
 INSERT INTO `main_questions` (`Main_Question_ID`, `Form_ID`, `Main_Question`, `QType_ID`, `Required`) VALUES
-(1, 1, 'fsdfsdfd', 1, 0),
-(2, 2, 'fsdfsfd', 6, 0);
+(14, 6, 'fsdfsdfsdfdsfsdf1', 5, 0),
+(24, 5, 'fsdfsdfsdfdsfsdf1', 6, 1),
+(25, 7, 'fsdfsdfsdfdsfsdf1', 6, 1);
 
 -- --------------------------------------------------------
 
@@ -166,7 +173,10 @@ CREATE TABLE `sub_question` (
 --
 
 INSERT INTO `sub_question` (`Sub_Question_ID`, `Main_Question_ID`, `Sub_Question`) VALUES
-(1, 2, 'fsdfdsf');
+(14, 24, 'ryrtyryt'),
+(15, 24, 'q1212e2'),
+(16, 25, 'ryrtyryt'),
+(17, 25, 'q1212e2');
 
 -- --------------------------------------------------------
 
@@ -275,13 +285,13 @@ ALTER TABLE `answers`
 -- AUTO_INCREMENT for table `choices`
 --
 ALTER TABLE `choices`
-  MODIFY `Choice_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `Choice_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT for table `forms`
 --
 ALTER TABLE `forms`
-  MODIFY `Form_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `Form_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `grid_answer`
@@ -293,7 +303,7 @@ ALTER TABLE `grid_answer`
 -- AUTO_INCREMENT for table `main_questions`
 --
 ALTER TABLE `main_questions`
-  MODIFY `Main_Question_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `Main_Question_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `question_type`
@@ -311,7 +321,7 @@ ALTER TABLE `responses`
 -- AUTO_INCREMENT for table `sub_question`
 --
 ALTER TABLE `sub_question`
-  MODIFY `Sub_Question_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `Sub_Question_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `users`
