@@ -113,7 +113,7 @@ fetch('http://localhost:3001/api/forms')
       card.innerHTML = `
         <h3>${form.Form_Name}</h3>
         <p>${form.Description || 'No description'}</p>
-        <a href="/forms-builder/form/${form.Form_ID}">Open Form</a>
+        <a href="http://localhost:3000/edit-form/${form.Form_ID}" target="_blank">Open Form</a>
       `;
 
       container.appendChild(card);
