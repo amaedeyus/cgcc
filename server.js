@@ -4,7 +4,7 @@ require('dotenv').config({ path: path.join(__dirname, 'backend/.env') });
 
 // Debug check
 console.log('Server startup env check:', {
-  PORT: process.env.PORT || 3000,
+  PORT: process.env.PORT || 3002,
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID ? 'Loaded' : 'MISSING',
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET ? 'Loaded' : 'MISSING',
   SESSION_SECRET: process.env.SESSION_SECRET ? 'Loaded' : 'MISSING',
@@ -74,6 +74,15 @@ app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/main.html'));
 });
 
+// Dashboard route (protected)
+app.get('/admin', (req, res) => {
+  if (!req.isAuthenticated()) {
+    return res.redirect('/login');
+  }
+  res.sendFile(path.join(__dirname, 'public/admin.html'));
+});
+
+
 // Form submission
 app.post('/submit', (req, res) => {
   console.log('Form submitted:', req.body);
@@ -90,12 +99,24 @@ app.get('/auth/google',
 
 // Google OAuth callback
 app.get('/auth/google/callback',
-  passport.authenticate('google', { 
-    failureRedirect: '/login',
-    successRedirect: '/dashboard',
-    failureFlash: true
-  })
+  passport.authenticate('google', { failureRedirect: '/login', failureFlash: true }),
+  (req, res) => {
+    console.log('✅ Authenticated User:', req.user); // <== Add this
+
+    if (!req.user || !req.user.userType) {
+      console.warn('⚠️ No userType found on authenticated user.');
+      return res.redirect('/login');
+    }
+
+    if (req.user.userType === 'admin') {
+      return res.redirect('/admin');
+    } else {
+      return res.redirect('/dashboard');
+    }
+  }
 );
+
+
 
 // ===== 7. Error Handling =====
 app.use((err, req, res, next) => {
