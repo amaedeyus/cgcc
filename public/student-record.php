@@ -1,4 +1,4 @@
-<?php require("backend/connect2.php"); ?>
+<?php require("../backend/connect2.php"); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -35,7 +35,7 @@
         </tr>
 
         <?php
-        $sql = "SELECT * FROM student ORDER BY sid";
+        $sql = "SELECT * FROM student ORDER BY student_id";
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
@@ -45,7 +45,7 @@
                 echo "<td>" . $row['last_name'] . "</td>"; 
                 echo "<td>" . $row['first_name'] . "</td>";
                 echo "<td>" . $row['year_level'] . "</td>";
-                echo "<td><a href='edit_student.php?id=" . $row['sid'] . "'>Edit</a> | <a href='delete_student.php?id=" . $row['sid'] . "'>Delete</a></td>";
+                echo "<td><a href='edit_student.php?id=" . $row['student_id'] . "'>Edit</a> | <a href='delete_student.php?id=" . $row['student_id'] . "'>Delete</a></td>";
                 echo "</tr>";
             }
         } else {
