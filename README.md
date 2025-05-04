@@ -1,3 +1,9 @@
 ## run in terminal
 # npm install connect-flash dotenv express express-session morgan passport passport-google-oauth20 mysql2
 # npm install --save-dev nodemon
+
+## Run in Terminal
+## `cd react_form`
+## `npm install react react-dom react-bootstrap @hello-pangea/dnd react-icons bootstrap`
+## `npm install express knex body-parser cors dotenv`
+## `npm install --save-dev nodemon`
