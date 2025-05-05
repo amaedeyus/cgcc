@@ -1,12 +1,19 @@
-<?php 
-$host="localhost";
-$user="root";
-$pass="";
-$db="form_builder";
-$conn=new mysqli($host, $user, $pass, $db);
+<?php
+header("Content-Type: application/json");
 
-if($conn->connect_error){
-    echo "Failed to connect to the database".$conn->connect_error;
+$host = "localhost";
+$user = "root";
+$pass = "";
+$db = "form_builder";
+
+$conn = new mysqli($host, $user, $pass, $db);
+
+if ($conn->connect_error) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Database connection failed', 'message' => $conn->connect_error]);
+    exit;
 }
 
+// Optional: Set charset
+$conn->set_charset("utf8mb4");
 ?>

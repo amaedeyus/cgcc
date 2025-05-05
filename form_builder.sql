@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 04, 2025 at 10:19 AM
+-- Generation Time: May 04, 2025 at 03:22 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -20,7 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Database: `form_builder`
 --
-
+CREATE DATABASE IF NOT EXISTS `form_builder`;
+USE `form_builder`;
 -- --------------------------------------------------------
 
 --
@@ -61,8 +62,8 @@ INSERT INTO `choices` (`Choice_ID`, `Main_Question_ID`, `Choice_Text`) VALUES
 --
 
 CREATE TABLE `counselor` (
-  `cid` int(11) NOT NULL,
-  `id` int(11) NOT NULL,
+  `counselor_index` int(11) NOT NULL,
+  `user_index` int(11) NOT NULL,
   `counselor_id` bigint(15) NOT NULL,
   `last_name` varchar(50) NOT NULL,
   `first_name` varchar(50) NOT NULL,
@@ -129,6 +130,19 @@ INSERT INTO `main_questions` (`Main_Question_ID`, `Form_ID`, `Main_Question`, `Q
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `program`
+--
+
+CREATE TABLE `program` (
+  `program_index` int(11) NOT NULL,
+  `counselor_index` int(11) NOT NULL,
+  `program_id` varchar(20) NOT NULL,
+  `program_name` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `question_type`
 --
 
@@ -170,8 +184,8 @@ CREATE TABLE `responses` (
 --
 
 CREATE TABLE `student` (
-  `sid` int(11) NOT NULL,
-  `id` int(11) NOT NULL,
+  `student_index` int(11) NOT NULL,
+  `user_index` int(11) NOT NULL,
   `student_id` bigint(15) NOT NULL,
   `last_name` varchar(50) NOT NULL,
   `first_name` varchar(50) NOT NULL,
@@ -182,7 +196,7 @@ CREATE TABLE `student` (
 -- Dumping data for table `student`
 --
 
-INSERT INTO `student` (`sid`, `id`, `student_id`, `last_name`, `first_name`, `year_level`) VALUES
+INSERT INTO `student` (`student_index`, `user_index`, `student_id`, `last_name`, `first_name`, `year_level`) VALUES
 (1, 1, 2023351801, 'Balion', 'Angel Amaya', 2),
 (2, 4, 2023350761, 'Del Rosario', 'Renz Andrei', 2);
 
@@ -212,8 +226,9 @@ INSERT INTO `sub_question` (`Sub_Question_ID`, `Main_Question_ID`, `Sub_Question
 --
 
 CREATE TABLE `users` (
-  `id` int(11) NOT NULL,
+  `user_index` int(11) NOT NULL,
   `email` varchar(255) NOT NULL,
+  `password` varchar(100) NOT NULL,
   `type` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -222,13 +237,13 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `email`, `type`, `created_at`) VALUES
-(1, 'angel_amaya_balion@dlsl.edu.ph', 'student', '2025-04-30 06:48:52'),
-(2, 'amybalion533@gmail.com', 'admin', '2025-04-30 07:34:49'),
-(3, 'balionamaya01@gmail.com', 'counselor', '2025-04-30 07:35:57'),
-(4, 'renz_andrei_delrosario@dlsl.edu.ph', 'student', '2025-05-02 02:29:55'),
-(5, 'xyrelle_dominique_talens@dlsl.edu.ph', 'student', '2025-05-04 08:13:56'),
-(6, 'lyrus_lei_doctolero@dlsl.edu.ph', 'student', '2025-05-04 08:13:56');
+INSERT INTO `users` (`user_index`, `email`, `password`, `type`, `created_at`) VALUES
+(1, 'angel_amaya_balion@dlsl.edu.ph', '$2y$10$.ugAqIwocz1sb1wE4k9p/.OQ.VQfqOiy/8YrMyXk7l1sTDNUe19s6', 'student', '2025-04-30 06:48:52'),
+(2, 'amybalion533@gmail.com', '$2y$10$.ugAqIwocz1sb1wE4k9p/.OQ.VQfqOiy/8YrMyXk7l1sTDNUe19s6', 'admin', '2025-04-30 07:34:49'),
+(3, 'balionamaya01@gmail.com', '$2y$10$.ugAqIwocz1sb1wE4k9p/.OQ.VQfqOiy/8YrMyXk7l1sTDNUe19s6', 'counselor', '2025-04-30 07:35:57'),
+(4, 'renz_andrei_delrosario@dlsl.edu.ph', '$2y$10$ZtzitJGInBQZl.LYAS4cxuS5v31acCrUuuUSLsO1ehjNLXQgF4Iza', 'student', '2025-05-02 02:29:55'),
+(5, 'xyrelle_dominique_talens@dlsl.edu.ph', '$2y$10$YEayWrIWlENsw6wqLxI8EuBasWFOds0yK3uLla04ZgjCmo3V4hHa6', 'student', '2025-05-04 08:13:56'),
+(6, 'lyrus_lei_doctolero@dlsl.edu.ph', '$2y$10$I0jZ6DYNZU3nzf/qPlq7K.dzNCEdnYFJKF3w48iAeN6rzCagJVQ2C', 'student', '2025-05-04 08:13:56');
 
 --
 -- Indexes for dumped tables
@@ -254,8 +269,8 @@ ALTER TABLE `choices`
 -- Indexes for table `counselor`
 --
 ALTER TABLE `counselor`
-  ADD PRIMARY KEY (`cid`),
-  ADD KEY `fk2` (`id`);
+  ADD PRIMARY KEY (`counselor_index`),
+  ADD KEY `fk2` (`user_index`);
 
 --
 -- Indexes for table `forms`
@@ -282,6 +297,13 @@ ALTER TABLE `main_questions`
   ADD KEY `QType_ID` (`QType_ID`);
 
 --
+-- Indexes for table `program`
+--
+ALTER TABLE `program`
+  ADD PRIMARY KEY (`program_index`),
+  ADD KEY `fk3` (`counselor_index`);
+
+--
 -- Indexes for table `question_type`
 --
 ALTER TABLE `question_type`
@@ -298,8 +320,7 @@ ALTER TABLE `responses`
 -- Indexes for table `student`
 --
 ALTER TABLE `student`
-  ADD PRIMARY KEY (`sid`),
-  ADD KEY `fk1` (`id`);
+  ADD PRIMARY KEY (`student_index`);
 
 --
 -- Indexes for table `sub_question`
@@ -312,7 +333,7 @@ ALTER TABLE `sub_question`
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`),
+  ADD PRIMARY KEY (`user_index`),
   ADD UNIQUE KEY `email` (`email`);
 
 --
@@ -335,7 +356,7 @@ ALTER TABLE `choices`
 -- AUTO_INCREMENT for table `counselor`
 --
 ALTER TABLE `counselor`
-  MODIFY `cid` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `counselor_index` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `forms`
@@ -356,6 +377,12 @@ ALTER TABLE `main_questions`
   MODIFY `Main_Question_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
+-- AUTO_INCREMENT for table `program`
+--
+ALTER TABLE `program`
+  MODIFY `program_index` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `question_type`
 --
 ALTER TABLE `question_type`
@@ -371,7 +398,7 @@ ALTER TABLE `responses`
 -- AUTO_INCREMENT for table `student`
 --
 ALTER TABLE `student`
-  MODIFY `sid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `student_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `sub_question`
@@ -383,7 +410,7 @@ ALTER TABLE `sub_question`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `user_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- Constraints for dumped tables
@@ -407,7 +434,7 @@ ALTER TABLE `choices`
 -- Constraints for table `counselor`
 --
 ALTER TABLE `counselor`
-  ADD CONSTRAINT `fk2` FOREIGN KEY (`id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `fk2` FOREIGN KEY (`user_index`) REFERENCES `users` (`user_index`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `grid_answer`
@@ -426,6 +453,12 @@ ALTER TABLE `main_questions`
   ADD CONSTRAINT `main_questions_ibfk_2` FOREIGN KEY (`QType_ID`) REFERENCES `question_type` (`QType_ID`);
 
 --
+-- Constraints for table `program`
+--
+ALTER TABLE `program`
+  ADD CONSTRAINT `fk3` FOREIGN KEY (`counselor_index`) REFERENCES `counselor` (`counselor_index`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `responses`
 --
 ALTER TABLE `responses`
@@ -435,7 +468,7 @@ ALTER TABLE `responses`
 -- Constraints for table `student`
 --
 ALTER TABLE `student`
-  ADD CONSTRAINT `fk1` FOREIGN KEY (`id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `fk1` FOREIGN KEY (`user_index`) REFERENCES `users` (`user_index`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `sub_question`
