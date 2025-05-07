@@ -6,10 +6,7 @@ import { useParams } from 'react-router-dom';
 import './App.css';
 
 
-const API_BASE_URL = '../../backend/forms';
-
-
-
+const API_BASE_URL = 'http://localhost/cgcc-system/backend/forms';
 
 const QuestionBuilder = () => {
   const { id } = useParams(); // Get form ID from URL
@@ -89,8 +86,8 @@ const QuestionBuilder = () => {
     // Determine if we are creating or updating
     const method = id ? 'PUT' : 'POST';
     const url = id 
-      ? `${API_BASE_URL}/update_form.php?id=${id}` 
-      : `${API_BASE_URL}/create_form.php`;
+      ? `${API_BASE_URL}/update.php?id=${id}` 
+      : `${API_BASE_URL}/create.php`;
 
   // Prepare the form data for submission
   const formData = {

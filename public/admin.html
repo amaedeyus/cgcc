@@ -59,18 +59,16 @@
         
             <div class="schedule">
                 <button class="button-class" onclick="">
-                    Schedule a Counseling Appointment
+                    Manage Counselors
                 </button>
             </div>
             <div class="update">
-                <button class="button-class" onclick="">
-                    Edit Profile Information
+                <button class="button-class" onclick="window.location.href='http://localhost:3001'">
+                    Create a new form
                 </button>
             </div>
         </div>
-
     </div>
-
 <script>
 
 
@@ -97,7 +95,7 @@ function goToPage(){
 }
 
 // 🆕 Fetch and display forms
-fetch('http://localhost:3001/api/forms')
+fetch('http://localhost/cgcc-system/backend/forms/form.php')
   .then(response => response.json())
   .then(data => {
     const container = document.getElementById('form-card-container');
@@ -113,7 +111,7 @@ fetch('http://localhost:3001/api/forms')
       card.innerHTML = `
         <h3>${form.Form_Name}</h3>
         <p>${form.Description || 'No description'}</p>
-        <a href="http://localhost:3000/edit-form/${form.Form_ID}" target="_blank">Open Form</a>
+        <a href="http://localhost:3001/edit-form/${form.Form_ID}" target="_blank">Open Form</a>
       `;
 
       container.appendChild(card);

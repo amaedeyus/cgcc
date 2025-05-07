@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 04, 2025 at 03:22 PM
+-- Generation Time: May 07, 2025 at 02:37 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -53,7 +53,8 @@ CREATE TABLE `choices` (
 --
 
 INSERT INTO `choices` (`Choice_ID`, `Main_Question_ID`, `Choice_Text`) VALUES
-(1, 2, 'fsdfsdfdfsdf');
+(8, 7, 'fsdfsdfdfsdf'),
+(9, 7, 'asdadas');
 
 -- --------------------------------------------------------
 
@@ -89,7 +90,8 @@ CREATE TABLE `forms` (
 
 INSERT INTO `forms` (`Form_ID`, `Form_Name`, `Description`, `Time_Created`) VALUES
 (1, 'sfdsf', 'fsdf', '2025-04-30 05:28:30'),
-(2, 'fsdfsdfs', 'fsdfsdfsdf', '2025-04-30 12:25:24');
+(2, 'fsdfsdfs', 'fsdfsdfsdf', '2025-04-30 12:25:24'),
+(3, '3form', 'hi hello', '2025-05-07 19:58:46');
 
 -- --------------------------------------------------------
 
@@ -125,7 +127,9 @@ CREATE TABLE `main_questions` (
 
 INSERT INTO `main_questions` (`Main_Question_ID`, `Form_ID`, `Main_Question`, `QType_ID`, `Required`) VALUES
 (1, 1, 'fsdfsdfd', 1, 0),
-(2, 2, 'fsdfsfd', 6, 0);
+(6, 2, 'what is your name?', 1, 0),
+(7, 2, 'fsdfsfd', 6, 1),
+(8, 3, 'what is going on?', 1, 1);
 
 -- --------------------------------------------------------
 
@@ -217,7 +221,8 @@ CREATE TABLE `sub_question` (
 --
 
 INSERT INTO `sub_question` (`Sub_Question_ID`, `Main_Question_ID`, `Sub_Question`) VALUES
-(1, 2, 'fsdfdsf');
+(6, 7, 'fsdfdsf'),
+(7, 7, 'question no 2');
 
 -- --------------------------------------------------------
 
@@ -320,7 +325,8 @@ ALTER TABLE `responses`
 -- Indexes for table `student`
 --
 ALTER TABLE `student`
-  ADD PRIMARY KEY (`student_index`);
+  ADD PRIMARY KEY (`student_index`),
+  ADD KEY `fk1` (`user_index`);
 
 --
 -- Indexes for table `sub_question`
@@ -350,7 +356,7 @@ ALTER TABLE `answers`
 -- AUTO_INCREMENT for table `choices`
 --
 ALTER TABLE `choices`
-  MODIFY `Choice_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `Choice_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `counselor`
@@ -362,7 +368,7 @@ ALTER TABLE `counselor`
 -- AUTO_INCREMENT for table `forms`
 --
 ALTER TABLE `forms`
-  MODIFY `Form_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `Form_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `grid_answer`
@@ -374,7 +380,7 @@ ALTER TABLE `grid_answer`
 -- AUTO_INCREMENT for table `main_questions`
 --
 ALTER TABLE `main_questions`
-  MODIFY `Main_Question_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `Main_Question_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `program`
@@ -404,7 +410,7 @@ ALTER TABLE `student`
 -- AUTO_INCREMENT for table `sub_question`
 --
 ALTER TABLE `sub_question`
-  MODIFY `Sub_Question_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `Sub_Question_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `users`

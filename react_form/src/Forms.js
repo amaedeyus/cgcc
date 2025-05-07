@@ -6,7 +6,7 @@ const Forms = () => {
   const [forms, setForms] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/forms')
+    fetch('http://localhost/cgcc-system/backend/forms/form.php')
       .then((response) => {
         if (!response.ok) {
           throw new Error('Failed to fetch forms');

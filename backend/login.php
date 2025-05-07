@@ -8,7 +8,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = $_POST['password'] ?? null;
 
     if (!$email || !$password) {
-        $error = "Please enter both email and password.";
+        echo "Please enter both email and password.";
     } else {
         // Prepare query to fetch user data
         $query = "SELECT * FROM users WHERE email = ?";
@@ -26,20 +26,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 // Set session variables
                 $_SESSION['user_index'] = $row['user_index'];
                 $_SESSION['email'] = $row['email'];
-                $_SESSION['user_type'] = $row['user_type'];
+                $_SESSION['user_type'] = $row['type'];
 
                 // Redirect users based on role
-                if ($row['user_type'] == 'admin') {
-                    //header("Location: admin-dashboard.php");
+                if ($row['type'] == 'admin') {
+                    header("Location: ../public/admin.html");
                 } else {
                     header("Location: ../public/main.html");
                 }
                 exit();
             } else {
-                $error = "Invalid email or password.";
+                echo "Invalid email or password.";
             }
         } else {
-            $error = "Invalid email or password.";
+            echo "Invalid email or password.";
         }
 
         $stmt->close();

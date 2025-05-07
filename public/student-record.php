@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="css/base.css">
     <title>Student Records</title>
 </head>
+
 <body>
 <header>
     <div class="logo">

@@ -1,12 +1,33 @@
 <?php
-require '../connect.php';
+header("Access-Control-Allow-Origin: http://localhost:3000");
+header("Access-Control-Allow-Origin: http://localhost:3001");
+header("Access-Control-Allow-Methods: GET, OPTIONS");
+header("Access-Control-Allow-Credentials: true");
+header("Content-Type: application/json");
 
-try {
-    $stmt = $pdo->query("SELECT * FROM Forms");
-    $forms = $stmt->fetchAll();
+// Include your database connection
+require '../connect.php'; // Make sure the path is correct
+
+// Try to fetch the forms
+$query = "SELECT * FROM Forms";
+$result = $conn->query($query);
+
+if ($result) {
+    $forms = [];
+    
+    // Fetch all results and store in the $forms array
+    while ($row = $result->fetch_assoc()) {
+        $forms[] = $row;
+    }
+
+    // Return the forms as JSON
     echo json_encode($forms);
-} catch (Exception $e) {
+} else {
+    // Return 500 error if the query fails
     http_response_code(500);
-    echo json_encode(['error' => 'Failed to retrieve forms']);
+    echo json_encode(['error' => 'Failed to retrieve forms', 'message' => $conn->error]);
 }
+
+// Close the connection
+$conn->close();
 ?>
