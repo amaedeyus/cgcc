@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 07, 2025 at 02:37 PM
+-- Generation Time: May 07, 2025 at 02:59 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -22,6 +22,7 @@ SET time_zone = "+00:00";
 --
 CREATE DATABASE IF NOT EXISTS `form_builder`;
 USE `form_builder`;
+
 -- --------------------------------------------------------
 
 --
@@ -53,8 +54,7 @@ CREATE TABLE `choices` (
 --
 
 INSERT INTO `choices` (`Choice_ID`, `Main_Question_ID`, `Choice_Text`) VALUES
-(8, 7, 'fsdfsdfdfsdf'),
-(9, 7, 'asdadas');
+(1, 2, 'fsdfsdfdfsdf');
 
 -- --------------------------------------------------------
 
@@ -90,8 +90,7 @@ CREATE TABLE `forms` (
 
 INSERT INTO `forms` (`Form_ID`, `Form_Name`, `Description`, `Time_Created`) VALUES
 (1, 'sfdsf', 'fsdf', '2025-04-30 05:28:30'),
-(2, 'fsdfsdfs', 'fsdfsdfsdf', '2025-04-30 12:25:24'),
-(3, '3form', 'hi hello', '2025-05-07 19:58:46');
+(2, 'fsdfsdfs', 'fsdfsdfsdf', '2025-04-30 12:25:24');
 
 -- --------------------------------------------------------
 
@@ -127,9 +126,7 @@ CREATE TABLE `main_questions` (
 
 INSERT INTO `main_questions` (`Main_Question_ID`, `Form_ID`, `Main_Question`, `QType_ID`, `Required`) VALUES
 (1, 1, 'fsdfsdfd', 1, 0),
-(6, 2, 'what is your name?', 1, 0),
-(7, 2, 'fsdfsfd', 6, 1),
-(8, 3, 'what is going on?', 1, 1);
+(2, 2, 'fsdfsfd', 6, 0);
 
 -- --------------------------------------------------------
 
@@ -202,7 +199,17 @@ CREATE TABLE `student` (
 
 INSERT INTO `student` (`student_index`, `user_index`, `student_id`, `last_name`, `first_name`, `year_level`) VALUES
 (1, 1, 2023351801, 'Balion', 'Angel Amaya', 2),
-(2, 4, 2023350761, 'Del Rosario', 'Renz Andrei', 2);
+(2, 4, 2023350761, 'Del Rosario', 'Renz Andrei', 2),
+(3, 5, 2023359771, 'Talens', 'Xyrelle Dominique', 2),
+(4, 6, 2023352471, 'Doctolero', 'Lyrus Lei', 2),
+(5, 7, 20233621, 'Alonzo', 'Enjey Kashlee', 2),
+(6, 8, 2023363891, 'Alonzo', 'Jhenelle', 2),
+(7, 9, 2023350511, 'Dela Vega', 'Princess Mihaela', 2),
+(8, 10, 2023348471, 'Estrella', 'Juan Benjo', 2),
+(9, 11, 2023362901, 'Liwanag', 'Katherine Anne', 2),
+(10, 12, 2023362341, 'Paray', 'Jane Allyson', 2),
+(11, 13, 2023358411, 'Sahagun', 'Daniel Luis', 2),
+(12, 14, 2023352411, 'Tenorio', 'Jhon Paulo', 2);
 
 -- --------------------------------------------------------
 
@@ -221,8 +228,7 @@ CREATE TABLE `sub_question` (
 --
 
 INSERT INTO `sub_question` (`Sub_Question_ID`, `Main_Question_ID`, `Sub_Question`) VALUES
-(6, 7, 'fsdfdsf'),
-(7, 7, 'question no 2');
+(1, 2, 'fsdfdsf');
 
 -- --------------------------------------------------------
 
@@ -248,7 +254,15 @@ INSERT INTO `users` (`user_index`, `email`, `password`, `type`, `created_at`) VA
 (3, 'balionamaya01@gmail.com', '$2y$10$.ugAqIwocz1sb1wE4k9p/.OQ.VQfqOiy/8YrMyXk7l1sTDNUe19s6', 'counselor', '2025-04-30 07:35:57'),
 (4, 'renz_andrei_delrosario@dlsl.edu.ph', '$2y$10$ZtzitJGInBQZl.LYAS4cxuS5v31acCrUuuUSLsO1ehjNLXQgF4Iza', 'student', '2025-05-02 02:29:55'),
 (5, 'xyrelle_dominique_talens@dlsl.edu.ph', '$2y$10$YEayWrIWlENsw6wqLxI8EuBasWFOds0yK3uLla04ZgjCmo3V4hHa6', 'student', '2025-05-04 08:13:56'),
-(6, 'lyrus_lei_doctolero@dlsl.edu.ph', '$2y$10$I0jZ6DYNZU3nzf/qPlq7K.dzNCEdnYFJKF3w48iAeN6rzCagJVQ2C', 'student', '2025-05-04 08:13:56');
+(6, 'lyrus_lei_doctolero@dlsl.edu.ph', '$2y$10$I0jZ6DYNZU3nzf/qPlq7K.dzNCEdnYFJKF3w48iAeN6rzCagJVQ2C', 'student', '2025-05-04 08:13:56'),
+(7, 'enjey_kashlee_alonzo@dlsl.edu.ph', '', 'student', '2025-05-07 12:42:20'),
+(8, 'jhenelle_alonzo@dlsl.edu.ph', '', 'student', '2025-05-07 12:45:54'),
+(9, 'princess_mihaela_delavega@dlsl.edu.ph', '', 'student', '2025-05-07 12:45:54'),
+(10, 'juan_benjo_estrella@dlsl.edu.ph', '', 'student', '2025-05-07 12:45:54'),
+(11, 'katherine_anne_liwanag@dlsl.edu.ph', '', 'student', '2025-05-07 12:45:54'),
+(12, 'jane_allyson_paray@dlsl.edu.ph', '', 'student', '2025-05-07 12:45:54'),
+(13, 'daniel_luis_sahagun@dlsl.edu.ph', '', 'student', '2025-05-07 12:45:54'),
+(14, 'jhon_paulo_tenorio@dlsl.edu.ph', '', 'student', '2025-05-07 12:45:54');
 
 --
 -- Indexes for dumped tables
@@ -356,7 +370,7 @@ ALTER TABLE `answers`
 -- AUTO_INCREMENT for table `choices`
 --
 ALTER TABLE `choices`
-  MODIFY `Choice_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `Choice_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `counselor`
@@ -368,7 +382,7 @@ ALTER TABLE `counselor`
 -- AUTO_INCREMENT for table `forms`
 --
 ALTER TABLE `forms`
-  MODIFY `Form_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `Form_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `grid_answer`
@@ -380,7 +394,7 @@ ALTER TABLE `grid_answer`
 -- AUTO_INCREMENT for table `main_questions`
 --
 ALTER TABLE `main_questions`
-  MODIFY `Main_Question_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `Main_Question_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `program`
@@ -404,19 +418,19 @@ ALTER TABLE `responses`
 -- AUTO_INCREMENT for table `student`
 --
 ALTER TABLE `student`
-  MODIFY `student_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `student_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `sub_question`
 --
 ALTER TABLE `sub_question`
-  MODIFY `Sub_Question_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `Sub_Question_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `user_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- Constraints for dumped tables
