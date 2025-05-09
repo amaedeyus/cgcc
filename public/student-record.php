@@ -28,20 +28,9 @@
             <div class="page-left">
                 <div class="profile">
                     <div class="profile-picture"></div>
-                    <span id="user-name"></span> <!-- papalitan ng id ni user -->
+                    <span id="user-name">Counselor</span> <!-- papalitan ng id ni user -->
                         <div class="edit">
                             <a href="#">✎Edit Profile</a>
-                        </div>
-                </div>
-                <div class="sidebar-nav">
-                    <a onclick="goToPage()">➤ Counseling Schedule</a>
-                    <div class="dropdown" onclick="toggleDropdown('Forms')">➤ Forms</div>
-                        <div id="Forms" class="dropdown-content">
-                            <a href="../student-profile-form.html">Student Information</a>
-                            <a href="#">General Mental Health Screening</a>
-                            <a href="#">Counseling Concerns & Exit Interview</a>
-                            <a href="#">Counseling Evaluation</a>
-                            <a href="#">Exit Interview</a>
                         </div>
                 </div>
             </div>
@@ -71,7 +60,7 @@
                 echo "<td>" . $row['last_name'] . "</td>"; 
                 echo "<td>" . $row['first_name'] . "</td>";
                 echo "<td>" . $row['year_level'] . "</td>";
-                echo "<td><a href='edit_student.php?id=" . $row['student_id'] . "'>Edit</a> | <a href='delete_student.php?id=" . $row['student_id'] . "'>Delete</a></td>";
+                echo "<td><a href='view_student.php?id=" . $row['student_id'] . "'>View</a></td>";
                 echo "</tr>";
             }
         } else {
