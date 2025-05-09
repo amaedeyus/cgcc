@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/record.css">
     <title>Student Records</title>
 </head>
 <body>
@@ -22,6 +23,31 @@
 </header>
 
 <div class="grid-body">
+
+    <div class="left-bg"></div>
+            <div class="page-left">
+                <div class="profile">
+                    <div class="profile-picture"></div>
+                    <span id="user-name"></span> <!-- papalitan ng id ni user -->
+                        <div class="edit">
+                            <a href="#">✎Edit Profile</a>
+                        </div>
+                </div>
+                <div class="sidebar-nav">
+                    <a onclick="goToPage()">➤ Counseling Schedule</a>
+                    <div class="dropdown" onclick="toggleDropdown('Forms')">➤ Forms</div>
+                        <div id="Forms" class="dropdown-content">
+                            <a href="../student-profile-form.html">Student Information</a>
+                            <a href="#">General Mental Health Screening</a>
+                            <a href="#">Counseling Concerns & Exit Interview</a>
+                            <a href="#">Counseling Evaluation</a>
+                            <a href="#">Exit Interview</a>
+                        </div>
+                </div>
+            </div>
+
+
+    <div class="table-container">
     <table>
         <tr>
             <td colspan="7"><b>Student Records</b></td>

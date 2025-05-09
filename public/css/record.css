@@ -1,0 +1,63 @@
+.grid-body{
+    display: grid;
+    grid-template-columns: .3fr 1fr;
+    grid-template-rows: 1fr;
+    grid-column-gap: 0px;
+    grid-row-gap: 0px;
+}
+
+.table-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    grid-column: 2;
+    max-height: 400px; /* Adjust height as needed */
+    overflow-y: auto;
+}
+
+table {
+    width: 70%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #ffffff; /* white */
+    box-shadow: 0 0 10px rgba(2, 61, 2, 0.2); /* soft green shadow */
+}
+
+th {
+    background-color: #4fbd9c; /* rgb(79, 189, 156) */
+    color: white;
+    font-weight: bold;
+    padding: 12px;
+    text-align: left;
+    border-bottom: 2px solid #249a76; /* rgb(36, 154, 118) */
+}
+
+td {
+    padding: 10px;
+    border-bottom: 1px solid #edfdf3; /* light green background border */
+    vertical-align: top;
+    color: #023702; /* rgb(2, 55, 2) for content */
+}
+
+tr:hover {
+    background-color: #edfdf3; /* light green hover */
+}
+
+table tr:first-child td {
+    text-align: center;
+    font-size: 1.25em;
+    background-color: #edfdf3; /* match info box background */
+    border-bottom: 2px solid #c0e8db; /* slightly darker variant */
+    color: #023702;
+}
+
+td a {
+    color: #249a76; /* green link color */
+    text-decoration: none;
+    margin: 0 5px;
+}
+
+td a:hover {
+    text-decoration: underline;
+    color: #023702; /* deepen on hover */
+}
