@@ -30,6 +30,10 @@ If Composer is not installed on your machine:
 - Download and install it from [https://getcomposer.org/](https://getcomposer.org/)
 - Or run this command in the terminal (macOS/Linux):
 
+### 3️⃣ API
+- copy secret.json in the shared google drive
+- paste the contents in the cgcc-system/backend/config/secret.json
+- do not commit the json file 
 
 ## Run in terminal
 ### composer install
@@ -37,7 +41,6 @@ If Composer is not installed on your machine:
 ## Run in Terminal
 ### cd react_form
 ### npm install react react-dom react-router-dom react-bootstrap @hello-pangea/dnd react-icons bootstrap
-### npm install express knex body-parser cors dotenv
 ### npm install --save-dev nodemon
 
 ## Run the application (steps)

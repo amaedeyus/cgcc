@@ -5,7 +5,6 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 ## Run in Terminal
 ## `cd react_form`
 ## `npm install react react-dom react-bootstrap @hello-pangea/dnd react-icons bootstrap`
-## `npm install express knex body-parser cors dotenv`
 ## `npm install --save-dev nodemon`
 
 ## Available Scripts
