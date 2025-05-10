@@ -24,7 +24,7 @@ try {
     $pdo->beginTransaction();
 
     // Insert Response
-    $stmt = $pdo->prepare("INSERT INTO Responses (Form_ID, Student_ID) VALUES (?, ?)");
+    $stmt = $pdo->prepare("INSERT INTO responses (form_index, student_index) VALUES (?, ?)");
     $stmt->execute([$formId, $data['studentId'] ?? null]);
     $responseId = $pdo->lastInsertId();
 
@@ -35,13 +35,13 @@ try {
         $gridAnswers = $answer['gridAnswers'] ?? [];
 
         if ($choiceId || $textAnswer) {
-            $pdo->prepare("INSERT INTO Answers (Response_ID, Main_Question_ID, Choice_ID, Text_Answer) VALUES (?, ?, ?, ?)")
+            $pdo->prepare("INSERT INTO answers (response_index, main_question_index, choice_index, Text_Answer) VALUES (?, ?, ?, ?)")
                ->execute([$responseId, $questionId, $choiceId, $textAnswer]);
         }
 
         if (!empty($gridAnswers)) {
             foreach ($gridAnswers as $gridAnswer) {
-                $pdo->prepare("INSERT INTO Grid_Answer (Response_id, Main_Question_ID, Sub_Question_ID, Choice_ID) VALUES (?, ?, ?, ?)")
+                $pdo->prepare("INSERT INTO grid_answers (response_index, main_question_index, sub_question_index, choice_index) VALUES (?, ?, ?, ?)")
                    ->execute([
                        $responseId,
                        $questionId,

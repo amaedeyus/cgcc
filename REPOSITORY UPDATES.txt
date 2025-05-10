@@ -1,3 +1,7 @@
 5/7/2025
 # migrated from node server js to php
 # more students in database
+
+5/11/2025
+# fixed database naming conventions
+## Appointment Scheduler UI (just incase we will need it later)

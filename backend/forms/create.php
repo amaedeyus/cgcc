@@ -51,7 +51,7 @@ $conn->autocommit(FALSE); // Turn off auto-commit
 
 try {
     // Insert form
-    $stmt = $conn->prepare("INSERT INTO Forms (Form_Name, Description) VALUES (?, ?)");
+    $stmt = $conn->prepare("INSERT INTO forms (form_name, description) VALUES (?, ?)");
     $stmt->bind_param("ss", $title, $description);
     $stmt->execute();
     $formId = $stmt->insert_id;
@@ -65,8 +65,8 @@ try {
         $type = $q['type'];
         $required = $q['required'] ?? false;
 
-        // Get QType_ID
-        $stmt = $conn->prepare("SELECT QType_ID FROM Question_Type WHERE Question_Type = ?");
+        // Get type_index
+        $stmt = $conn->prepare("SELECT type_index FROM question_types WHERE type_name = ?");
         $stmt->bind_param("s", $type);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -76,10 +76,10 @@ try {
         }
 
         $typeRow = $result->fetch_assoc();
-        $typeId = $typeRow['QType_ID'];
+        $typeId = $typeRow['type_index'];
 
         // Insert main question
-        $stmt = $conn->prepare("INSERT INTO Main_Questions (Form_ID, Main_Question, QType_ID, Required) VALUES (?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO main_questions (form_index, main_question_text, type_index, is_required) VALUES (?, ?, ?, ?)");
         $stmt->bind_param("ssss", $formId, $questionText, $typeId, $required);
         $stmt->execute();
         $questionId = $stmt->insert_id;
@@ -87,10 +87,10 @@ try {
         // Insert choices (options)
         if (!empty($q['options']) && is_array($q['options'])) {
             foreach ($q['options'] as $opt) {
-                $text = is_string($opt) ? $opt : ($opt['Choice_Text'] ?? '');
+                $text = is_string($opt) ? $opt : ($opt['choice_text'] ?? '');
                 $text = trim($text);
                 if (!empty($text)) {
-                    $stmt = $conn->prepare("INSERT INTO Choices (Main_Question_ID, Choice_Text) VALUES (?, ?)");
+                    $stmt = $conn->prepare("INSERT INTO choices (main_question_index, choice_text) VALUES (?, ?)");
                     $stmt->bind_param("ss", $questionId, $text);
                     $stmt->execute();
                 }
@@ -102,7 +102,7 @@ try {
             foreach ($q['rows'] as $row) {
                 $text = trim($row);
                 if (!empty($text)) {
-                    $stmt = $conn->prepare("INSERT INTO Sub_Question (Main_Question_ID, Sub_Question) VALUES (?, ?)");
+                    $stmt = $conn->prepare("INSERT INTO sub_questions (main_question_index, sub_question_text) VALUES (?, ?)");
                     $stmt->bind_param("ss", $questionId, $text);
                     $stmt->execute();
                 }

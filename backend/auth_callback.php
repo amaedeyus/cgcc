@@ -2,12 +2,8 @@
 session_start();
 use Google\Service\Oauth2;
 require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/connect.php'; // include your DB connection
-
-use Dotenv\Dotenv;
-$dotenv = Dotenv::createImmutable(__DIR__);
-$dotenv->load();
-
+    require_once __DIR__ . '/connect.php'; // include your DB connection
+    
 // Initialize Google Client
 $client = new Google_Client();
 $client->setAuthConfig(__DIR__ . '/config/secret.json');

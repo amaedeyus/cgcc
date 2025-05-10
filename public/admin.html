@@ -109,9 +109,9 @@ fetch('http://localhost/cgcc-system/backend/forms/form.php')
       card.classList.add('form-card'); // Add your own styling class
 
       card.innerHTML = `
-        <h3>${form.Form_Name}</h3>
-        <p>${form.Description || 'No description'}</p>
-        <a href="http://localhost:3001/edit-form/${form.Form_ID}" target="_blank">Open Form</a>
+        <h3>${form.form_name}</h3>
+        <p>${form.description || 'No description'}</p>
+        <a href="http://localhost:3001/edit-form/${form.form_index}" target="_blank">Open Form</a>
       `;
 
       container.appendChild(card);

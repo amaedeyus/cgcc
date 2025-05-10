@@ -9,7 +9,7 @@ header("Content-Type: application/json");
 require '../connect.php'; // Make sure the path is correct
 
 // Try to fetch the forms
-$query = "SELECT * FROM Forms";
+$query = "SELECT * FROM forms";
 $result = $conn->query($query);
 
 if ($result) {

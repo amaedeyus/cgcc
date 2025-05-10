@@ -5,9 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/record.css">
     <title>Student Records</title>
 </head>
-
 <body>
 <header>
     <div class="logo">
@@ -23,6 +23,20 @@
 </header>
 
 <div class="grid-body">
+
+    <div class="left-bg"></div>
+            <div class="page-left">
+                <div class="profile">
+                    <div class="profile-picture"></div>
+                    <span id="user-name">Counselor</span> <!-- papalitan ng id ni user -->
+                        <div class="edit">
+                            <a href="#">✎Edit Profile</a>
+                        </div>
+                </div>
+            </div>
+
+
+    <div class="table-container">
     <table>
         <tr>
             <td colspan="7"><b>Student Records</b></td>
@@ -36,7 +50,7 @@
         </tr>
 
         <?php
-        $sql = "SELECT * FROM student ORDER BY student_id";
+        $sql = "SELECT * FROM student ORDER BY last_name";
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
@@ -46,7 +60,7 @@
                 echo "<td>" . $row['last_name'] . "</td>"; 
                 echo "<td>" . $row['first_name'] . "</td>";
                 echo "<td>" . $row['year_level'] . "</td>";
-                echo "<td><a href='edit_student.php?id=" . $row['student_id'] . "'>Edit</a> | <a href='delete_student.php?id=" . $row['student_id'] . "'>Delete</a></td>";
+                echo "<td><a href='view_student.php?id=" . $row['student_id'] . "'>View</a></td>";
                 echo "</tr>";
             }
         } else {

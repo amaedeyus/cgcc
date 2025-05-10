@@ -53,7 +53,7 @@ $conn->autocommit(FALSE); // Turn off auto-commit
 
 try {
     // 1. Check if form exists
-    $stmt = $conn->prepare("SELECT * FROM Forms WHERE Form_ID = ?");
+    $stmt = $conn->prepare("SELECT * FROM forms WHERE form_index = ?");
     $stmt->bind_param("s", $formId);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -64,20 +64,20 @@ try {
     }
 
     // 2. Update form metadata
-    $stmt = $conn->prepare("UPDATE Forms SET Form_Name = ?, Description = ? WHERE Form_ID = ?");
+    $stmt = $conn->prepare("UPDATE forms SET form_name = ?, description = ? WHERE form_index = ?");
     $stmt->bind_param("sss", $title, $description, $formId);
     $stmt->execute();
 
     // 3. Delete existing structure
-    $stmt = $conn->prepare("DELETE FROM Sub_Question WHERE Main_Question_ID IN (SELECT Main_Question_ID FROM Main_Questions WHERE Form_ID = ?)");
+    $stmt = $conn->prepare("DELETE FROM sub_questions WHERE main_question_index IN (SELECT main_question_index FROM main_questions WHERE form_index = ?)");
     $stmt->bind_param("s", $formId);
     $stmt->execute();
 
-    $stmt = $conn->prepare("DELETE FROM Choices WHERE Main_Question_ID IN (SELECT Main_Question_ID FROM Main_Questions WHERE Form_ID = ?)");
+    $stmt = $conn->prepare("DELETE FROM choices WHERE main_question_index IN (SELECT main_question_index FROM main_questions WHERE form_index = ?)");
     $stmt->bind_param("s", $formId);
     $stmt->execute();
 
-    $stmt = $conn->prepare("DELETE FROM Main_Questions WHERE Form_ID = ?");
+    $stmt = $conn->prepare("DELETE FROM main_questions WHERE form_index = ?");
     $stmt->bind_param("s", $formId);
     $stmt->execute();
 
@@ -91,8 +91,8 @@ try {
         $type = $q['type'];
         $required = $q['required'] ?? false;
 
-        // Get QType_ID
-        $stmt = $conn->prepare("SELECT QType_ID FROM Question_Type WHERE Question_Type = ?");
+        // Get type_index
+        $stmt = $conn->prepare("SELECT type_index FROM question_types WHERE type_name = ?");
         $stmt->bind_param("s", $type);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -102,10 +102,10 @@ try {
         }
 
         $typeRow = $result->fetch_assoc();
-        $typeId = $typeRow['QType_ID'];
+        $typeId = $typeRow['type_index'];
 
         // Insert main question
-        $stmt = $conn->prepare("INSERT INTO Main_Questions (Form_ID, Main_Question, QType_ID, Required) VALUES (?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO main_questions (form_index, main_question_text, type_index, is_required) VALUES (?, ?, ?, ?)");
         $stmt->bind_param("ssss", $formId, $questionText, $typeId, $required);
         $stmt->execute();
         $questionId = $stmt->insert_id;
@@ -113,10 +113,10 @@ try {
         // Insert choices (options)
         if (!empty($q['options']) && is_array($q['options'])) {
             foreach ($q['options'] as $opt) {
-                $text = is_string($opt) ? $opt : ($opt['Choice_Text'] ?? '');
+                $text = is_string($opt) ? $opt : ($opt['choice_text'] ?? '');
                 $text = trim($text);
                 if (!empty($text)) {
-                    $stmt = $conn->prepare("INSERT INTO Choices (Main_Question_ID, Choice_Text) VALUES (?, ?)");
+                    $stmt = $conn->prepare("INSERT INTO choices (main_question_index, choice_text) VALUES (?, ?)");
                     $stmt->bind_param("ss", $questionId, $text);
                     $stmt->execute();
                 }
@@ -128,7 +128,7 @@ try {
             foreach ($q['rows'] as $row) {
                 $text = trim($row);
                 if (!empty($text)) {
-                    $stmt = $conn->prepare("INSERT INTO Sub_Question (Main_Question_ID, Sub_Question) VALUES (?, ?)");
+                    $stmt = $conn->prepare("INSERT INTO sub_questions (main_question_index, sub_question_text) VALUES (?, ?)");
                     $stmt->bind_param("ss", $questionId, $text);
                     $stmt->execute();
                 }

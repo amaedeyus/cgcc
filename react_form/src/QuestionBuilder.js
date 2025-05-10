@@ -34,18 +34,18 @@ const QuestionBuilder = () => {
   
         // Set title and description
         setFormInfo({
-          title: data.Form_Name,
-          description: data.Description,
+          title: data.form_name,
+          description: data.description,
         });
   
         // Format questions to match our state structure
         const formattedQuestions = data.questions.map((q) => ({
-          id: String(q.Main_Question_ID),
-          question: q.Main_Question,
-          type: q.Question_Type,
+          id: String(q.main_question_index),
+          question: q.main_question_text,
+          type: q.type_name,
           options: q.options || [],  // keep full choice objects
           rows: q.rows || [],
-          required: !!q.Required,
+          required: !!q.is_required,
           isEditing: false,
         }));
 
@@ -98,7 +98,7 @@ const QuestionBuilder = () => {
       type: q.type,
       required: q.required, // Ensure the required field is part of the payload
       options: (q.options || [])
-      .map(opt => typeof opt === 'string' ? opt.trim() : (opt?.Choice_Text || '').trim())
+      .map(opt => typeof opt === 'string' ? opt.trim() : (opt?.choice_text || '').trim())
       .filter(text => text),
       rows: (q.rows || []).filter(row => row?.trim()).map(row => row?.trim() || '')
     })),
@@ -330,7 +330,7 @@ const QuestionBuilder = () => {
           !q.options ||
           q.options.length === 0 ||
           q.options.some(opt => {
-            const text = typeof opt === 'string' ? opt : opt?.Choice_Text;
+            const text = typeof opt === 'string' ? opt : opt?.choice_text;
             return !text || text.trim() === '';
           })
         ) {
@@ -352,7 +352,7 @@ const QuestionBuilder = () => {
         if (
           !q.options ||
           q.options.length === 0 ||
-          q.options.some(opt => !opt || (opt.Choice_Text ?? opt).trim() === '')
+          q.options.some(opt => !opt || (opt.choice_text ?? opt).trim() === '')
         ) {
           setValidationError(`Question ${i + 1} has empty columns.`);
           return false;
@@ -485,7 +485,7 @@ const QuestionBuilder = () => {
                                           <Form.Control
                                             type="text"
                                             placeholder={`Option ${idx + 1}`}
-                                            value={opt?.Choice_Text ?? opt ?? ''}
+                                            value={opt?.choice_text ?? opt ?? ''}
                                             onChange={(e) => handleOptionChange(q.id, idx, e.target.value)}
                                           />
                                           {q.options.length > 1 && (
@@ -555,7 +555,7 @@ const QuestionBuilder = () => {
                                           <Form.Control
                                             type="text"
                                             placeholder={`Option ${idx + 1}`}
-                                            value={opt?.Choice_Text ?? opt ?? ''}
+                                            value={opt?.choice_text ?? opt ?? ''}
                                             onChange={(e) => handleOptionChange(q.id, idx, e.target.value)}
                                           />
                                           {q.options.length > 1 && (
@@ -591,7 +591,7 @@ const QuestionBuilder = () => {
                                           <Form.Control
                                             type="text"
                                             placeholder={`Option ${idx + 1}`}
-                                            value={opt?.Choice_Text ?? opt ?? ''}
+                                            value={opt?.choice_text ?? opt ?? ''}
                                             onChange={(e) => handleOptionChange(q.id, idx, e.target.value)}
                                           />
                                           {q.options.length > 1 && (
@@ -671,7 +671,7 @@ const QuestionBuilder = () => {
                                         <Form.Check
                                           key={idx}
                                           type={q.type === 'multiple' ? 'radio' : 'checkbox'}
-                                          label={(opt?.Choice_Text ?? opt) || `Option ${idx + 1}`}
+                                          label={(opt?.choice_text ?? opt) || `Option ${idx + 1}`}
                                           name={`question-${q.id}`}
                                           id={`question-${q.id}-option-${idx}`}
                                           className="mb-2"
@@ -687,7 +687,7 @@ const QuestionBuilder = () => {
                                           <th></th>
                                           {q.options.map((opt, idx) => (
                                             <th key={`col-${idx}`} className="text-center">
-                                              {(opt?.Choice_Text ?? opt) || `Option ${idx + 1}`}
+                                              {(opt?.choice_text ?? opt) || `Option ${idx + 1}`}
                                             </th>
                                           ))}
                                         </tr>
@@ -710,8 +710,8 @@ const QuestionBuilder = () => {
                                     <Form.Select>
                                       <option value="">Select an option</option>
                                       {q.options.map((opt, idx) => (
-                                        <option key={idx} value={opt?.Choice_Text ?? opt ?? ''}>
-                                          {(opt?.Choice_Text ?? opt) || `Option ${idx + 1}`}
+                                        <option key={idx} value={opt?.choice_text ?? opt ?? ''}>
+                                          {(opt?.choice_text ?? opt) || `Option ${idx + 1}`}
                                         </option>
                                       ))}
                                     </Form.Select>

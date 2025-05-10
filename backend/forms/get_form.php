@@ -28,7 +28,7 @@ if (!$formId || !is_numeric($formId)) {
 }
 
 // Fetch form details
-$query = "SELECT * FROM Forms WHERE Form_ID = ?";
+$query = "SELECT * FROM forms WHERE form_index = ?";
 $stmt = $conn->prepare($query);
 $stmt->bind_param("i", $formId);
 $stmt->execute();
@@ -43,11 +43,11 @@ if ($formResult->num_rows === 0) {
 $form = $formResult->fetch_assoc();
 
 // Fetch questions for the form
-$query = "SELECT mq.*, qt.Question_Type 
-          FROM Main_Questions mq
-          JOIN Question_Type qt ON mq.QType_ID = qt.QType_ID 
-          WHERE mq.Form_ID = ?
-          ORDER BY mq.Main_Question_ID";
+$query = "SELECT mq.*, qt.type_name 
+          FROM main_questions mq
+          JOIN question_types qt ON mq.type_index = qt.type_index 
+          WHERE mq.form_index = ?
+          ORDER BY mq.main_question_index";
 $stmt = $conn->prepare($query);
 $stmt->bind_param("i", $formId);
 $stmt->execute();
@@ -56,27 +56,27 @@ $questionsResult = $stmt->get_result();
 $questions = [];
 while ($q = $questionsResult->fetch_assoc()) {
     // Get options
-    $query = "SELECT * FROM Choices WHERE Main_Question_ID = ? ORDER BY Choice_ID";
+    $query = "SELECT * FROM choices WHERE main_question_index = ? ORDER BY choice_index";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $q['Main_Question_ID']);
+    $stmt->bind_param("i", $q['main_question_index']);
     $stmt->execute();
     $choicesResult = $stmt->get_result();
     $options = $choicesResult->fetch_all(MYSQLI_ASSOC);
 
     // Get sub-questions (rows)
-    $query = "SELECT * FROM Sub_Question WHERE Main_Question_ID = ? ORDER BY Sub_Question_ID";
+    $query = "SELECT * FROM sub_questions WHERE main_question_index = ? ORDER BY sub_question_index";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $q['Main_Question_ID']);
+    $stmt->bind_param("i", $q['main_question_index']);
     $stmt->execute();
     $subQResult = $stmt->get_result();
-    $rows = array_column($subQResult->fetch_all(MYSQLI_ASSOC), 'Sub_Question');
+    $rows = array_column($subQResult->fetch_all(MYSQLI_ASSOC), 'sub_question_text');
 
     // Match expected structure
     $questions[] = [
-        'Main_Question_ID' => $q['Main_Question_ID'],
-        'Main_Question' => $q['Main_Question'],
-        'Question_Type' => $q['Question_Type'],
-        'Required' => (bool)$q['Required'],
+        'main_question_index' => $q['main_question_index'],
+        'main_question_text' => $q['main_question_text'],
+        'type_name' => $q['type_name'],
+        'is_required' => (bool)$q['is_required'],
         'options' => $options,
         'rows' => $rows
     ];
@@ -84,9 +84,9 @@ while ($q = $questionsResult->fetch_assoc()) {
 
 // Final response
 echo json_encode([
-    'Form_ID' => $form['Form_ID'],
-    'Form_Name' => $form['Form_Name'],
-    'Description' => $form['Description'],
+    'form_index' => $form['form_index'],
+    'form_name' => $form['form_name'],
+    'description' => $form['description'],
     'questions' => $questions
 ]);
 
