@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 11, 2025 at 12:15 AM
+-- Generation Time: May 13, 2025 at 09:17 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -22,7 +22,6 @@ SET time_zone = "+00:00";
 --
 CREATE DATABASE IF NOT EXISTS `form_builder`;
 USE `form_builder`
-
 -- --------------------------------------------------------
 
 --
@@ -55,8 +54,9 @@ CREATE TABLE `choices` (
 
 INSERT INTO `choices` (`choice_index`, `main_question_index`, `choice_text`) VALUES
 (1, 2, 'fsdfsdfdfsdf'),
-(4, 8, 'ads'),
-(5, 8, 'das');
+(15, 18, 'Row 2'),
+(16, 20, 'ads'),
+(17, 20, 'das');
 
 -- --------------------------------------------------------
 
@@ -115,8 +115,30 @@ CREATE TABLE `forms` (
 --
 
 INSERT INTO `forms` (`form_index`, `form_name`, `description`, `created_at`) VALUES
-(1, 'sfdsf', 'fsdf', '2025-04-30 05:28:30'),
+(1, 'Form1', 'fsdf', '2025-04-30 05:28:30'),
 (2, 'fsdfsdfs', 'fsdfsdfsdf', '2025-04-30 12:25:24');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `form_sections`
+--
+
+CREATE TABLE `form_sections` (
+  `section_index` int(11) NOT NULL,
+  `form_index` int(11) NOT NULL,
+  `section_title` varchar(255) NOT NULL,
+  `section_description` text DEFAULT NULL,
+  `section_order` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `form_sections`
+--
+
+INSERT INTO `form_sections` (`section_index`, `form_index`, `section_title`, `section_description`, `section_order`) VALUES
+(2, 2, 'Title', 'This is a description', 1),
+(5, 1, 'Section 1 Title', 'This is a description of section 1.', 1);
 
 -- --------------------------------------------------------
 
@@ -143,17 +165,19 @@ CREATE TABLE `main_questions` (
   `form_index` int(11) DEFAULT NULL,
   `main_question_text` text DEFAULT NULL,
   `type_index` int(11) DEFAULT NULL,
-  `is_required` tinyint(1) NOT NULL DEFAULT 0
+  `is_required` tinyint(1) NOT NULL DEFAULT 0,
+  `section_index` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `main_questions`
 --
 
-INSERT INTO `main_questions` (`main_question_index`, `form_index`, `main_question_text`, `type_index`, `is_required`) VALUES
-(2, 2, 'fsdfsfd', 6, 0),
-(7, 1, 'fsdfsdfd', 1, 0),
-(8, 1, 'nnkjigyh', 6, 1);
+INSERT INTO `main_questions` (`main_question_index`, `form_index`, `main_question_text`, `type_index`, `is_required`, `section_index`) VALUES
+(2, 2, 'fsdfsfd', 6, 0, 2),
+(18, 1, 'Question 1', 6, 0, 5),
+(19, 1, 'fsdfsdfd', 1, 0, 5),
+(20, 1, 'nnkjigyh', 6, 1, 5);
 
 -- --------------------------------------------------------
 
@@ -371,7 +395,8 @@ CREATE TABLE `sub_questions` (
 
 INSERT INTO `sub_questions` (`sub_question_index`, `main_question_index`, `sub_question_text`) VALUES
 (1, 2, 'fsdfdsf'),
-(2, 8, 'dasd');
+(9, 18, 'Row 1'),
+(10, 20, 'dasd');
 
 -- --------------------------------------------------------
 
@@ -447,6 +472,13 @@ ALTER TABLE `forms`
   ADD PRIMARY KEY (`form_index`);
 
 --
+-- Indexes for table `form_sections`
+--
+ALTER TABLE `form_sections`
+  ADD PRIMARY KEY (`section_index`),
+  ADD KEY `form_index` (`form_index`);
+
+--
 -- Indexes for table `grid_answers`
 --
 ALTER TABLE `grid_answers`
@@ -462,7 +494,8 @@ ALTER TABLE `grid_answers`
 ALTER TABLE `main_questions`
   ADD PRIMARY KEY (`main_question_index`),
   ADD KEY `Form_ID` (`form_index`),
-  ADD KEY `QType_ID` (`type_index`);
+  ADD KEY `QType_ID` (`type_index`),
+  ADD KEY `section_index` (`section_index`);
 
 --
 -- Indexes for table `programs`
@@ -528,7 +561,7 @@ ALTER TABLE `answers`
 -- AUTO_INCREMENT for table `choices`
 --
 ALTER TABLE `choices`
-  MODIFY `choice_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `choice_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `counselors`
@@ -549,6 +582,12 @@ ALTER TABLE `forms`
   MODIFY `form_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
+-- AUTO_INCREMENT for table `form_sections`
+--
+ALTER TABLE `form_sections`
+  MODIFY `section_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
 -- AUTO_INCREMENT for table `grid_answers`
 --
 ALTER TABLE `grid_answers`
@@ -558,7 +597,7 @@ ALTER TABLE `grid_answers`
 -- AUTO_INCREMENT for table `main_questions`
 --
 ALTER TABLE `main_questions`
-  MODIFY `main_question_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `main_question_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `programs`
@@ -594,7 +633,7 @@ ALTER TABLE `students`
 -- AUTO_INCREMENT for table `sub_questions`
 --
 ALTER TABLE `sub_questions`
-  MODIFY `sub_question_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `sub_question_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -627,6 +666,12 @@ ALTER TABLE `counselors`
   ADD CONSTRAINT `fk2` FOREIGN KEY (`user_index`) REFERENCES `users` (`user_index`) ON DELETE CASCADE;
 
 --
+-- Constraints for table `form_sections`
+--
+ALTER TABLE `form_sections`
+  ADD CONSTRAINT `form_sections_ibfk_1` FOREIGN KEY (`form_index`) REFERENCES `forms` (`form_index`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `grid_answers`
 --
 ALTER TABLE `grid_answers`
@@ -640,7 +685,8 @@ ALTER TABLE `grid_answers`
 --
 ALTER TABLE `main_questions`
   ADD CONSTRAINT `main_questions_ibfk_1` FOREIGN KEY (`form_index`) REFERENCES `forms` (`form_index`) ON DELETE CASCADE,
-  ADD CONSTRAINT `main_questions_ibfk_2` FOREIGN KEY (`type_index`) REFERENCES `question_types` (`type_index`);
+  ADD CONSTRAINT `main_questions_ibfk_2` FOREIGN KEY (`type_index`) REFERENCES `question_types` (`type_index`),
+  ADD CONSTRAINT `main_questions_ibfk_3` FOREIGN KEY (`section_index`) REFERENCES `form_sections` (`section_index`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `programs`

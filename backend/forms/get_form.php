@@ -3,7 +3,7 @@ header("Access-Control-Allow-Methods: GET, OPTIONS");
 header("Access-Control-Allow-Credentials: true");
 header("Content-Type: application/json");
 
-// ✅ CORS Fix — Only allow known origins
+// CORS Handling - Only allow known origins
 $allowed_origins = ['http://localhost:3000', 'http://localhost:3001'];
 if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed_origins)) {
     header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
@@ -42,43 +42,127 @@ if ($formResult->num_rows === 0) {
 
 $form = $formResult->fetch_assoc();
 
-// Fetch questions for the form
-$query = "SELECT mq.*, qt.type_name 
-          FROM main_questions mq
-          JOIN question_types qt ON mq.type_index = qt.type_index 
-          WHERE mq.form_index = ?
-          ORDER BY mq.main_question_index";
+// Fetch sections for the form
+$query = "SELECT * FROM form_sections WHERE form_index = ? ORDER BY section_order";
 $stmt = $conn->prepare($query);
 $stmt->bind_param("i", $formId);
 $stmt->execute();
-$questionsResult = $stmt->get_result();
+$sectionsResult = $stmt->get_result();
 
-$questions = [];
-while ($q = $questionsResult->fetch_assoc()) {
-    // Get options
-    $query = "SELECT * FROM choices WHERE main_question_index = ? ORDER BY choice_index";
+$sections = [];
+$allQuestions = []; // For legacy support
+
+while ($section = $sectionsResult->fetch_assoc()) {
+    // Fetch questions for this section
+    $query = "SELECT mq.*, qt.type_name 
+              FROM main_questions mq
+              JOIN question_types qt ON mq.type_index = qt.type_index 
+              WHERE mq.section_index = ?
+              ORDER BY mq.main_question_index";
+    $stmt2 = $conn->prepare($query);
+    $stmt2->bind_param("i", $section['section_index']);
+    $stmt2->execute();
+    $questionsResult = $stmt2->get_result();
+
+    $questions = [];
+    while ($q = $questionsResult->fetch_assoc()) {
+        // Get options
+        $query = "SELECT * FROM choices WHERE main_question_index = ? ORDER BY choice_index";
+        $stmt3 = $conn->prepare($query);
+        $stmt3->bind_param("i", $q['main_question_index']);
+        $stmt3->execute();
+        $choicesResult = $stmt3->get_result();
+        $options = $choicesResult->fetch_all(MYSQLI_ASSOC);
+
+        // Get sub-questions (rows)
+        $query = "SELECT * FROM sub_questions WHERE main_question_index = ? ORDER BY sub_question_index";
+        $stmt4 = $conn->prepare($query);
+        $stmt4->bind_param("i", $q['main_question_index']);
+        $stmt4->execute();
+        $subQResult = $stmt4->get_result();
+        $rows = array_column($subQResult->fetch_all(MYSQLI_ASSOC), 'sub_question_text');
+
+        $questionData = [
+            'id' => (string)$q['main_question_index'],
+            'main_question_index' => $q['main_question_index'],
+            'question' => $q['main_question_text'],
+            'type' => $q['type_name'],
+            'required' => (bool)$q['is_required'],
+            'options' => array_map(function($opt) {
+                return $opt['choice_text'] ?? $opt; // Handle both object and string formats
+            }, $options),
+            'rows' => $rows
+        ];
+
+        $questions[] = $questionData;
+        $allQuestions[] = $questionData; // Add to legacy questions array
+    }
+
+    $sections[] = [
+        'id' => (string)$section['section_index'],
+        'section_index' => $section['section_index'],
+        'title' => $section['section_title'],
+        'description' => $section['section_description'],
+        'order' => $section['section_order'],
+        'questions' => $questions
+    ];
+}
+
+// For backward compatibility with older forms that might not have sections
+if (empty($sections)) {
+    // Fetch all questions directly (legacy format)
+    $query = "SELECT mq.*, qt.type_name 
+              FROM main_questions mq
+              JOIN question_types qt ON mq.type_index = qt.type_index 
+              WHERE mq.form_index = ?
+              ORDER BY mq.main_question_index";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $q['main_question_index']);
+    $stmt->bind_param("i", $formId);
     $stmt->execute();
-    $choicesResult = $stmt->get_result();
-    $options = $choicesResult->fetch_all(MYSQLI_ASSOC);
+    $questionsResult = $stmt->get_result();
 
-    // Get sub-questions (rows)
-    $query = "SELECT * FROM sub_questions WHERE main_question_index = ? ORDER BY sub_question_index";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $q['main_question_index']);
-    $stmt->execute();
-    $subQResult = $stmt->get_result();
-    $rows = array_column($subQResult->fetch_all(MYSQLI_ASSOC), 'sub_question_text');
+    $questions = [];
+    while ($q = $questionsResult->fetch_assoc()) {
+        // Get options
+        $query = "SELECT * FROM choices WHERE main_question_index = ? ORDER BY choice_index";
+        $stmt2 = $conn->prepare($query);
+        $stmt2->bind_param("i", $q['main_question_index']);
+        $stmt2->execute();
+        $choicesResult = $stmt2->get_result();
+        $options = $choicesResult->fetch_all(MYSQLI_ASSOC);
 
-    // Match expected structure
-    $questions[] = [
-        'main_question_index' => $q['main_question_index'],
-        'main_question_text' => $q['main_question_text'],
-        'type_name' => $q['type_name'],
-        'is_required' => (bool)$q['is_required'],
-        'options' => $options,
-        'rows' => $rows
+        // Get sub-questions (rows)
+        $query = "SELECT * FROM sub_questions WHERE main_question_index = ? ORDER BY sub_question_index";
+        $stmt3 = $conn->prepare($query);
+        $stmt3->bind_param("i", $q['main_question_index']);
+        $stmt3->execute();
+        $subQResult = $stmt3->get_result();
+        $rows = array_column($subQResult->fetch_all(MYSQLI_ASSOC), 'sub_question_text');
+
+        $questionData = [
+            'id' => (string)$q['main_question_index'],
+            'main_question_index' => $q['main_question_index'],
+            'question' => $q['main_question_text'],
+            'type' => $q['type_name'],
+            'required' => (bool)$q['is_required'],
+            'options' => array_map(function($opt) {
+                return $opt['choice_text'] ?? $opt;
+            }, $options),
+            'rows' => $rows
+        ];
+
+        $questions[] = $questionData;
+        $allQuestions[] = $questionData;
+    }
+
+    // Create a default section with all questions
+    $sections[] = [
+        'id' => '0',
+        'section_index' => 0,
+        'title' => 'Default Section',
+        'description' => '',
+        'order' => 1,
+        'questions' => $questions
     ];
 }
 
@@ -87,9 +171,15 @@ echo json_encode([
     'form_index' => $form['form_index'],
     'form_name' => $form['form_name'],
     'description' => $form['description'],
-    'questions' => $questions
-]);
+    'sections' => $sections,
+    'questions' => $allQuestions // Legacy support
+], JSON_NUMERIC_CHECK);
 
-$stmt->close();
+// Close all statements
+if (isset($stmt)) $stmt->close();
+if (isset($stmt2)) $stmt2->close();
+if (isset($stmt3)) $stmt3->close();
+if (isset($stmt4)) $stmt4->close();
+
 $conn->close();
 ?>

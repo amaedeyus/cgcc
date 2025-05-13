@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 // Include mysqli connection
-require_once '../connect.php'; // Make sure this defines $conn as a mysqli object
+require_once '../connect.php';
 
 $input = file_get_contents('php://input');
 $data = json_decode($input, true);
@@ -24,15 +24,15 @@ error_log("Raw Input: " . $input);
 error_log("Decoded Data: " . print_r($data, true));
 
 // Validate input
-if (!$data || !isset($data['title']) || !is_array($data['questions'])) {
+if (!$data || !isset($data['title']) || !isset($data['sections'])) {
     http_response_code(400);
-    echo json_encode(['error' => 'Missing title or questions']);
+    echo json_encode(['error' => 'Missing title or sections']);
     exit;
 }
 
 $title = trim($data['title']);
 $description = $data['description'] ?? null;
-$questions = $data['questions'];
+$sections = $data['sections'];
 
 if (empty($title)) {
     http_response_code(400);
@@ -40,14 +40,14 @@ if (empty($title)) {
     exit;
 }
 
-if (!is_array($questions) || count($questions) === 0) {
+if (!is_array($sections) || count($sections) === 0) {
     http_response_code(400);
-    echo json_encode(['error' => 'At least one question is required']);
+    echo json_encode(['error' => 'At least one section is required']);
     exit;
 }
 
 // Begin transaction
-$conn->autocommit(FALSE); // Turn off auto-commit
+$conn->autocommit(FALSE);
 
 try {
     // Insert form
@@ -56,55 +56,66 @@ try {
     $stmt->execute();
     $formId = $stmt->insert_id;
 
-    foreach ($questions as $q) {
-        if (!isset($q['question'], $q['type'])) {
-            throw new Exception("Missing question or type");
-        }
-
-        $questionText = trim($q['question']);
-        $type = $q['type'];
-        $required = $q['required'] ?? false;
-
-        // Get type_index
-        $stmt = $conn->prepare("SELECT type_index FROM question_types WHERE type_name = ?");
-        $stmt->bind_param("s", $type);
+    $sectionOrder = 1;
+    foreach ($sections as $section) {
+        // Insert section
+        $stmt = $conn->prepare("INSERT INTO form_sections (form_index, section_title, section_description, section_order) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("issi", $formId, $section['title'], $section['description'], $sectionOrder);
         $stmt->execute();
-        $result = $stmt->get_result();
+        $sectionId = $stmt->insert_id;
+        $sectionOrder++;
 
-        if ($result->num_rows === 0) {
-            throw new Exception("Invalid question type: $type");
-        }
+        foreach ($section['questions'] as $q) {
+            if (!isset($q['question'], $q['type'])) {
+                throw new Exception("Missing question or type");
+            }
 
-        $typeRow = $result->fetch_assoc();
-        $typeId = $typeRow['type_index'];
+            $questionText = trim($q['question']);
+            $type = $q['type'];
+            $required = $q['required'] ?? false;
 
-        // Insert main question
-        $stmt = $conn->prepare("INSERT INTO main_questions (form_index, main_question_text, type_index, is_required) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("ssss", $formId, $questionText, $typeId, $required);
-        $stmt->execute();
-        $questionId = $stmt->insert_id;
+            // Get type_index
+            $stmt = $conn->prepare("SELECT type_index FROM question_types WHERE type_name = ?");
+            $stmt->bind_param("s", $type);
+            $stmt->execute();
+            $result = $stmt->get_result();
 
-        // Insert choices (options)
-        if (!empty($q['options']) && is_array($q['options'])) {
-            foreach ($q['options'] as $opt) {
-                $text = is_string($opt) ? $opt : ($opt['choice_text'] ?? '');
-                $text = trim($text);
-                if (!empty($text)) {
-                    $stmt = $conn->prepare("INSERT INTO choices (main_question_index, choice_text) VALUES (?, ?)");
-                    $stmt->bind_param("ss", $questionId, $text);
-                    $stmt->execute();
+            if ($result->num_rows === 0) {
+                throw new Exception("Invalid question type: $type");
+            }
+
+            $typeRow = $result->fetch_assoc();
+            $typeId = $typeRow['type_index'];
+
+            // Insert main question with section reference
+            $stmt = $conn->prepare("INSERT INTO main_questions (form_index, section_index, main_question_text, type_index, is_required) VALUES (?, ?, ?, ?, ?)");
+            $requiredInt = $required ? 1 : 0;
+            $stmt->bind_param("iisii", $formId, $sectionId, $questionText, $typeId, $requiredInt);
+            $stmt->execute();
+            $questionId = $stmt->insert_id;
+
+            // Insert choices (options)
+            if (!empty($q['options']) && is_array($q['options'])) {
+                foreach ($q['options'] as $opt) {
+                    $text = is_string($opt) ? $opt : ($opt['choice_text'] ?? '');
+                    $text = trim($text);
+                    if (!empty($text)) {
+                        $stmt = $conn->prepare("INSERT INTO choices (main_question_index, choice_text) VALUES (?, ?)");
+                        $stmt->bind_param("is", $questionId, $text);
+                        $stmt->execute();
+                    }
                 }
             }
-        }
 
-        // Insert subquestions (rows)
-        if (!empty($q['rows']) && is_array($q['rows'])) {
-            foreach ($q['rows'] as $row) {
-                $text = trim($row);
-                if (!empty($text)) {
-                    $stmt = $conn->prepare("INSERT INTO sub_questions (main_question_index, sub_question_text) VALUES (?, ?)");
-                    $stmt->bind_param("ss", $questionId, $text);
-                    $stmt->execute();
+            // Insert subquestions (rows)
+            if (!empty($q['rows']) && is_array($q['rows'])) {
+                foreach ($q['rows'] as $row) {
+                    $text = trim($row);
+                    if (!empty($text)) {
+                        $stmt = $conn->prepare("INSERT INTO sub_questions (main_question_index, sub_question_text) VALUES (?, ?)");
+                        $stmt->bind_param("is", $questionId, $text);
+                        $stmt->execute();
+                    }
                 }
             }
         }
@@ -125,5 +136,5 @@ try {
     ]);
 }
 
-$conn->autocommit(TRUE); // Turn auto-commit back on
+$conn->autocommit(TRUE);
 ?>

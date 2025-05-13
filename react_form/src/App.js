@@ -11,9 +11,6 @@ function App() {
         <nav>
           <ul>
             <li>
-              <Link to="/">Forms</Link>
-            </li>
-            <li>
               <Link to="/QuestionBuilder">QuestionBuilder</Link>
             </li>
           </ul>

@@ -5,3 +5,6 @@
 5/11/2025
 # fixed database naming conventions
 ## Appointment Scheduler UI (just incase we will need it later)
+
+5/14/2025
+# added sections in the forms
