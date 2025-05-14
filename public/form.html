@@ -34,6 +34,28 @@
         .grid-table td {
             padding: 10px;
         }
+        .section-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .progress-container {
+            margin-bottom: 20px;
+            display: none;
+        }
+        .progress-bar {
+            transition: width 0.3s ease;
+        }
+        #progress-text {
+            margin-top: 5px;
+            display: block;
+            text-align: right;
+            font-size: 14px;
+            color: #6c757d;
+        }
     </style>
 </head>
 <body>
@@ -43,14 +65,34 @@
                 <h1 id="form-title">Loading form...</h1>
                 <p id="form-description" class="lead"></p>
             </div>
+            
             <div id="sections-container"></div>
-            <div class="d-grid gap-2">
-                <button id="submit-btn" class="btn btn-primary btn-lg" disabled>Submit Form</button>
+
+            <div class="progress-container">
+                <div class="progress">
+                    <div id="progress-bar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                </div>
+                <span id="progress-text">0/0 pages</span>
+            </div>
+
+            
+            <div class="section-navigation">
+                <button id="prev-section-btn" class="btn btn-outline-primary" disabled>Previous</button>
+                <div>
+                    <button id="clear-section-btn" class="btn btn-outline-danger me-2">Clear Section</button>
+                    <button id="next-section-btn" class="btn btn-primary">Next Section</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
+        // Global variables
+        let currentSectionIndex = 0;
+        let formData = null;
+        let sections = [];
+        let formResponses = {};
+
         document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
             const formId = urlParams.get('id');
@@ -61,6 +103,18 @@
             }
 
             fetchFormData(formId);
+            
+            // Event listeners
+            document.getElementById('prev-section-btn').addEventListener('click', showPreviousSection);
+            document.getElementById('clear-section-btn').addEventListener('click', clearCurrentSection);
+            document.getElementById('next-section-btn').addEventListener('click', () => {
+                if (currentSectionIndex === sections.length - 1) {
+                    submitForm(); // Call your working function
+                } else {
+                    showNextSection(); // Navigate to next section
+                }
+            });
+
         });
 
         async function fetchFormData(formId) {
@@ -71,8 +125,9 @@
                     throw new Error('Failed to fetch form data');
                 }
                 
-                const formData = await response.json();
-                renderForm(formData);
+                formData = await response.json();
+                sections = formData.sections;
+                initializeForm();
             } catch (error) {
                 console.error('Error:', error);
                 document.getElementById('form-title').textContent = 'Error loading form';
@@ -80,83 +135,91 @@
             }
         }
 
-        function renderForm(formData) {
+        function initializeForm() {
             // Set form title and description
             document.getElementById('form-title').textContent = formData.title;
             document.getElementById('form-description').textContent = formData.description;
             
+            // Initialize progress
+            updateProgress();
+            
+            // Render first section
+            renderSection(currentSectionIndex);
+        }
+
+        function renderSection(sectionIndex) {
             const sectionsContainer = document.getElementById('sections-container');
             sectionsContainer.innerHTML = '';
             
-            // Render each section
-            formData.sections.forEach(section => {
-                const sectionElement = document.createElement('div');
-                sectionElement.className = 'form-section';
-                
-                if (section.title) {
-                    const sectionTitle = document.createElement('h2');
-                    sectionTitle.textContent = section.title;
-                    sectionElement.appendChild(sectionTitle);
-                }
-                
-                if (section.description) {
-                    const sectionDesc = document.createElement('p');
-                    sectionDesc.className = 'text-muted';
-                    sectionDesc.textContent = section.description;
-                    sectionElement.appendChild(sectionDesc);
-                }
-                
-                // Render questions in this section
-                section.questions.forEach(question => {
-                    const questionCard = document.createElement('div');
-                    questionCard.className = 'question-card';
-                    
-                    const questionLabel = document.createElement('label');
-                    questionLabel.className = 'form-label mb-3';
-                    if (question.required) {
-                        questionLabel.classList.add('required-label');
-                    }
-                    questionLabel.textContent = question.question;
-                    questionCard.appendChild(questionLabel);
-                    
-                    // Render appropriate input based on question type
-                    switch (question.type) {
-                        case 'short':
-                            questionCard.appendChild(createShortAnswerInput(question));
-                            break;
-                        case 'paragraph':
-                            questionCard.appendChild(createParagraphInput(question));
-                            break;
-                        case 'multiple':
-                            questionCard.appendChild(createMultipleChoiceInput(question));
-                            break;
-                        case 'checkbox':
-                            questionCard.appendChild(createCheckboxInput(question));
-                            break;
-                        case 'dropdown':
-                            questionCard.appendChild(createDropdownInput(question));
-                            break;
-                        case 'grid':
-                            questionCard.appendChild(createGridInput(question));
-                            break;
-                        case 'date':
-                            questionCard.appendChild(createDateInput(question));
-                            break;
-                        default:
-                            questionCard.appendChild(document.createTextNode('Unsupported question type'));
-                    }
-                    
-                    sectionElement.appendChild(questionCard);
-                });
-                
-                sectionsContainer.appendChild(sectionElement);
-            });
+            const section = sections[sectionIndex];
+            const sectionElement = document.createElement('div');
+            sectionElement.className = 'form-section';
+            sectionElement.dataset.sectionIndex = sectionIndex;
             
-            // Enable submit button
-            document.getElementById('submit-btn').disabled = false;
-            document.getElementById('submit-btn').addEventListener('click', () => {
-                submitForm(formData.form_id);
+            if (section.title) {
+                const sectionTitle = document.createElement('h2');
+                sectionTitle.textContent = section.title;
+                sectionElement.appendChild(sectionTitle);
+            }
+            
+            if (section.description) {
+                const sectionDesc = document.createElement('p');
+                sectionDesc.className = 'text-muted';
+                sectionDesc.textContent = section.description;
+                sectionElement.appendChild(sectionDesc);
+            }
+            
+            // Render questions in this section
+            section.questions.forEach(question => {
+                const questionCard = document.createElement('div');
+                questionCard.className = 'question-card';
+                
+                const questionLabel = document.createElement('label');
+                questionLabel.className = 'form-label mb-3';
+                if (question.required) {
+                    questionLabel.classList.add('required-label');
+                }
+                questionLabel.textContent = question.question;
+                questionCard.appendChild(questionLabel);
+                
+                // Render appropriate input based on question type
+                const inputElement = createInputElement(question);
+                questionCard.appendChild(inputElement);
+                
+                // Load saved response if exists
+                loadSavedResponse(question.id, inputElement);
+                
+                sectionElement.appendChild(questionCard);
             });
+
+            
+            
+            sectionsContainer.appendChild(sectionElement);
+            
+            // Update navigation buttons
+            updateNavigationButtons();
+            
+        }
+
+        function createInputElement(question) {
+            switch (question.type) {
+                case 'short':
+                    return createShortAnswerInput(question);
+                case 'paragraph':
+                    return createParagraphInput(question);
+                case 'multiple':
+                    return createMultipleChoiceInput(question);
+                case 'checkbox':
+                    return createCheckboxInput(question);
+                case 'dropdown':
+                    return createDropdownInput(question);
+                case 'grid':
+                    return createGridInput(question);
+                case 'date':
+                    return createDateInput(question);
+                default:
+                    return document.createTextNode('Unsupported question type');
+            }
         }
 
         function createShortAnswerInput(question) {
@@ -218,14 +281,14 @@
                 const input = document.createElement('input');
                 input.className = 'form-check-input';
                 input.type = 'checkbox';
-                input.name = `question_${question.id}`;
+                input.name = `question_${question.id}_${option.id}`;
                 input.value = option.id;
                 input.dataset.questionId = question.id;
                 input.dataset.questionType = question.type;
                 
                 const label = document.createElement('label');
                 label.className = 'form-check-label';
-                label.htmlFor = `option_${option.id}`;
+                label.htmlFor = `question_${question.id}_${option.id}`;
                 label.textContent = option.text;
                 
                 div.appendChild(input);
@@ -331,86 +394,223 @@
             return input;
         }
 
-        async function submitForm(formId) {
-            // Validate required fields first
-            if (!validateRequiredFields()) {
+        function loadSavedResponse(questionId, inputElement) {
+            if (formResponses[questionId]) {
+                const response = formResponses[questionId];
+                
+                if (response.type === 'checkbox') {
+                    // For checkboxes, check all saved options
+                    response.value.forEach(value => {
+                        const checkbox = inputElement.querySelector(`input[type="checkbox"][value="${value}"]`);
+                        if (checkbox) checkbox.checked = true;
+                    });
+                } else if (response.type === 'multiple' || response.type === 'dropdown') {
+                    // For radio buttons and dropdowns
+                    const input = inputElement.querySelector(`input[type="radio"][value="${response.value}"]`) || inputElement;
+                    if (input.tagName === 'SELECT') {
+                        input.value = response.value;
+                    } else if (input) {
+                        input.checked = true;
+                    }
+                } else {
+                    // For text inputs, textareas, date inputs
+                    inputElement.value = response.value;
+                }
+            }
+        }
+
+        function saveCurrentSectionResponses() {
+            const currentSection = sections[currentSectionIndex];
+            const sectionElement = document.querySelector(`.form-section[data-section-index="${currentSectionIndex}"]`);
+            
+            currentSection.questions.forEach(question => {
+                const questionId = question.id;
+                const questionType = question.type;
+                let value = null;
+                
+                if (questionType === 'checkbox') {
+                    // Get all checked checkboxes for this question
+                    const checkboxes = sectionElement.querySelectorAll(
+                        `input[type="checkbox"][name^="question_${question.id}_"]:checked`
+                    );
+                    value = Array.from(checkboxes).map(cb => cb.value);
+                } else if (questionType === 'multiple') {
+                    // Get selected radio button
+                    const radio = sectionElement.querySelector(
+                        `input[type="radio"][name="question_${question.id}"]:checked`
+                    );
+                    value = radio ? radio.value : null;
+                } else if (questionType === 'dropdown') {
+                    // Get selected dropdown value
+                    const select = sectionElement.querySelector(
+                        `select[data-question-id="${question.id}"]`
+                    );
+                    value = select ? select.value : null;
+                } else if (questionType === 'grid') {
+                    // Get all selected grid options
+                    const selectedRadios = sectionElement.querySelectorAll(
+                        `input[type="radio"][name^="question_${question.id}_row_"]:checked`
+                    );
+                    value = Array.from(selectedRadios).map(radio => ({
+                        rowId: radio.dataset.rowId,
+                        choiceId: radio.value
+                    }));
+                } else {
+                    // For text inputs, textareas, date inputs
+                    const input = sectionElement.querySelector(
+                        `[data-question-id="${question.id}"]`
+                    );
+                    value = input ? input.value : null;
+                }
+                
+                if (value !== null) {
+                    formResponses[questionId] = {
+                        type: questionType,
+                        value: value
+                    };
+                }
+            });
+        }
+
+        function showNextSection() {
+            // Validate current section before proceeding
+            if (!validateCurrentSection()) {
                 alert('Please complete all required fields');
                 return;
             }
             
-            // Collect all responses
-            const responses = collectResponses();
+            // Save responses before moving
+            saveCurrentSectionResponses();
             
-            try {
-                const response = await fetch('http://localhost/cgcc-system/backend/forms/submit_response.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        form_id: formId,
-                        responses: responses
-                    })
+            // Move to next section
+            currentSectionIndex++;
+            renderSection(currentSectionIndex);
+            updateProgress();
+        }
+
+        function showPreviousSection() {
+            // Save responses before moving (don't validate)
+            saveCurrentSectionResponses();
+            
+            // Move to previous section
+            currentSectionIndex--;
+            renderSection(currentSectionIndex);
+            updateProgress();
+        }
+
+        function clearCurrentSection() {
+            if (confirm('Are you sure you want to clear all responses in this section?')) {
+                const currentSection = sections[currentSectionIndex];
+                const sectionElement = document.querySelector(`.form-section[data-section-index="${currentSectionIndex}"]`);
+                
+                currentSection.questions.forEach(question => {
+                    const questionId = question.id;
+                    delete formResponses[questionId];
+                    
+                    if (question.type === 'checkbox') {
+                        // Uncheck all checkboxes
+                        sectionElement.querySelectorAll(
+                            `input[type="checkbox"][name^="question_${question.id}_"]`
+                        ).forEach(checkbox => {
+                            checkbox.checked = false;
+                        });
+                    } else if (question.type === 'multiple') {
+                        // Uncheck all radio buttons
+                        sectionElement.querySelectorAll(
+                            `input[type="radio"][name="question_${question.id}"]`
+                        ).forEach(radio => {
+                            radio.checked = false;
+                        });
+                    } else if (question.type === 'dropdown') {
+                        // Reset dropdown
+                        const select = sectionElement.querySelector(
+                            `select[data-question-id="${question.id}"]`
+                        );
+                        if (select) select.selectedIndex = 0;
+                    } else if (question.type === 'grid') {
+                        // Uncheck all grid radios
+                        sectionElement.querySelectorAll(
+                            `input[type="radio"][name^="question_${question.id}_row_"]`
+                        ).forEach(radio => {
+                            radio.checked = false;
+                        });
+                    } else {
+                        // Clear text inputs, textareas, date inputs
+                        const input = sectionElement.querySelector(
+                            `[data-question-id="${question.id}"]`
+                        );
+                        if (input) input.value = '';
+                    }
                 });
-                
-                if (!response.ok) {
-                    throw new Error('Failed to submit form');
-                }
-                
-                const result = await response.json();
-                alert('Form submitted successfully!');
-                // Optionally redirect or show success message
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Failed to submit form. Please try again.');
             }
         }
 
-        function validateRequiredFields() {
+        function validateCurrentSection() {
+            const currentSection = sections[currentSectionIndex];
+            const sectionElement = document.querySelector(`.form-section[data-section-index="${currentSectionIndex}"]`);
             let isValid = true;
             
-            document.querySelectorAll('[data-question-id]').forEach(element => {
-                const questionId = element.dataset.questionId;
-                const questionType = element.dataset.questionType;
-                const isRequired = element.required || element.dataset.required === 'true';
+            currentSection.questions.forEach(question => {
+                if (!question.required) return;
                 
-                if (!isRequired) return;
+                const questionId = question.id;
+                const questionType = question.type;
                 
-                if (questionType === 'grid') {
-                    // For grid questions, check at least one radio is selected per row
-                    const rowId = element.dataset.rowId;
-                    const radioGroup = document.querySelectorAll(
-                        `input[type="radio"][name="question_${questionId}_row_${rowId}"]`
-                    );
-                    
-                    const isChecked = Array.from(radioGroup).some(radio => radio.checked);
-                    if (!isChecked) {
-                        isValid = false;
-                        // Highlight the row
-                        const row = element.closest('tr');
-                        row.style.backgroundColor = 'rgba(255, 0, 0, 0.1)';
-                    }
-                } else if (questionType === 'checkbox') {
-                    // For checkboxes, at least one needs to be checked
-                    const checkboxes = document.querySelectorAll(
-                        `input[type="checkbox"][data-question-id="${questionId}"]`
+                if (questionType === 'checkbox') {
+                    // At least one checkbox should be checked
+                    const checkboxes = sectionElement.querySelectorAll(
+                        `input[type="checkbox"][name^="question_${questionId}_"]`
                     );
                     const isChecked = Array.from(checkboxes).some(cb => cb.checked);
                     if (!isChecked) {
                         isValid = false;
-                        highlightRequired(element);
+                        highlightRequired(checkboxes[0]);
                     }
-                } else if (questionType === 'multiple' || questionType === 'dropdown') {
-                    // For radio groups and dropdowns
-                    if (!element.checked && !element.value) {
+                } else if (questionType === 'multiple') {
+                    // A radio button should be selected
+                    const radio = sectionElement.querySelector(
+                        `input[type="radio"][name="question_${questionId}"]:checked`
+                    );
+                    if (!radio) {
                         isValid = false;
-                        highlightRequired(element);
+                        const radios = sectionElement.querySelectorAll(
+                            `input[type="radio"][name="question_${questionId}"]`
+                        );
+                        highlightRequired(radios[0]);
                     }
+                } else if (questionType === 'dropdown') {
+                    // A dropdown option should be selected (not the default)
+                    const select = sectionElement.querySelector(
+                        `select[data-question-id="${questionId}"]`
+                    );
+                    if (!select || !select.value) {
+                        isValid = false;
+                        highlightRequired(select);
+                    }
+                } else if (questionType === 'grid') {
+                    // Each row should have a selected radio
+                    question.rows.forEach(row => {
+                        const radioGroup = sectionElement.querySelectorAll(
+                            `input[type="radio"][name="question_${questionId}_row_${row.id}"]`
+                        );
+                        const isChecked = Array.from(radioGroup).some(radio => radio.checked);
+                        if (!isChecked) {
+                            isValid = false;
+                            const rowElement = radioGroup[0].closest('tr');
+                            rowElement.style.backgroundColor = 'rgba(255, 0, 0, 0.1)';
+                            setTimeout(() => {
+                                rowElement.style.backgroundColor = '';
+                            }, 2000);
+                        }
+                    });
                 } else {
-                    // For text inputs, textareas, etc.
-                    if (!element.value.trim()) {
+                    // Text inputs, textareas, date inputs should not be empty
+                    const input = sectionElement.querySelector(
+                        `[data-question-id="${questionId}"]`
+                    );
+                    if (!input || !input.value.trim()) {
                         isValid = false;
-                        highlightRequired(element);
+                        highlightRequired(input);
                     }
                 }
             });
@@ -419,73 +619,137 @@
         }
 
         function highlightRequired(element) {
+            if (!element) return;
+            
             element.style.borderColor = 'red';
             setTimeout(() => {
                 element.style.borderColor = '';
             }, 2000);
+            
+            // Scroll to the first invalid element
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
-        function collectResponses() {
-            const responses = [];
+        function updateNavigationButtons() {
+            const prevBtn = document.getElementById('prev-section-btn');
+            const nextBtn = document.getElementById('next-section-btn');
+
+            // Previous button (hide if on first section)
+            if (currentSectionIndex === 0) {
+                prevBtn.classList.add('hidden');
+            } else {
+                prevBtn.classList.remove('hidden');
+            }
+
+            // Change Next button to "Submit" if on last section
+            if (currentSectionIndex === sections.length - 1) {
+                nextBtn.textContent = 'Submit';
+                nextBtn.onclick = submitForm; // Set to your submission function
+            } else {
+                nextBtn.textContent = currentSectionIndex === sections.length - 2 ? 'Last Section' : 'Next Section';
+                nextBtn.onclick = showNextSection; // Set back to navigation
+            }
+        }
+
+
+        function updateProgress() {
+            const progressContainer = document.querySelector('.progress-container');
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+
+            // Hide progress container if only one section
+            if (sections.length <= 1) {
+                progressContainer.style.display = 'none';
+                return;
+            } else {
+                progressContainer.style.display = 'block';
+            }
+
+            const pageLabel = (sections.length === 1) ? "page" : "pages";
+            const progress = ((currentSectionIndex + 1) / sections.length) * 100;
+            progressBar.style.width = `${progress}%`;
+            progressText.textContent = `${currentSectionIndex + 1}/${sections.length} ${pageLabel}`;
+        }
+
+        async function submitForm() {
+            // Validate the last section
+            if (!validateCurrentSection()) {
+                alert('Please complete all required fields');
+                return;
+            }
             
-            // Handle regular questions (non-grid)
-            document.querySelectorAll('[data-question-id]:not([data-row-id])').forEach(element => {
-                const questionId = element.dataset.questionId;
-                const questionType = element.dataset.questionType;
-                
-                if (questionType === 'checkbox') {
-                    // Checkboxes can have multiple selections
-                    const checkedBoxes = document.querySelectorAll(
-                        `input[type="checkbox"][data-question-id="${questionId}"]:checked`
-                    );
-                    
-                    if (checkedBoxes.length > 0) {
-                        Array.from(checkedBoxes).forEach(checkbox => {
-                            responses.push({
-                                question_id: questionId,
-                                type: questionType,
-                                choice_id: checkbox.value,
-                                text_answer: null
-                            });
-                        });
-                    }
-                } else if (questionType === 'multiple' || questionType === 'dropdown') {
-                    // Radio buttons and dropdowns
-                    if (element.checked || (element.tagName === 'SELECT' && element.value)) {
-                        responses.push({
+            // Save responses from the last section
+            saveCurrentSectionResponses();
+            
+            // Prepare the data for submission
+            const submissionData = {
+                form_id: formData.form_id,
+                responses: []
+            };
+            
+            // Format responses according to your backend requirements
+            for (const [questionId, response] of Object.entries(formResponses)) {
+                if (response.type === 'grid') {
+                    // Handle grid responses (array of row selections)
+                    response.value.forEach(gridResponse => {
+                        submissionData.responses.push({
                             question_id: questionId,
-                            type: questionType,
-                            choice_id: element.value,
+                            type: response.type,
+                            row_id: gridResponse.rowId,
+                            choice_id: gridResponse.choiceId,
                             text_answer: null
                         });
-                    }
-                } else {
-                    // Text inputs, textareas, date inputs
-                    if (element.value.trim()) {
-                        responses.push({
+                    });
+                } else if (response.type === 'checkbox') {
+                    // Handle checkbox responses (array of selected options)
+                    response.value.forEach(choiceId => {
+                        submissionData.responses.push({
                             question_id: questionId,
-                            type: questionType,
-                            choice_id: null,
-                            text_answer: element.value.trim()
+                            type: response.type,
+                            choice_id: choiceId,
+                            text_answer: null
                         });
-                    }
-                }
-            });
-            
-            // Handle grid questions
-            document.querySelectorAll('[data-question-type="grid"][data-row-id]').forEach(element => {
-                if (element.checked) {
-                    responses.push({
-                        question_id: element.dataset.questionId,
-                        type: 'grid',
-                        row_id: element.dataset.rowId,
-                        choice_id: element.value,
+                    });
+                } else if (response.type === 'multiple' || response.type === 'dropdown') {
+                    // Handle single choice responses
+                    submissionData.responses.push({
+                        question_id: questionId,
+                        type: response.type,
+                        choice_id: response.value,
                         text_answer: null
                     });
+                } else {
+                    // Handle text responses
+                    submissionData.responses.push({
+                        question_id: questionId,
+                        type: response.type,
+                        choice_id: null,
+                        text_answer: response.value
+                    });
                 }
-            });
+            }
             
-            return responses;
+            try {
+                const response = await fetch('http://localhost/cgcc-system/backend/forms/submit_response.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(submissionData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to submit form');
+                }
+                
+                const result = await response.json();
+                alert('Form submitted successfully!');
+                // Redirect or show success message
+                window.location.href = 'submission-success.html';
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to submit form. Please try again.');
+            }
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
