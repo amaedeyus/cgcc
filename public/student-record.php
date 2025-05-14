@@ -50,7 +50,7 @@
         </tr>
 
         <?php
-        $sql = "SELECT * FROM student ORDER BY student_id";
+        $sql = "SELECT * FROM student ORDER BY last_name";
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
