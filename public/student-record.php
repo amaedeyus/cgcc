@@ -50,17 +50,17 @@
         </tr>
 
         <?php
-        $sql = "SELECT * FROM student ORDER BY last_name";
+        $sql = "SELECT * FROM students ORDER BY last_name";
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
                 echo "<tr>";
-                echo "<td>" . $row['student_id'] . "</td>";
+                echo "<td>" . $row['student_index'] . "</td>";
                 echo "<td>" . $row['last_name'] . "</td>"; 
                 echo "<td>" . $row['first_name'] . "</td>";
                 echo "<td>" . $row['year_level'] . "</td>";
-                echo "<td><a href='view_student.php?id=" . $row['student_id'] . "'>View</a></td>";
+                echo "<td><a href='view_student.php?id=" . $row['student_index'] . "'>View</a></td>";
                 echo "</tr>";
             }
         } else {

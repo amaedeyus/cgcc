@@ -6,57 +6,119 @@
     <title>Form Submission</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        .form-section {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 30px;
-            border: 1px solid #dee2e6;
-        }
-        .question-card {
-            background-color: white;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            border: 1px solid #dee2e6;
-        }
-        .required-label::after {
-            content: " *";
-            color: red;
-        }
-        .grid-table {
-            width: 100%;
-        }
-        .grid-table th {
-            text-align: center;
-            background-color: #f1f1f1;
-        }
-        .grid-table td {
-            padding: 10px;
-        }
-        .section-navigation {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-        .hidden {
-            display: none !important;
-        }
-        .progress-container {
-            margin-bottom: 20px;
-            display: none;
-        }
-        .progress-bar {
-            transition: width 0.3s ease;
-        }
-        #progress-text {
-            margin-top: 5px;
-            display: block;
-            text-align: right;
-            font-size: 14px;
-            color: #6c757d;
-        }
-    </style>
+    body {
+        background-color: #f8f9fa;
+        color: #212529;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .form-section {
+        background-color: #ffffff;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 30px;
+        border: 1px solid #ced4da;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    .question-card {
+        background-color: #D1E7DD; /* light green */
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 1px solid #A3CFBB; /* medium green border */
+        color: #0F5132; /* dark green text */
+    }
+
+    .required-label::after {
+        content: " *";
+        color: #dc3545;
+    }
+
+    .grid-table {
+        width: 100%;
+        border-collapse: collapse;
+        color: #212529;
+    }
+
+    .grid-table th {
+        text-align: center;
+        background-color: #A3CFBB;
+        color: #0F5132;
+        padding: 12px;
+        border: 1px solid #D1E7DD;
+    }
+
+    .grid-table td {
+        padding: 10px;
+        border: 1px solid #dee2e6;
+    }
+
+    .section-navigation {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+
+    .hidden {
+        display: none !important;
+    }
+
+    .progress-container {
+        margin-bottom: 20px;
+    }
+
+    .progress {
+        background-color: #E9ECEF;
+        height: 10px;
+        border-radius: 5px;
+    }
+
+    .progress-bar {
+        background-color: #198754; /* Bootstrap green */
+        height: 10px;
+        transition: width 0.3s ease;
+    }
+
+    #progress-text {
+        margin-top: 5px;
+        display: block;
+        text-align: right;
+        font-size: 14px;
+        color: #6c757d;
+    }
+
+    .btn-outline-primary {
+        border-color: #0F5132;
+        color: #0F5132;
+    }
+
+    .btn-outline-primary:hover {
+        background-color: #0F5132;
+        color: #ffffff;
+    }
+
+    .btn-outline-danger {
+        border-color: #dc3545;
+        color: #dc3545;
+    }
+
+    .btn-outline-danger:hover {
+        background-color: #dc3545;
+        color: #ffffff;
+    }
+
+    .btn-primary {
+        background-color: #0F5132;
+        border-color: #0F5132;
+    }
+
+    .btn-primary:hover {
+        background-color: #0c3e26;
+        border-color: #0c3e26;
+    }
+</style>
+
 </head>
 <body>
     <div class="container py-5">
