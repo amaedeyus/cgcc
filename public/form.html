@@ -119,7 +119,7 @@
 
         async function fetchFormData(formId) {
             try {
-                const response = await fetch(`http://localhost/cgcc-system/backend/forms/getformforsubmission.php?id=${formId}`);
+                const response = await fetch(`http://localhost/cgcc/backend/forms/getformforsubmission.php?id=${formId}`);
                 
                 if (!response.ok) {
                     throw new Error('Failed to fetch form data');
