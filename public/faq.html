@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="cgcc2.png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/form.css">
+    <base href="Media/">
+    <title>CGCC - Frequently Asked Questions</title>
+    <style>
+        .faq-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .faq-section {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        .section-title {
+            color: #2c3e50;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .faq-item {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+        .faq-question {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .faq-question:after {
+            content: '+';
+            font-size: 1.5em;
+            color: #4CAF50;
+        }
+        .faq-question.active:after {
+            content: '-';
+        }
+        .faq-answer {
+            display: none;
+            padding: 10px 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .emergency-box {
+            background-color: #fff8f8;
+            border: 2px solid #ff6b6b;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        .emergency-title {
+            color: #d63031;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .search-box {
+            margin: 20px 0;
+            position: relative;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            font-family: 'Poppins', sans-serif;
+            padding-right: 40px;
+        }
+        .search-box:after {
+            content: '🔍';
+            position: absolute;
+            right: 20px;
+            top: 12px;
+        }
+        .appointment-link {
+            color: #4CAF50;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .appointment-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <img src="cgcc.png" alt="cgcc-logo" class="logo-img">
+            College Guidance and Counseling Center
+        </div>
+        <nav class="navigation">
+            <a href="../main.html">Home</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../about-mental-health.html">About Mental Health</a>
+            <a href="../faq.html" class="active">FAQ</a>
+        </nav>
+    </header>
+
+    <div class="faq-container">
+        <h1 class="form-title">Frequently Asked Questions</h1>
+      
+
+        <div class="search-box">
+            <input type="text" placeholder="Search FAQs...">
+        </div>
+
+        <div class="faq-section">
+            <h2 class="section-title">General Questions</h2>
+            
+            <div class="faq-item">
+                <div class="faq-question">Where is the Guidance Center located?</div>
+                <div class="faq-answer">
+                    <p>We are located at the Mabini Building, 3rd Floor, College Guidance and Counselling Center, De La Salle Lipa.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">What are your office hours?</div>
+                <div class="faq-answer">
+                    <p>Our office hours are:</p>
+                    <ul>
+                        <li>Monday to Friday: 8:00 AM - 1:30 PM</li>
+                        <li>Closed on weekends and holidays</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-section">
+            <h2 class="section-title">Counseling Services</h2>
+            
+            <div class="faq-item">
+                <div class="faq-question">How do I schedule a counseling session?</div>
+                <div class="faq-answer">
+                    <p>You can schedule a session by:</p>
+                    <ol>
+                        <li>Visiting our office at Mabini Building, 3rd Floor</li>
+                        <li>Setting an appointment online at <a href="https://dlsl.instructure.com/courses/27929/pages/counseling?fbclid=IwY2xjawKU65tleHRuA2FlbQIxMQABHnDHqTQ9XD6UYF7PkFE92s2Eh6pCHu28BqkVgJJ48g_0vDbMKGc4pGlCVoMf_aem_GkYnELLmAq-cdIujJCV3HA" class="appointment-link" target="_blank">DLSL Counseling Portal</a></li>
+                        <li>Emailing collegeguidance.office@dlsl.edu.ph</li>
+                    </ol>
+                    <p>Walk-in consultations are also accommodated based on counselor availability.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">Is counseling confidential?</div>
+                <div class="faq-answer">
+                    <p>Yes, all counseling sessions are confidential. Information shared during sessions will not be disclosed to anyone without your written consent, except in situations where there is risk of harm to yourself or others, or when required by law.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">Is there a limit to counseling sessions?</div>
+                <div class="faq-answer">
+                    <p>No, there is no limit to the number of counseling sessions. Students may schedule sessions as needed throughout their time at the university.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-section">
+            <h2 class="section-title">Mental Health Resources</h2>
+            
+            <div class="faq-item">
+                <div class="faq-question">What should I do if I'm worried about a friend?</div>
+                <div class="faq-answer">
+                    <p>If you're concerned about a friend:</p>
+                    <ol>
+                        <li>Express your concern in a caring, non-judgmental way</li>
+                        <li>Listen without trying to "fix" their problems</li>
+                        <li>Encourage them to seek professional help</li>
+                        <li>Offer to accompany them to the Guidance Center</li>
+                        <li>If it's an emergency, contact campus security or the Guidance Office immediately</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">Are there online mental health resources available?</div>
+                <div class="faq-answer">
+                    <p>Yes, we recommend these online resources:</p>
+                    <ul>
+                        <li><strong>Philippine Mental Health Association:</strong> <a href="https://www.pmha.org.ph" target="_blank">www.pmha.org.ph</a></li>
+                        <li><strong>National Center for Mental Health:</strong> Crisis Hotline 0917-899-8727 (USAP)</li>
+                        <li><strong>MindNation:</strong> <a href="https://mindnation.com" target="_blank">mindnation.com</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // FAQ toggle functionality
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                question.classList.toggle('active');
+                const answer = question.nextElementSibling;
+                if (question.classList.contains('active')) {
+                    answer.style.display = 'block';
+                } else {
+                    answer.style.display = 'none';
+                }
+            });
+        });
+
+        // Simple search functionality
+        document.querySelector('.search-box input').addEventListener('keyup', function() {
+            const searchTerm = this.value.toLowerCase();
+            document.querySelectorAll('.faq-item').forEach(item => {
+                const question = item.querySelector('.faq-question').textContent.toLowerCase();
+                const answer = item.querySelector('.faq-answer').textContent.toLowerCase();
+                if (question.includes(searchTerm) || answer.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    </script>
+    
+</body>
+</html>
