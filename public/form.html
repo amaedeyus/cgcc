@@ -6,119 +6,178 @@
     <title>Form Submission</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-    body {
-        background-color: #f8f9fa;
-        color: #212529;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
+        body {
+            background-color: #f8f9fa;
+            color: #212529;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-    .form-section {
-        background-color: #ffffff;
-        border-radius: 12px;
-        padding: 24px;
-        margin-bottom: 30px;
-        border: 1px solid #ced4da;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    }
+        #form-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
 
-    .question-card {
-        background-color: #D1E7DD; /* light green */
-        border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 20px;
-        border: 1px solid #A3CFBB; /* medium green border */
-        color: #0F5132; /* dark green text */
-    }
+        .form-section {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
 
-    .required-label::after {
-        content: " *";
-        color: #dc3545;
-    }
+        /* Question text - not bold */
+        .question-card .form-label {
+            font-size: 1.2rem;
+            font-weight: normal; /* Removed bold */
+            margin-bottom: 15px;
+            display: block;
+        }
 
-    .grid-table {
-        width: 100%;
-        border-collapse: collapse;
-        color: #212529;
-    }
+        /* Choice labels with reduced spacing */
+        .form-check {
+            padding: 5px 0; /* Reduced from 8px */
+            padding-left: 2em;
+            margin-bottom: 8px; /* Reduced spacing between choices */
+        }
 
-    .grid-table th {
-        text-align: center;
-        background-color: #A3CFBB;
-        color: #0F5132;
-        padding: 12px;
-        border: 1px solid #D1E7DD;
-    }
+        /* Updated green color scheme */
+        .question-card {
+            background-color: #E8F5E9;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid #C8E6C9;
+            color: #2E7D32;
+        }
 
-    .grid-table td {
-        padding: 10px;
-        border: 1px solid #dee2e6;
-    }
+        /* Checkboxes and radio buttons */
+        .form-check-input {
+            width: 1.3em;
+            height: 1.3em;
+            margin-top: 0.15em;
+            margin-left: -1.8em;
+        }
 
-    .section-navigation {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 20px;
-    }
+        /* Choice text styling */
+        .form-check-label {
+            font-size: 1rem;
+            padding-left: 0.5em;
+            vertical-align: middle;
+            cursor: pointer;
+            display: inline-block;
+            width: calc(100% - 2em);
+        }
 
-    .hidden {
-        display: none !important;
-    }
+        /* Rest of your existing styles... */
+        .required-label::after {
+            content: " *";
+            color: #d32f2f;
+        }
 
-    .progress-container {
-        margin-bottom: 20px;
-    }
+        .grid-table th {
+            text-align: center;
+            background-color: #C8E6C9;
+            color: #1B5E20;
+            padding: 12px;
+            border: 1px solid #E8F5E9;
+        }
 
-    .progress {
-        background-color: #E9ECEF;
-        height: 10px;
-        border-radius: 5px;
-    }
+        .grid-table td {
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            background-color: #ffffff;
+        }
 
-    .progress-bar {
-        background-color: #198754; /* Bootstrap green */
-        height: 10px;
-        transition: width 0.3s ease;
-    }
+        .btn-outline-primary {
+            border-color: #4CAF50;
+            color: #4CAF50;
+            padding: 7px 18px;
+        }
 
-    #progress-text {
-        margin-top: 5px;
-        display: block;
-        text-align: right;
-        font-size: 14px;
-        color: #6c757d;
-    }
+        .btn-outline-primary:hover {
+            background-color: #4CAF50;
+            color: #ffffff;
+        }
 
-    .btn-outline-primary {
-        border-color: #0F5132;
-        color: #0F5132;
-    }
+        .btn-outline-danger {
+            border-color: #d32f2f;
+            color: #d32f2f;
+            padding: 7px 18px;
+        }
 
-    .btn-outline-primary:hover {
-        background-color: #0F5132;
-        color: #ffffff;
-    }
+        .btn-outline-danger:hover {
+            background-color: #d32f2f;
+            color: #ffffff;
+        }
 
-    .btn-outline-danger {
-        border-color: #dc3545;
-        color: #dc3545;
-    }
+        .btn-primary {
+            background-color: #4CAF50;
+            border-color: #4CAF50;
+            padding: 7px 18px;
+        }
 
-    .btn-outline-danger:hover {
-        background-color: #dc3545;
-        color: #ffffff;
-    }
+        .btn-primary:hover {
+            background-color: #3d8b40;
+            border-color: #3d8b40;
+        }
 
-    .btn-primary {
-        background-color: #0F5132;
-        border-color: #0F5132;
-    }
+        .progress-bar {
+            background-color: #4CAF50;
+        }
 
-    .btn-primary:hover {
-        background-color: #0c3e26;
-        border-color: #0c3e26;
-    }
-</style>
+        /* Add this to your existing styles */
+        .form-check-label:hover,
+        .grid-table label:hover {
+            background-color: rgba(0,0,0,0.03);
+        }
 
+        .grid-table label {
+            display: block;
+            width: 100%;
+            height: 100%;
+            margin: -12px;
+            padding: 12px;
+        }
+
+        .form-check-input:checked {
+            background-color: #4CAF50;
+            border-color: #4CAF50;
+        }
+
+        .form-control:focus, .form-select:focus, textarea.form-control:focus {
+            border-color: #81C784;
+            box-shadow: 0 0 0 0.25rem rgba(76, 175, 80, 0.25);
+        }
+
+        .section-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .progress-container {
+            margin-bottom: 20px;
+        }
+
+        .progress {
+            background-color: #E9ECEF;
+            height: 10px;
+            border-radius: 5px;
+        }
+
+        #progress-text {
+            margin-top: 6px;
+            display: block;
+            text-align: right;
+            font-size: 14px;
+            color: #6c757d;
+        }
+    </style>
 </head>
 <body>
     <div class="container py-5">
@@ -181,7 +240,7 @@
 
         async function fetchFormData(formId) {
             try {
-                const response = await fetch(`http://localhost/cgcc/backend/forms/getformforsubmission.php?id=${formId}`);
+                const response = await fetch(`http://localhost/cgcc-system/backend/forms/getformforsubmission.php?id=${formId}`);
                 
                 if (!response.ok) {
                     throw new Error('Failed to fetch form data');
@@ -303,7 +362,6 @@
             textarea.required = question.required;
             return textarea;
         }
-
         function createMultipleChoiceInput(question) {
             const container = document.createElement('div');
             
@@ -311,10 +369,13 @@
                 const div = document.createElement('div');
                 div.className = 'form-check';
                 
+                const inputId = `question_${question.id}_option_${option.id}`;
+                
                 const input = document.createElement('input');
                 input.className = 'form-check-input';
                 input.type = 'radio';
                 input.name = `question_${question.id}`;
+                input.id = inputId;
                 input.value = option.id;
                 input.dataset.questionId = question.id;
                 input.dataset.questionType = question.type;
@@ -322,8 +383,9 @@
                 
                 const label = document.createElement('label');
                 label.className = 'form-check-label';
-                label.htmlFor = `option_${option.id}`;
+                label.htmlFor = inputId;
                 label.textContent = option.text;
+                label.style.cursor = 'pointer'; // Make cursor pointer to indicate clickable
                 
                 div.appendChild(input);
                 div.appendChild(label);
@@ -340,18 +402,22 @@
                 const div = document.createElement('div');
                 div.className = 'form-check';
                 
+                const inputId = `question_${question.id}_option_${option.id}`;
+                
                 const input = document.createElement('input');
                 input.className = 'form-check-input';
                 input.type = 'checkbox';
                 input.name = `question_${question.id}_${option.id}`;
+                input.id = inputId;
                 input.value = option.id;
                 input.dataset.questionId = question.id;
                 input.dataset.questionType = question.type;
                 
                 const label = document.createElement('label');
                 label.className = 'form-check-label';
-                label.htmlFor = `question_${question.id}_${option.id}`;
+                label.htmlFor = inputId;
                 label.textContent = option.text;
+                label.style.cursor = 'pointer'; // Make cursor pointer to indicate clickable
                 
                 div.appendChild(input);
                 div.appendChild(label);
@@ -696,20 +762,14 @@
             const prevBtn = document.getElementById('prev-section-btn');
             const nextBtn = document.getElementById('next-section-btn');
 
-            // Previous button (hide if on first section)
-            if (currentSectionIndex === 0) {
-                prevBtn.classList.add('hidden');
-            } else {
-                prevBtn.classList.remove('hidden');
-            }
-
-            // Change Next button to "Submit" if on last section
+            // Previous button - disabled on first section, enabled otherwise
+            prevBtn.disabled = (currentSectionIndex === 0);
+            
+            // Next button - changes to "Submit" on last section
             if (currentSectionIndex === sections.length - 1) {
                 nextBtn.textContent = 'Submit';
-                nextBtn.onclick = submitForm; // Set to your submission function
             } else {
-                nextBtn.textContent = currentSectionIndex === sections.length - 2 ? 'Last Section' : 'Next Section';
-                nextBtn.onclick = showNextSection; // Set back to navigation
+                nextBtn.textContent = 'Next Section';
             }
         }
 

@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Submission</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            color: #212529;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        #form-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .form-section {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        .question-card .form-label {
+            font-size: 1.2rem;
+            font-weight: normal;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .form-check {
+            padding: 5px 0;
+            padding-left: 2em;
+            margin-bottom: 8px;
+        }
+
+        .question-card {
+            background-color: #E8F5E9;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid #C8E6C9;
+            color: #2E7D32;
+        }
+
+        .form-check-input {
+            width: 1.3em;
+            height: 1.3em;
+            margin-top: 0.15em;
+            margin-left: -1.8em;
+        }
+
+        .form-check-label {
+            font-size: 1rem;
+            padding-left: 0.5em;
+            vertical-align: middle;
+            cursor: pointer;
+            display: inline-block;
+            width: calc(100% - 2em);
+        }
+
+        .required-label::after {
+            content: " *";
+            color: #d32f2f;
+        }
+
+        .grid-table th {
+            text-align: center;
+            background-color: #C8E6C9;
+            color: #1B5E20;
+            padding: 12px;
+            border: 1px solid #E8F5E9;
+        }
+
+        .grid-table td {
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            background-color: #ffffff;
+        }
+
+        .btn-outline-primary {
+            border-color: #4CAF50;
+            color: #4CAF50;
+            padding: 7px 18px;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: #4CAF50;
+            color: #ffffff;
+        }
+
+        .btn-outline-danger {
+            border-color: #d32f2f;
+            color: #d32f2f;
+            padding: 7px 18px;
+        }
+
+        .btn-outline-danger:hover {
+            background-color: #d32f2f;
+            color: #ffffff;
+        }
+
+        .btn-primary {
+            background-color: #4CAF50;
+            border-color: #4CAF50;
+            padding: 7px 18px;
+        }
+
+        .btn-primary:hover {
+            background-color: #3d8b40;
+            border-color: #3d8b40;
+        }
+
+        .progress-bar {
+            background-color: #4CAF50;
+        }
+
+        .form-check-label:hover,
+        .grid-table label:hover {
+            background-color: rgba(0,0,0,0.03);
+        }
+
+        .grid-table label {
+            display: block;
+            width: 100%;
+            height: 100%;
+            margin: -12px;
+            padding: 12px;
+        }
+
+        .form-check-input:checked {
+            background-color: #4CAF50;
+            border-color: #4CAF50;
+        }
+
+        .form-control:focus, .form-select:focus, textarea.form-control:focus {
+            border-color: #81C784;
+            box-shadow: 0 0 0 0.25rem rgba(76, 175, 80, 0.25);
+        }
+
+        .section-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .progress-container {
+            margin-bottom: 20px;
+        }
+
+        .progress {
+            background-color: #E9ECEF;
+            height: 10px;
+            border-radius: 5px;
+        }
+
+        #progress-text {
+            margin-top: 6px;
+            display: block;
+            text-align: right;
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        .save-feedback {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            animation: fadeInOut 3s ease-in-out;
+            opacity: 0;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(20px); }
+            20% { opacity: 1; transform: translateY(0); }
+            80% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(20px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <div id="form-container">
+            <div class="text-center mb-4">
+                <h1 id="form-title">Loading form...</h1>
+                <p id="form-description" class="lead"></p>
+            </div>
+            
+            <div id="sections-container"></div>
+
+            <div class="progress-container">
+                <div class="progress">
+                    <div id="progress-bar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                </div>
+                <span id="progress-text">0/0 pages</span>
+            </div>
+            
+            <div class="section-navigation">
+                <button id="prev-section-btn" class="btn btn-outline-primary" disabled>Previous</button>
+                <div>
+                    <button id="clear-section-btn" class="btn btn-outline-danger me-2">Clear Section</button>
+                    <button id="next-section-btn" class="btn btn-primary">Next Section</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="save-feedback" class="save-feedback alert alert-success" style="display: none;">
+        Responses saved successfully
+    </div>
+
+    <script>
+        // Global variables
+        let currentSectionIndex = 0;
+        let formData = null;
+        let sections = [];
+        let formResponses = {};
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const formId = urlParams.get('id');
+            
+            if (!formId) {
+                alert('No form ID specified in URL');
+                return;
+            }
+
+            fetchFormData(formId);
+            
+            // Event listeners
+            document.getElementById('prev-section-btn').addEventListener('click', showPreviousSection);
+            document.getElementById('clear-section-btn').addEventListener('click', clearCurrentSection);
+            document.getElementById('next-section-btn').addEventListener('click', handleNextAction);
+        });
+
+        async function fetchFormData(formId) {
+            try {
+                const response = await fetch(`http://localhost/cgcc-system/backend/forms/get_form1.php?id=${formId}`);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch form data');
+                }
+                
+                formData = await response.json();
+                sections = formData.sections;
+                initializeForm();
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('form-title').textContent = 'Error loading form';
+                alert('Failed to load form. Please try again later.');
+            }
+        }
+
+        function initializeForm() {
+            // Set form title and description
+            document.getElementById('form-title').textContent = formData.form_name;
+            document.getElementById('form-description').textContent = formData.description || '';
+            
+            // Initialize progress
+            updateProgress();
+            
+            // Render first section
+            renderSection(currentSectionIndex);
+        }
+
+        function renderSection(sectionIndex) {
+            const sectionsContainer = document.getElementById('sections-container');
+            sectionsContainer.innerHTML = '';
+            
+            const section = sections[sectionIndex];
+            const sectionElement = document.createElement('div');
+            sectionElement.className = 'form-section';
+            sectionElement.dataset.sectionIndex = sectionIndex;
+            
+            if (section.title) {
+                const sectionTitle = document.createElement('h2');
+                sectionTitle.textContent = section.title;
+                sectionElement.appendChild(sectionTitle);
+            }
+            
+            if (section.description) {
+                const sectionDesc = document.createElement('p');
+                sectionDesc.className = 'text-muted';
+                sectionDesc.textContent = section.description;
+                sectionElement.appendChild(sectionDesc);
+            }
+            
+            // Render questions in this section
+            section.questions.forEach(question => {
+                const questionCard = document.createElement('div');
+                questionCard.className = 'question-card';
+                
+                const questionLabel = document.createElement('label');
+                questionLabel.className = 'form-label mb-3';
+                if (question.required) {
+                    questionLabel.classList.add('required-label');
+                }
+                questionLabel.textContent = question.question;
+                questionCard.appendChild(questionLabel);
+                
+                // Render appropriate input based on question type
+                const inputElement = createInputElement(question);
+                questionCard.appendChild(inputElement);
+                
+                // Load saved response if exists
+                loadSavedResponse(question.id, inputElement);
+                
+                sectionElement.appendChild(questionCard);
+            });
+            
+            sectionsContainer.appendChild(sectionElement);
+            
+            // Update navigation buttons
+            updateNavigationButtons();
+        }
+
+        function createInputElement(question) {
+            switch (question.type) {
+                case 'short':
+                    return createShortAnswerInput(question);
+                case 'paragraph':
+                    return createParagraphInput(question);
+                case 'multiple':
+                    return createMultipleChoiceInput(question);
+                case 'checkbox':
+                    return createCheckboxInput(question);
+                case 'dropdown':
+                    return createDropdownInput(question);
+                case 'grid':
+                    return createGridInput(question);
+                case 'date':
+                    return createDateInput(question);
+                default:
+                    return document.createTextNode('Unsupported question type');
+            }
+        }
+
+        function createShortAnswerInput(question) {
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'form-control';
+            input.dataset.questionId = question.id;
+            input.dataset.questionType = question.type;
+            input.required = question.required;
+            return input;
+        }
+
+        function createParagraphInput(question) {
+            const textarea = document.createElement('textarea');
+            textarea.className = 'form-control';
+            textarea.rows = 4;
+            textarea.dataset.questionId = question.id;
+            textarea.dataset.questionType = question.type;
+            textarea.required = question.required;
+            return textarea;
+        }
+
+        function createMultipleChoiceInput(question) {
+            const container = document.createElement('div');
+            
+            question.options.forEach((option, index) => {
+                const div = document.createElement('div');
+                div.className = 'form-check';
+                
+                const inputId = `question_${question.id}_option_${index}`;
+                
+                const input = document.createElement('input');
+                input.className = 'form-check-input';
+                input.type = 'radio';
+                input.name = `question_${question.id}`;
+                input.id = inputId;
+                input.value = option;
+                input.dataset.questionId = question.id;
+                input.dataset.questionType = question.type;
+                input.required = question.required;
+                
+                const label = document.createElement('label');
+                label.className = 'form-check-label';
+                label.htmlFor = inputId;
+                label.textContent = option;
+                label.style.cursor = 'pointer';
+                
+                div.appendChild(input);
+                div.appendChild(label);
+                container.appendChild(div);
+            });
+            
+            // Add "Other" option if specified
+            if (question.includeOther) {
+                const div = document.createElement('div');
+                div.className = 'form-check';
+                
+                const inputId = `question_${question.id}_option_other`;
+                const input = document.createElement('input');
+                input.className = 'form-check-input';
+                input.type = 'radio';
+                input.name = `question_${question.id}`;
+                input.id = inputId;
+                input.value = 'other';
+                input.dataset.questionId = question.id;
+                input.dataset.questionType = question.type;
+                
+                const label = document.createElement('label');
+                label.className = 'form-check-label';
+                label.htmlFor = inputId;
+                label.textContent = 'Other:';
+                label.style.cursor = 'pointer';
+                
+                const otherInput = document.createElement('input');
+                otherInput.type = 'text';
+                otherInput.className = 'form-control mt-2';
+                otherInput.style.marginLeft = '2em';
+                otherInput.style.width = 'calc(100% - 2em)';
+                otherInput.dataset.otherFor = question.id;
+                otherInput.disabled = true;
+                
+                // Enable/disable other text input based on selection
+                container.querySelectorAll(`input[name="question_${question.id}"]`).forEach(radio => {
+                    radio.addEventListener('change', function() {
+                        otherInput.disabled = this.value !== 'other';
+                        if (this.value === 'other') {
+                            otherInput.focus();
+                        }
+                    });
+                });
+                
+                div.appendChild(input);
+                div.appendChild(label);
+                div.appendChild(otherInput);
+                container.appendChild(div);
+            }
+            
+            return container;
+        }
+
+        function createCheckboxInput(question) {
+            const container = document.createElement('div');
+            
+            question.options.forEach((option, index) => {
+                const div = document.createElement('div');
+                div.className = 'form-check';
+                
+                const inputId = `question_${question.id}_option_${index}`;
+                
+                const input = document.createElement('input');
+                input.className = 'form-check-input';
+                input.type = 'checkbox';
+                input.name = `question_${question.id}_${index}`;
+                input.id = inputId;
+                input.value = option;
+                input.dataset.questionId = question.id;
+                input.dataset.questionType = question.type;
+                
+                const label = document.createElement('label');
+                label.className = 'form-check-label';
+                label.htmlFor = inputId;
+                label.textContent = option;
+                label.style.cursor = 'pointer';
+                
+                div.appendChild(input);
+                div.appendChild(label);
+                container.appendChild(div);
+            });
+            
+            // Add "Other" option if specified
+            if (question.includeOther) {
+                const div = document.createElement('div');
+                div.className = 'form-check';
+                
+                const inputId = `question_${question.id}_option_other`;
+                const input = document.createElement('input');
+                input.className = 'form-check-input';
+                input.type = 'checkbox';
+                input.name = `question_${question.id}_other`;
+                input.id = inputId;
+                input.value = 'other';
+                input.dataset.questionId = question.id;
+                input.dataset.questionType = question.type;
+                
+                const label = document.createElement('label');
+                label.className = 'form-check-label';
+                label.htmlFor = inputId;
+                label.textContent = 'Other:';
+                label.style.cursor = 'pointer';
+                
+                const otherInput = document.createElement('input');
+                otherInput.type = 'text';
+                otherInput.className = 'form-control mt-2';
+                otherInput.style.marginLeft = '2em';
+                otherInput.style.width = 'calc(100% - 2em)';
+                otherInput.dataset.otherFor = question.id;
+                otherInput.disabled = true;
+                
+                // Enable/disable other text input based on selection
+                input.addEventListener('change', function() {
+                    otherInput.disabled = !this.checked;
+                    if (this.checked) {
+                        otherInput.focus();
+                    }
+                });
+                
+                div.appendChild(input);
+                div.appendChild(label);
+                div.appendChild(otherInput);
+                container.appendChild(div);
+            }
+            
+            return container;
+        }
+
+        function createDropdownInput(question) {
+            const select = document.createElement('select');
+            select.className = 'form-select';
+            select.dataset.questionId = question.id;
+            select.dataset.questionType = question.type;
+            select.required = question.required;
+            
+            // Add default empty option
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = '-- Select an option --';
+            defaultOption.selected = true;
+            defaultOption.disabled = true;
+            select.appendChild(defaultOption);
+            
+            // Add options
+            question.options.forEach((option, index) => {
+                const opt = document.createElement('option');
+                opt.value = option;
+                opt.textContent = option;
+                select.appendChild(opt);
+            });
+            
+            return select;
+        }
+
+        function createGridInput(question) {
+            const table = document.createElement('table');
+            table.className = 'grid-table table table-bordered';
+            
+            // Create header row with options
+            const thead = document.createElement('thead');
+            const headerRow = document.createElement('tr');
+            
+            // Empty first header cell
+            headerRow.appendChild(document.createElement('th'));
+            
+            // Add option headers
+            question.options.forEach(option => {
+                const th = document.createElement('th');
+                th.textContent = option;
+                headerRow.appendChild(th);
+            });
+            
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+            
+            // Create table body with rows
+            const tbody = document.createElement('tbody');
+            
+            question.rows.forEach((row, rowIndex) => {
+                const tr = document.createElement('tr');
+                
+                // Row label cell
+                const labelCell = document.createElement('td');
+                labelCell.textContent = row;
+                tr.appendChild(labelCell);
+                
+                // Radio button cells
+                question.options.forEach((option, optionIndex) => {
+                    const cell = document.createElement('td');
+                    cell.className = 'text-center';
+                    
+                    const input = document.createElement('input');
+                    input.type = 'radio';
+                    input.name = `question_${question.id}_row_${rowIndex}`;
+                    input.value = optionIndex;
+                    input.dataset.questionId = question.id;
+                    input.dataset.rowIndex = rowIndex;
+                    input.dataset.questionType = question.type;
+                    if (question.required) {
+                        input.dataset.required = 'true';
+                    }
+                    
+                    cell.appendChild(input);
+                    tr.appendChild(cell);
+                });
+                
+                tbody.appendChild(tr);
+            });
+            
+            table.appendChild(tbody);
+            return table;
+        }
+
+        function createDateInput(question) {
+            const input = document.createElement('input');
+            input.type = 'date';
+            input.className = 'form-control';
+            input.dataset.questionId = question.id;
+            input.dataset.questionType = question.type;
+            input.required = question.required;
+            return input;
+        }
+
+        function loadSavedResponse(questionId, inputElement) {
+            if (formResponses[questionId]) {
+                const response = formResponses[questionId];
+                
+                if (response.type === 'checkbox') {
+                    // For checkboxes, check all saved options
+                    response.value.forEach(value => {
+                        const checkboxes = inputElement.querySelectorAll(`input[type="checkbox"]`);
+                        checkboxes.forEach(checkbox => {
+                            if (checkbox.value === value) {
+                                checkbox.checked = true;
+                            }
+                        });
+                    });
+                } else if (response.type === 'multiple' || response.type === 'dropdown') {
+                    // For radio buttons and dropdowns
+                    if (response.value === 'other' && inputElement.querySelector('input[data-other-for]')) {
+                        inputElement.querySelector(`input[value="other"]`).checked = true;
+                        inputElement.querySelector('input[data-other-for]').value = response.otherText || '';
+                        inputElement.querySelector('input[data-other-for]').disabled = false;
+                    } else {
+                        const input = inputElement.querySelector(`input[type="radio"][value="${response.value}"]`) || inputElement;
+                        if (input.tagName === 'SELECT') {
+                            input.value = response.value;
+                        } else if (input) {
+                            input.checked = true;
+                        }
+                    }
+                } else {
+                    // For text inputs, textareas, date inputs
+                    inputElement.value = response.value;
+                }
+            }
+        }
+
+        function saveCurrentSectionResponses() {
+            const currentSection = sections[currentSectionIndex];
+            const sectionElement = document.querySelector(`.form-section[data-section-index="${currentSectionIndex}"]`);
+            
+            currentSection.questions.forEach(question => {
+                const questionId = question.id;
+                const questionType = question.type;
+                let value = null;
+                let otherText = null;
+                
+                if (questionType === 'checkbox') {
+                    // Get all checked checkboxes for this question
+                    const checkboxes = sectionElement.querySelectorAll(
+                        `input[type="checkbox"][name^="question_${question.id}_"]:checked`
+                    );
+                    value = Array.from(checkboxes).map(cb => cb.value);
+                    
+                    // Check for "other" option
+                    const otherCheckbox = sectionElement.querySelector(
+                        `input[type="checkbox"][name^="question_${question.id}_"][value="other"]:checked`
+                    );
+                    if (otherCheckbox) {
+                        const otherInput = sectionElement.querySelector(`input[data-other-for="${question.id}"]`);
+                        if (otherInput && otherInput.value) {
+                            value.push('other');
+                            otherText = otherInput.value;
+                        }
+                    }
+                } else if (questionType === 'multiple') {
+                    // Get selected radio button
+                    const radio = sectionElement.querySelector(
+                        `input[type="radio"][name="question_${question.id}"]:checked`
+                    );
+                    value = radio ? radio.value : null;
+                    
+                    // Check for "other" option
+                    if (value === 'other') {
+                        const otherInput = sectionElement.querySelector(`input[data-other-for="${question.id}"]`);
+                        if (otherInput) {
+                            otherText = otherInput.value;
+                        }
+                    }
+                } else if (questionType === 'dropdown') {
+                    // Get selected dropdown value
+                    const select = sectionElement.querySelector(
+                        `select[data-question-id="${question.id}"]`
+                    );
+                    value = select ? select.value : null;
+                } else if (questionType === 'grid') {
+                    // Get all selected grid options
+                    const selectedRadios = sectionElement.querySelectorAll(
+                        `input[type="radio"][name^="question_${question.id}_row_"]:checked`
+                    );
+                    value = Array.from(selectedRadios).map(radio => ({
+                        rowIndex: radio.dataset.rowIndex,
+                        optionIndex: radio.value
+                    }));
+                } else {
+                    // For text inputs, textareas, date inputs
+                    const input = sectionElement.querySelector(
+                        `[data-question-id="${question.id}"]`
+                    );
+                    value = input ? input.value : null;
+                }
+                
+                if (value !== null) {
+                    formResponses[questionId] = {
+                        type: questionType,
+                        value: value
+                    };
+                    
+                    if (otherText !== null) {
+                        formResponses[questionId].otherText = otherText;
+                    }
+                }
+            });
+        }
+
+        function handleNextAction() {
+            if (currentSectionIndex === sections.length - 1) {
+                submitForm();
+            } else {
+                showNextSection();
+            }
+        }
+
+        function showNextSection() {
+            if (!validateCurrentSection()) {
+                alert('Please complete all required fields');
+                return;
+            }
+            
+            saveCurrentSectionResponses();
+            
+            // Get current section behavior
+            const currentSection = sections[currentSectionIndex];
+            const behavior = currentSection.behavior || 'next-page'; // Default to next-page if not specified
+            
+            if (behavior === 'same-page') {
+                // Show save feedback
+                showSaveFeedback();
+                
+                // If this is the last section, proceed to submit
+                if (currentSectionIndex === sections.length - 1) {
+                    submitForm();
+                }
+            } else {
+                // Default behavior - move to next section
+                currentSectionIndex++;
+                renderSection(currentSectionIndex);
+                updateProgress();
+            }
+        }
+
+        function showSaveFeedback() {
+            const feedback = document.getElementById('save-feedback');
+            feedback.style.display = 'block';
+            feedback.style.opacity = '1';
+            
+            setTimeout(() => {
+                feedback.style.opacity = '0';
+                setTimeout(() => {
+                    feedback.style.display = 'none';
+                }, 500);
+            }, 2500);
+        }
+
+        function showPreviousSection() {
+            saveCurrentSectionResponses();
+            currentSectionIndex--;
+            renderSection(currentSectionIndex);
+            updateProgress();
+        }
+
+        function clearCurrentSection() {
+            if (confirm('Are you sure you want to clear all responses in this section?')) {
+                const currentSection = sections[currentSectionIndex];
+                const sectionElement = document.querySelector(`.form-section[data-section-index="${currentSectionIndex}"]`);
+                
+                currentSection.questions.forEach(question => {
+                    const questionId = question.id;
+                    delete formResponses[questionId];
+                    
+                    if (question.type === 'checkbox') {
+                        sectionElement.querySelectorAll(
+                            `input[type="checkbox"][name^="question_${question.id}_"]`
+                        ).forEach(checkbox => {
+                            checkbox.checked = false;
+                        });
+                        const otherInput = sectionElement.querySelector(`input[data-other-for="${question.id}"]`);
+                        if (otherInput) {
+                            otherInput.value = '';
+                            otherInput.disabled = true;
+                        }
+                    } else if (question.type === 'multiple') {
+                        sectionElement.querySelectorAll(
+                            `input[type="radio"][name="question_${question.id}"]`
+                        ).forEach(radio => {
+                            radio.checked = false;
+                        });
+                        const otherInput = sectionElement.querySelector(`input[data-other-for="${question.id}"]`);
+                        if (otherInput) {
+                            otherInput.value = '';
+                            otherInput.disabled = true;
+                        }
+                    } else if (question.type === 'dropdown') {
+                        const select = sectionElement.querySelector(
+                            `select[data-question-id="${question.id}"]`
+                        );
+                        if (select) select.selectedIndex = 0;
+                    } else if (question.type === 'grid') {
+                        sectionElement.querySelectorAll(
+                            `input[type="radio"][name^="question_${question.id}_row_"]`
+                        ).forEach(radio => {
+                            radio.checked = false;
+                        });
+                    } else {
+                        const input = sectionElement.querySelector(
+                            `[data-question-id="${question.id}"]`
+                        );
+                        if (input) input.value = '';
+                    }
+                });
+            }
+        }
+
+        function validateCurrentSection() {
+            const currentSection = sections[currentSectionIndex];
+            const sectionElement = document.querySelector(`.form-section[data-section-index="${currentSectionIndex}"]`);
+            let isValid = true;
+            
+            currentSection.questions.forEach(question => {
+                if (!question.required) return;
+                
+                const questionId = question.id;
+                const questionType = question.type;
+                
+                if (questionType === 'checkbox') {
+                    const checkboxes = sectionElement.querySelectorAll(
+                        `input[type="checkbox"][name^="question_${questionId}_"]:checked`
+                    );
+                    if (checkboxes.length === 0) {
+                        isValid = false;
+                        highlightRequired(sectionElement.querySelector(
+                            `input[type="checkbox"][name^="question_${questionId}_"]`
+                        ));
+                    }
+                } else if (questionType === 'multiple') {
+                    const radio = sectionElement.querySelector(
+                        `input[type="radio"][name="question_${questionId}"]:checked`
+                    );
+                    if (!radio) {
+                        isValid = false;
+                        highlightRequired(sectionElement.querySelector(
+                            `input[type="radio"][name="question_${questionId}"]`
+                        ));
+                    } else if (radio.value === 'other') {
+                        const otherInput = sectionElement.querySelector(`input[data-other-for="${questionId}"]`);
+                        if (!otherInput || !otherInput.value.trim()) {
+                            isValid = false;
+                            highlightRequired(otherInput);
+                        }
+                    }
+                } else if (questionType === 'dropdown') {
+                    const select = sectionElement.querySelector(
+                        `select[data-question-id="${questionId}"]`
+                    );
+                    if (!select || !select.value) {
+                        isValid = false;
+                        highlightRequired(select);
+                    }
+                } else if (questionType === 'grid') {
+                    question.rows.forEach((row, rowIndex) => {
+                        const radioGroup = sectionElement.querySelectorAll(
+                            `input[type="radio"][name="question_${questionId}_row_${rowIndex}"]`
+                        );
+                        const isChecked = Array.from(radioGroup).some(radio => radio.checked);
+                        if (!isChecked) {
+                            isValid = false;
+                            const rowElement = radioGroup[0].closest('tr');
+                            rowElement.style.backgroundColor = 'rgba(255, 0, 0, 0.1)';
+                            setTimeout(() => {
+                                rowElement.style.backgroundColor = '';
+                            }, 2000);
+                        }
+                    });
+                } else {
+                    const input = sectionElement.querySelector(
+                        `[data-question-id="${questionId}"]`
+                    );
+                    if (!input || !input.value.trim()) {
+                        isValid = false;
+                        highlightRequired(input);
+                    }
+                }
+            });
+            
+            return isValid;
+        }
+
+        function highlightRequired(element) {
+            if (!element) return;
+            
+            element.style.borderColor = 'red';
+            setTimeout(() => {
+                element.style.borderColor = '';
+            }, 2000);
+            
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function updateNavigationButtons() {
+            const prevBtn = document.getElementById('prev-section-btn');
+            const nextBtn = document.getElementById('next-section-btn');
+            const clearBtn = document.getElementById('clear-section-btn');
+
+            prevBtn.disabled = (currentSectionIndex === 0);
+            
+            // Get current section behavior
+            const currentSection = sections[currentSectionIndex];
+            const behavior = currentSection.behavior || 'next-page'; // Default to next-page if not specified
+            
+            if (currentSectionIndex === sections.length - 1) {
+                if (behavior === 'same-page') {
+                    nextBtn.textContent = 'Save and Submit';
+                } else {
+                    nextBtn.textContent = 'Submit';
+                }
+            } else {
+                if (behavior === 'same-page') {
+                    nextBtn.textContent = 'Save Responses';
+                } else {
+                    nextBtn.textContent = 'Next Section';
+                }
+            }
+            
+            // Adjust clear button text based on behavior
+            if (behavior === 'same-page') {
+                clearBtn.textContent = 'Clear Responses';
+            } else {
+                clearBtn.textContent = 'Clear Section';
+            }
+        }
+
+        function updateProgress() {
+            const progressContainer = document.querySelector('.progress-container');
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+
+            if (sections.length <= 1) {
+                progressContainer.style.display = 'none';
+                return;
+            } else {
+                progressContainer.style.display = 'block';
+            }
+
+            const pageLabel = (sections.length === 1) ? "page" : "pages";
+            const progress = ((currentSectionIndex + 1) / sections.length) * 100;
+            progressBar.style.width = `${progress}%`;
+            progressText.textContent = `${currentSectionIndex + 1}/${sections.length} ${pageLabel}`;
+        }
+
+        async function submitForm() {
+            if (!validateCurrentSection()) {
+                alert('Please complete all required fields');
+                return;
+            }
+            
+            saveCurrentSectionResponses();
+            
+            const submissionData = {
+                form_id: formData.form_index,
+                responses: []
+            };
+            
+            for (const [questionId, response] of Object.entries(formResponses)) {
+                if (response.type === 'grid') {
+                    response.value.forEach(gridResponse => {
+                        submissionData.responses.push({
+                            question_id: questionId,
+                            type: response.type,
+                            row_index: gridResponse.rowIndex,
+                            option_index: gridResponse.optionIndex,
+                            text_answer: null
+                        });
+                    });
+                } else if (response.type === 'checkbox') {
+                    response.value.forEach(value => {
+                        if (value === 'other') {
+                            submissionData.responses.push({
+                                question_id: questionId,
+                                type: response.type,
+                                choice_text: response.otherText || '',
+                                text_answer: null
+                            });
+                        } else {
+                            submissionData.responses.push({
+                                question_id: questionId,
+                                type: response.type,
+                                choice_text: value,
+                                text_answer: null
+                            });
+                        }
+                    });
+                } else if (response.type === 'multiple' || response.type === 'dropdown') {
+                    if (response.value === 'other') {
+                        submissionData.responses.push({
+                            question_id: questionId,
+                            type: response.type,
+                            choice_text: response.otherText || '',
+                            text_answer: null
+                        });
+                    } else {
+                        submissionData.responses.push({
+                            question_id: questionId,
+                            type: response.type,
+                            choice_text: response.value,
+                            text_answer: null
+                        });
+                    }
+                } else {
+                    submissionData.responses.push({
+                        question_id: questionId,
+                        type: response.type,
+                        choice_text: null,
+                        text_answer: response.value
+                    });
+                }
+            }
+            
+            try {
+                const response = await fetch('http://localhost/cgcc-system/backend/forms/submit_response.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(submissionData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to submit form');
+                }
+                
+                const result = await response.json();
+                alert('Form submitted successfully!');
+                window.location.href = 'submission-success.html';
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to submit form. Please try again.');
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
