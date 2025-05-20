@@ -52,9 +52,9 @@ try {
     $conn->begin_transaction();
 
     // 1. Get active snapshot for this form
-    $snapshotId = null;
+    $snapshotIndex = null;
     $snapshotStmt = $conn->prepare("
-        SELECT snapshot_id 
+        SELECT snapshot_index 
         FROM form_snapshots 
         WHERE form_index = ? AND is_active = 1
         ORDER BY created_at DESC 
@@ -66,16 +66,16 @@ try {
 
     if ($snapshotResult->num_rows > 0) {
         $snapshotRow = $snapshotResult->fetch_assoc();
-        $snapshotId = $snapshotRow['snapshot_id'];
+        $snapshotIndex = $snapshotRow['snapshot_index'];
     }
     $snapshotStmt->close();
 
     // 2. Insert into responses table
     $stmt = $conn->prepare("
-        INSERT INTO responses (form_index, student_index, snapshot_id) 
+        INSERT INTO responses (form_index, student_index, snapshot_index) 
         VALUES (?, ?, ?)
     ");
-    $stmt->bind_param("iii", $formId, $studentId, $snapshotId);
+    $stmt->bind_param("iii", $formId, $studentId, $snapshotIndex);
     
     if (!$stmt->execute()) {
         throw new Exception("Failed to create response: " . $stmt->error);
@@ -133,7 +133,7 @@ try {
         'success' => true,
         'message' => 'Response submitted successfully',
         'response_index' => $responseId,
-        'snapshot_id' => $snapshotId
+        'snapshot_index' => $snapshotIndex
     ]);
 
 } catch (Exception $e) {

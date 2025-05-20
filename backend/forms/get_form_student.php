@@ -1,5 +1,4 @@
 <?php
-
 session_start();
 require_once '../connect3.php'; // ✅ Move this here
 

@@ -315,30 +315,7 @@
     <div id="save-feedback" class="save-feedback alert alert-success" style="display: none;">
         Responses saved successfully
     </div>
-
     <script>
-
-        let studentId = null;
-
-        // Load studentId on page load
-        async function loadStudentId() {
-            try {
-                const response = await fetch('http://localhost/cgcc-system/backend/forms/get_student.php');
-                const data = await response.json();
-
-                if (data.error) {
-                    alert(data.error);
-                    window.location.href = '/cgcc-system/public/front-end.html';
-                    return;
-                }
-
-                studentId = data.studentId;
-            } catch (err) {
-                alert('Failed to load student info');
-                console.error(err);
-                window.location.href = '/cgcc-system/public/front-end.html';
-            }
-        }
         // Global variables
         let currentSectionIndex = 0;
         let formData = null;
@@ -353,26 +330,11 @@
                 return;
             }
             fetchFormData(formId);
+            
             // Event listeners
             document.getElementById('prev-section-btn').addEventListener('click', showPreviousSection);
             document.getElementById('clear-section-btn').addEventListener('click', clearCurrentSection);
             document.getElementById('next-section-btn').addEventListener('click', handleNextAction);
-        });
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const formId = urlParams.get('id');
-
-            if (!formId) {
-                alert('No form ID specified.');
-                return;
-            }
-
-            // First load student ID
-            loadStudentId().then(() => {
-                fetchFormData(formId);
-                setupEventListeners(); // Attach button events
-            });
         });
 
         async function fetchFormData(formId) {
@@ -382,7 +344,25 @@
                     throw new Error('Failed to fetch form data');
                 }
                 formData = await response.json();
-                sections = formData.sections;
+                sections = formData.sections || [];
+                
+                // Restore formResponses from localStorage AFTER form data is loaded
+                const savedData = localStorage.getItem('studentFormProgress');
+                if (savedData) {
+                    try {
+                        formResponses = JSON.parse(savedData);
+                        // Verify the saved data matches the current form
+                        if (formResponses.formId !== formId) {
+                            formResponses = {}; // Reset if form ID doesn't match
+                        }
+                    } catch (e) {
+                        console.warn("Invalid saved progress");
+                        formResponses = {};
+                    }
+                } else {
+                    formResponses = {};
+                }
+                
                 initializeForm();
             } catch (error) {
                 console.error('Error:', error);
@@ -391,37 +371,28 @@
             }
         }
 
-        function getTotalLogicalPages() {
-            if (sections.length === 0) return 0;
-
-            let totalPages = 1;
-            let prevBehavior = sections[0].behavior;
-
-            for (let i = 1; i < sections.length; i++) {
-                const currBehavior = sections[i].behavior || 'next-page';
-                if (currBehavior !== 'same-page' || prevBehavior === 'next-page') {
-                    totalPages++;
-                }
-                prevBehavior = currBehavior;
-            }
-
-            return totalPages;
-        }
-
         function initializeForm() {
-            document.getElementById('form-title').textContent = formData.form_name;
+            if (!formData) return;
+            
+            document.getElementById('form-title').textContent = formData.form_name || 'Untitled Form';
             document.getElementById('form-description').textContent = formData.description || '';
+            formResponses.formId = formData.form_index;
+            
             updateProgress();
             renderSectionsStartingAt(currentSectionIndex);
-            
         }
 
         function renderSectionsStartingAt(startIndex) {
             const sectionsContainer = document.getElementById('sections-container');
             sectionsContainer.innerHTML = '';
 
+            if (!sections || sections.length === 0) {
+                sectionsContainer.innerHTML = '<p>No sections available in this form.</p>';
+                return;
+            }
+
             let index = startIndex;
-            while (index < sections.length && sections[index].behavior === 'same-page') {
+            while (index < sections.length && (index === startIndex || sections[index].behavior === 'same-page')) {
                 const section = sections[index];
                 const sectionElement = document.createElement('div');
                 sectionElement.className = 'form-section';
@@ -439,22 +410,26 @@
                     sectionElement.appendChild(sectionDesc);
                 }
 
-                section.questions.forEach(question => {
-                    const questionCard = document.createElement('div');
-                    questionCard.className = 'question-card';
+                if (section.questions && section.questions.length > 0) {
+                    section.questions.forEach(question => {
+                        const questionCard = document.createElement('div');
+                        questionCard.className = 'question-card';
 
-                    const questionLabel = document.createElement('label');
-                    questionLabel.className = 'form-label mb-3';
-                    if (question.required) questionLabel.classList.add('required-label');
-                    questionLabel.textContent = question.question;
-                    questionCard.appendChild(questionLabel);
+                        const questionLabel = document.createElement('label');
+                        questionLabel.className = 'form-label mb-3';
+                        if (question.required) questionLabel.classList.add('required-label');
+                        questionLabel.textContent = question.question;
+                        questionCard.appendChild(questionLabel);
 
-                    const inputElement = createInputElement(question);
-                    questionCard.appendChild(inputElement);
-                    loadSavedResponse(question.id, inputElement);
+                        const inputElement = createInputElement(question);
+                        questionCard.appendChild(inputElement);
+                        loadSavedResponse(question.id, inputElement);
 
-                    sectionElement.appendChild(questionCard);
-                });
+                        sectionElement.appendChild(questionCard);
+                    });
+                } else {
+                    sectionElement.innerHTML += '<p>No questions in this section.</p>';
+                }
 
                 sectionsContainer.appendChild(sectionElement);
                 index++;
@@ -465,11 +440,10 @@
             updateProgress();
         }
 
-        // ————————————————————————
         // Input Creation Functions
-        // ————————————————————————
-
         function createInputElement(question) {
+            if (!question) return document.createTextNode('Invalid question');
+
             switch (question.type) {
                 case 'short':
                     return createShortAnswerInput(question);
@@ -496,7 +470,7 @@
             input.className = 'form-control';
             input.dataset.questionId = question.id;
             input.dataset.questionType = question.type;
-            input.required = question.required;
+            input.required = question.required || false;
             return input;
         }
 
@@ -506,37 +480,45 @@
             textarea.rows = 4;
             textarea.dataset.questionId = question.id;
             textarea.dataset.questionType = question.type;
-            textarea.required = question.required;
+            textarea.required = question.required || false;
             return textarea;
         }
 
         function createMultipleChoiceInput(question) {
             const container = document.createElement('div');
-            question.options.forEach((option, index) => {
-                const div = document.createElement('div');
-                div.className = 'form-check';
-                const inputId = `question_${question.id}_option_${index}`;
-                const input = document.createElement('input');
-                input.className = 'form-check-input';
-                input.type = 'radio';
-                input.name = `question_${question.id}`;
-                input.id = inputId;
-                input.value = option;
-                input.dataset.questionId = question.id;
-                input.dataset.questionType = question.type;
-                input.required = question.required;
-                const label = document.createElement('label');
-                label.className = 'form-check-label';
-                label.htmlFor = inputId;
-                label.textContent = option;
-                label.style.cursor = 'pointer';
-                div.appendChild(input);
-                div.appendChild(label);
-                container.appendChild(div);
-            });
+            
+            if (question.options && question.options.length > 0) {
+                question.options.forEach((option, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'form-check';
+                    
+                    const inputId = `question_${question.id}_option_${index}`;
+                    const input = document.createElement('input');
+                    input.className = 'form-check-input';
+                    input.type = 'radio';
+                    input.name = `question_${question.id}`;
+                    input.id = inputId;
+                    input.value = option;
+                    input.dataset.questionId = question.id;
+                    input.dataset.questionType = question.type;
+                    input.required = question.required || false;
+                    
+                    const label = document.createElement('label');
+                    label.className = 'form-check-label';
+                    label.htmlFor = inputId;
+                    label.textContent = option;
+                    label.style.cursor = 'pointer';
+                    
+                    div.appendChild(input);
+                    div.appendChild(label);
+                    container.appendChild(div);
+                });
+            }
+
             if (question.includeOther) {
                 const div = document.createElement('div');
                 div.className = 'form-check';
+                
                 const inputId = `question_${question.id}_option_other`;
                 const input = document.createElement('input');
                 input.className = 'form-check-input';
@@ -546,11 +528,13 @@
                 input.value = 'other';
                 input.dataset.questionId = question.id;
                 input.dataset.questionType = question.type;
+                
                 const label = document.createElement('label');
                 label.className = 'form-check-label';
                 label.htmlFor = inputId;
                 label.textContent = 'Other:';
                 label.style.cursor = 'pointer';
+                
                 const otherInput = document.createElement('input');
                 otherInput.type = 'text';
                 otherInput.className = 'form-control mt-2';
@@ -558,46 +542,57 @@
                 otherInput.style.width = 'calc(100% - 2em)';
                 otherInput.dataset.otherFor = question.id;
                 otherInput.disabled = true;
+                
                 container.querySelectorAll(`input[name="question_${question.id}"]`).forEach(radio => {
                     radio.addEventListener('change', function() {
                         otherInput.disabled = this.value !== 'other';
                         if (this.value === 'other') otherInput.focus();
                     });
                 });
+                
                 div.appendChild(input);
                 div.appendChild(label);
                 div.appendChild(otherInput);
                 container.appendChild(div);
             }
+            
             return container;
         }
 
         function createCheckboxInput(question) {
             const container = document.createElement('div');
-            question.options.forEach((option, index) => {
-                const div = document.createElement('div');
-                div.className = 'form-check';
-                const inputId = `question_${question.id}_option_${index}`;
-                const input = document.createElement('input');
-                input.className = 'form-check-input';
-                input.type = 'checkbox';
-                input.name = `question_${question.id}_${index}`;
-                input.id = inputId;
-                input.value = option;
-                input.dataset.questionId = question.id;
-                input.dataset.questionType = question.type;
-                const label = document.createElement('label');
-                label.className = 'form-check-label';
-                label.htmlFor = inputId;
-                label.textContent = option;
-                label.style.cursor = 'pointer';
-                div.appendChild(input);
-                div.appendChild(label);
-                container.appendChild(div);
-            });
+            
+            if (question.options && question.options.length > 0) {
+                question.options.forEach((option, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'form-check';
+                    
+                    const inputId = `question_${question.id}_option_${index}`;
+                    const input = document.createElement('input');
+                    input.className = 'form-check-input';
+                    input.type = 'checkbox';
+                    input.name = `question_${question.id}_${index}`;
+                    input.id = inputId;
+                    input.value = option;
+                    input.dataset.questionId = question.id;
+                    input.dataset.questionType = question.type;
+                    
+                    const label = document.createElement('label');
+                    label.className = 'form-check-label';
+                    label.htmlFor = inputId;
+                    label.textContent = option;
+                    label.style.cursor = 'pointer';
+                    
+                    div.appendChild(input);
+                    div.appendChild(label);
+                    container.appendChild(div);
+                });
+            }
+
             if (question.includeOther) {
                 const div = document.createElement('div');
                 div.className = 'form-check';
+                
                 const inputId = `question_${question.id}_option_other`;
                 const input = document.createElement('input');
                 input.className = 'form-check-input';
@@ -607,11 +602,13 @@
                 input.value = 'other';
                 input.dataset.questionId = question.id;
                 input.dataset.questionType = question.type;
+                
                 const label = document.createElement('label');
                 label.className = 'form-check-label';
                 label.htmlFor = inputId;
                 label.textContent = 'Other:';
                 label.style.cursor = 'pointer';
+                
                 const otherInput = document.createElement('input');
                 otherInput.type = 'text';
                 otherInput.className = 'form-control mt-2';
@@ -619,15 +616,18 @@
                 otherInput.style.width = 'calc(100% - 2em)';
                 otherInput.dataset.otherFor = question.id;
                 otherInput.disabled = true;
+                
                 input.addEventListener('change', function() {
                     otherInput.disabled = !this.checked;
                     if (this.checked) otherInput.focus();
                 });
+                
                 div.appendChild(input);
                 div.appendChild(label);
                 div.appendChild(otherInput);
                 container.appendChild(div);
             }
+            
             return container;
         }
 
@@ -636,57 +636,80 @@
             select.className = 'form-select';
             select.dataset.questionId = question.id;
             select.dataset.questionType = question.type;
-            select.required = question.required;
+            select.required = question.required || false;
+            
             const defaultOption = document.createElement('option');
             defaultOption.value = '';
             defaultOption.textContent = '-- Select an option --';
             defaultOption.selected = true;
             defaultOption.disabled = true;
             select.appendChild(defaultOption);
-            question.options.forEach((option, index) => {
-                const opt = document.createElement('option');
-                opt.value = option;
-                opt.textContent = option;
-                select.appendChild(opt);
-            });
+            
+            if (question.options && question.options.length > 0) {
+                question.options.forEach((option, index) => {
+                    const opt = document.createElement('option');
+                    opt.value = option;
+                    opt.textContent = option;
+                    select.appendChild(opt);
+                });
+            }
+            
             return select;
         }
 
         function createGridInput(question) {
             const table = document.createElement('table');
             table.className = 'grid-table table table-bordered';
+            
+            // Create table header
             const thead = document.createElement('thead');
             const headerRow = document.createElement('tr');
-            headerRow.appendChild(document.createElement('th'));
-            question.options.forEach(option => {
-                const th = document.createElement('th');
-                th.textContent = option;
-                headerRow.appendChild(th);
-            });
+            headerRow.appendChild(document.createElement('th')); // Empty top-left cell
+            
+            if (question.options && question.options.length > 0) {
+                question.options.forEach(option => {
+                    const th = document.createElement('th');
+                    th.textContent = option;
+                    headerRow.appendChild(th);
+                });
+            }
+            
             thead.appendChild(headerRow);
             table.appendChild(thead);
+            
+            // Create table body
             const tbody = document.createElement('tbody');
-            question.rows.forEach((row, rowIndex) => {
-                const tr = document.createElement('tr');
-                const labelCell = document.createElement('td');
-                labelCell.textContent = row;
-                tr.appendChild(labelCell);
-                question.options.forEach((option, optionIndex) => {
-                    const cell = document.createElement('td');
-                    cell.className = 'text-center';
-                    const input = document.createElement('input');
-                    input.type = 'radio';
-                    input.name = `question_${question.id}_row_${rowIndex}`;
-                    input.value = optionIndex;
-                    input.dataset.questionId = question.id;
-                    input.dataset.rowIndex = rowIndex;
-                    input.dataset.questionType = question.type;
-                    if (question.required) input.dataset.required = 'true';
-                    cell.appendChild(input);
-                    tr.appendChild(cell);
+            
+            if (question.rows && question.rows.length > 0) {
+                question.rows.forEach((row, rowIndex) => {
+                    const tr = document.createElement('tr');
+                    const labelCell = document.createElement('td');
+                    labelCell.textContent = row;
+                    tr.appendChild(labelCell);
+                    
+                    if (question.options && question.options.length > 0) {
+                        question.options.forEach((option, optionIndex) => {
+                            const cell = document.createElement('td');
+                            cell.className = 'text-center';
+                            
+                            const input = document.createElement('input');
+                            input.type = 'radio';
+                            input.name = `question_${question.id}_row_${rowIndex}`;
+                            input.value = optionIndex;
+                            input.dataset.questionId = question.id;
+                            input.dataset.rowIndex = rowIndex;
+                            input.dataset.questionType = question.type;
+                            if (question.required) input.dataset.required = 'true';
+                            
+                            cell.appendChild(input);
+                            tr.appendChild(cell);
+                        });
+                    }
+                    
+                    tbody.appendChild(tr);
                 });
-                tbody.appendChild(tr);
-            });
+            }
+            
             table.appendChild(tbody);
             return table;
         }
@@ -697,36 +720,68 @@
             input.className = 'form-control';
             input.dataset.questionId = question.id;
             input.dataset.questionType = question.type;
-            input.required = question.required;
+            input.required = question.required || false;
             return input;
         }
 
-        // ————————————————————————
-        // End of Input Creation Functions
-        // ————————————————————————
-
         function loadSavedResponse(questionId, inputElement) {
+            if (!questionId || !inputElement) return;
+            
             if (formResponses[questionId]) {
                 const response = formResponses[questionId];
+                
+                // Handle checkbox inputs
                 if (response.type === 'checkbox') {
-                    response.value.forEach(value => {
-                        const checkboxes = inputElement.querySelectorAll(`input[type="checkbox"]`);
-                        checkboxes.forEach(checkbox => {
-                            if (checkbox.value === value) checkbox.checked = true;
-                        });
+                    const checkboxes = inputElement.querySelectorAll(`input[type="checkbox"]`);
+                    checkboxes.forEach(checkbox => {
+                        if (response.value && response.value.includes(checkbox.value)) {
+                            checkbox.checked = true;
+                        }
                     });
-                } else if (response.type === 'multiple' || response.type === 'dropdown') {
-                    if (response.value === 'other' && inputElement.querySelector('input[data-other-for]')) {
-                        inputElement.querySelector(`input[value="other"]`).checked = true;
-                        inputElement.querySelector('input[data-other-for]').value = response.otherText || '';
-                        inputElement.querySelector('input[data-other-for]').disabled = false;
-                    } else {
-                        const input = inputElement.querySelector(`input[type="radio"][value="${response.value}"]`) || inputElement;
-                        if (input.tagName === 'SELECT') input.value = response.value;
-                        else if (input) input.checked = true;
+                    
+                    // Handle "other" option for checkboxes
+                    if (response.value && response.value.includes('other') && inputElement.querySelector('input[data-other-for]')) {
+                        const otherInput = inputElement.querySelector('input[data-other-for]');
+                        otherInput.value = response.otherText || '';
+                        otherInput.disabled = false;
                     }
-                } else {
-                    inputElement.value = response.value;
+                } 
+                // Handle radio button inputs
+                else if (response.type === 'multiple') {
+                    const radios = inputElement.querySelectorAll(`input[type="radio"]`);
+                    radios.forEach(radio => {
+                        if (radio.value === response.value) {
+                            radio.checked = true;
+                        }
+                    });
+                    
+                    // Handle "other" option for radio buttons
+                    if (response.value === 'other' && inputElement.querySelector('input[data-other-for]')) {
+                        const otherInput = inputElement.querySelector('input[data-other-for]');
+                        otherInput.value = response.otherText || '';
+                        otherInput.disabled = false;
+                    }
+                } 
+                // Handle dropdown inputs
+                else if (response.type === 'dropdown') {
+                    if (inputElement.tagName === 'SELECT') {
+                        inputElement.value = response.value || '';
+                    }
+                } 
+                // Handle grid inputs
+                else if (response.type === 'grid') {
+                    if (response.value) {
+                        response.value.forEach(gridResponse => {
+                            const radio = inputElement.querySelector(
+                                `input[type="radio"][name="question_${questionId}_row_${gridResponse.rowIndex}"][value="${gridResponse.optionIndex}"]`
+                            );
+                            if (radio) radio.checked = true;
+                        });
+                    }
+                } 
+                // Handle all other input types (text, textarea, date, etc.)
+                else {
+                    inputElement.value = response.value || '';
                 }
             }
         }
@@ -739,30 +794,33 @@
 
             saveCurrentSectionResponses();
 
-            const nextIndex = findNextLogicalPage(currentSectionIndex);
-
-            if (nextIndex >= sections.length) {
-                submitForm(); // This should run when no more sections exist
+            // Check if this is the last logical page
+            const isLastPage = currentSectionIndex >= sections.length - 1 || 
+                            (currentSectionIndex === sections.length - 2 && 
+                            sections[sections.length - 1].behavior === 'same-page');
+            
+            if (isLastPage) {
+                submitForm();
             } else {
+                const nextIndex = findNextLogicalPage(currentSectionIndex);
                 currentSectionIndex = nextIndex;
-                renderSectionsStartingAt(nextIndex);
+                renderSectionsStartingAt(currentSectionIndex);
             }
         }
 
-        function findNextLogicalPage(currentIndex) {
-            let i = currentIndex + 1;
-
-            // Stop at last section even if it's same-page
-            if (i >= sections.length) {
-                return sections.length;
+        function findNextLogicalPage(index) {
+            // If we're at the last section, return the current index
+            if (index >= sections.length - 1) {
+                return index;
             }
-
-            // For same-page sections, skip ahead to non-same-page
-            while (i < sections.length && sections[i].behavior === 'same-page') {
-                i++;
+            
+            // Find the next section that isn't marked as 'same-page'
+            let nextIndex = index + 1;
+            while (nextIndex < sections.length && sections[nextIndex].behavior === 'same-page') {
+                nextIndex++;
             }
-
-            return i;
+            
+            return Math.min(nextIndex, sections.length - 1);
         }
 
         function showPreviousSection() {
@@ -783,89 +841,112 @@
         }
 
         function validateCurrentSection() {
-            const currentSection = sections[currentSectionIndex];
-
-            const sectionElement = document.querySelector(`.form-section[data-section-index="${currentSectionIndex}"]`);
-            
-            if (!sectionElement) {
-                console.error(`Section element not found for index ${currentSectionIndex}`);
-                alert('Form structure not fully loaded – cannot validate');
-                return false;
-            }
-
             let isValid = true;
-
-            currentSection.questions.forEach(question => {
-                if (!question.required) return;
-
-                const questionId = question.id;
-                const questionType = question.type;
-
-                if (questionType === 'checkbox') {
-                    const checkboxes = sectionElement.querySelectorAll(`input[type="checkbox"][name^="question_${questionId}_"]:checked`);
-                    if (checkboxes.length === 0) {
-                        isValid = false;
-                        highlightRequired(sectionElement.querySelector(`input[type="checkbox"][name^="question_${questionId}_"]`));
+            
+            for (let i = currentSectionIndex; i >= 0 && (i === currentSectionIndex || sections[i].behavior === 'same-page'); i--) {
+                const section = sections[i];
+                const sectionElement = document.querySelector(`.form-section[data-section-index="${i}"]`);
+                
+                if (!section || !sectionElement || !section.questions) continue;
+                
+                section.questions.forEach(question => {
+                    if (!question.required) return;
+                    
+                    const questionId = question.id;
+                    const questionType = question.type;
+                    const questionElement = sectionElement.querySelector(`[data-question-id="${questionId}"]`);
+                    
+                    if (!questionElement) return;
+                    
+                    if (questionType === 'checkbox') {
+                        const checkboxes = sectionElement.querySelectorAll(
+                            `input[type="checkbox"][name^="question_${questionId}_"]:checked`
+                        );
+                        if (checkboxes.length === 0) {
+                            isValid = false;
+                            highlightRequired(sectionElement.querySelector(`input[type="checkbox"]`));
+                        }
+                    } else if (questionType === 'multiple') {
+                        const radio = sectionElement.querySelector(
+                            `input[type="radio"][name="question_${questionId}"]:checked`
+                        );
+                        if (!radio) {
+                            isValid = false;
+                            highlightRequired(sectionElement.querySelector(`input[type="radio"]`));
+                        }
+                    } else if (questionType === 'dropdown') {
+                        const select = sectionElement.querySelector(
+                            `select[data-question-id="${questionId}"]`
+                        );
+                        if (!select || !select.value) {
+                            isValid = false;
+                            highlightRequired(select);
+                        }
+                    } else if (questionType === 'grid') {
+                        if (question.rows) {
+                            question.rows.forEach((row, rowIndex) => {
+                                const radioGroup = sectionElement.querySelectorAll(
+                                    `input[type="radio"][name="question_${questionId}_row_${rowIndex}"]`
+                                );
+                                const isChecked = Array.from(radioGroup).some(radio => radio.checked);
+                                if (!isChecked) {
+                                    isValid = false;
+                                    const rowElement = radioGroup[0]?.closest('tr');
+                                    if (rowElement) {
+                                        rowElement.style.backgroundColor = 'rgba(255, 0, 0, 0.1)';
+                                        setTimeout(() => {
+                                            rowElement.style.backgroundColor = '';
+                                        }, 2000);
+                                    }
+                                }
+                            });
+                        }
+                    } else {
+                        const input = sectionElement.querySelector(
+                            `[data-question-id="${questionId}"]`
+                        );
+                        if (!input || !input.value.trim()) {
+                            isValid = false;
+                            highlightRequired(input);
+                        }
                     }
-                } else if (questionType === 'multiple') {
-                    const radio = sectionElement.querySelector(`input[type="radio"][name="question_${questionId}"]:checked`);
-                    if (!radio) {
-                        isValid = false;
-                        highlightRequired(sectionElement.querySelector(`input[type="radio"][name="question_${questionId}"]`));
-                    }
-                } else if (questionType === 'dropdown') {
-                    const select = sectionElement.querySelector(`select[data-question-id="${questionId}"]`);
-                    if (!select || !select.value) {
-                        isValid = false;
-                        highlightRequired(select);
-                    }
-                } else if (questionType === 'grid') {
-                    let hasSelection = false;
-                    sectionElement.querySelectorAll(`input[type="radio"][name^="question_${questionId}_row_"]`).forEach(radio => {
-                        if (radio.checked) hasSelection = true;
-                    });
-
-                    if (!hasSelection) {
-                        isValid = false;
-                        alert('Please complete all required grid selections.');
-                    }
-                } else {
-                    const input = sectionElement.querySelector(`[data-question-id="${questionId}"]`);
-                    if (!input || !input.value.trim()) {
-                        isValid = false;
-                        highlightRequired(input);
-                    }
-                }
-            });
-
+                });
+            }
+            
             return isValid;
         }
 
         function updateNavigationButtons() {
             const prevBtn = document.getElementById('prev-section-btn');
             const nextBtn = document.getElementById('next-section-btn');
-            const clearBtn = document.getElementById('clear-section-btn');
-
+            
             prevBtn.disabled = currentSectionIndex <= 0;
-
-            const nextSection = sections[currentSectionIndex + 1];
-            const currentBehavior = sections[currentSectionIndex]?.behavior || 'next-page';
-
-            if (currentSectionIndex === sections.length - 1) {
-                nextBtn.textContent = currentBehavior === 'same-page' ? 'Save and Submit' : 'Submit';
-            } else if (nextSection?.behavior === 'same-page') {
-                nextBtn.textContent = 'Save Responses';
+            
+            // Check if this is the last logical page
+            const isLastPage = currentSectionIndex >= sections.length - 1 || 
+                            (currentSectionIndex === sections.length - 2 && 
+                            sections[sections.length - 1].behavior === 'same-page');
+            
+            if (isLastPage) {
+                nextBtn.textContent = 'Submit';
+                nextBtn.classList.remove('btn-primary');
+                nextBtn.classList.add('btn-success');
             } else {
                 nextBtn.textContent = 'Next Section';
+                nextBtn.classList.remove('btn-success');
+                nextBtn.classList.add('btn-primary');
             }
-
-            clearBtn.textContent = currentBehavior === 'same-page' ? 'Clear Responses' : 'Clear Section';
         }
 
         function updateProgress() {
             const progressContainer = document.querySelector('.progress-container');
             const progressBar = document.getElementById('progress-bar');
             const progressText = document.getElementById('progress-text');
+
+            if (!sections || sections.length === 0) {
+                progressContainer.style.display = 'none';
+                return;
+            }
 
             // Count logical pages
             let totalPages = 1;
@@ -904,53 +985,14 @@
             progressText.textContent = `${currentPage}/${totalPages} ${totalPages > 1 ? 'pages' : 'page'}`;
         }
 
-        function countLogicalPages() {
-            let pageCount = 0;
-            let i = 0;
-            while (i < sections.length) {
-                if (sections[i].behavior !== 'same-page') {
-                    pageCount++;
-                    i++;
-                } else {
-                    pageCount++;
-                    while (i < sections.length && sections[i].behavior === 'same-page') i++;
-                }
-            }
-            return pageCount;
-        }
-
-        function getCurrentPageNumber(totalPages) {
-            let pageNumber = 1;
-            let i = 0;
-            while (i < currentSectionIndex) {
-                if (sections[i].behavior !== 'same-page') {
-                    pageNumber++;
-                    i++;
-                } else {
-                    pageNumber++;
-                    while (i < sections.length && sections[i].behavior === 'same-page') i++;
-                }
-            }
-            return pageNumber;
-        }
-
-        function showSaveFeedback() {
-            const feedback = document.getElementById('save-feedback');
-            feedback.style.display = 'block';
-            feedback.style.opacity = '1';
-            setTimeout(() => {
-                feedback.style.opacity = '0';
-                setTimeout(() => {
-                    feedback.style.display = 'none';
-                }, 500);
-            }, 2500);
-        }
-
         function clearCurrentSection() {
             if (confirm('Are you sure you want to clear all responses in this section?')) {
-                for (let i = currentSectionIndex; i >= 0 && sections[i].behavior === 'same-page'; i--) {
+                for (let i = currentSectionIndex; i >= 0 && (i === currentSectionIndex || sections[i].behavior === 'same-page'); i--) {
                     const section = sections[i];
                     const sectionElement = document.querySelector(`.form-section[data-section-index="${i}"]`);
+                    
+                    if (!section || !sectionElement || !section.questions) continue;
+                    
                     section.questions.forEach(question => {
                         const questionId = question.id;
                         delete formResponses[questionId];
@@ -986,13 +1028,22 @@
                         }
                     });
                 }
+                
+                localStorage.setItem('studentFormProgress', JSON.stringify(formResponses));
             }
         }
 
         function saveCurrentSectionResponses() {
-            for (let i = currentSectionIndex; i >= 0 && sections[i].behavior === 'same-page'; i--) {
+            if (!formData) return;
+            
+            formResponses.formId = formData.form_index;
+            
+            for (let i = currentSectionIndex; i >= 0 && (i === currentSectionIndex || sections[i].behavior === 'same-page'); i--) {
                 const section = sections[i];
                 const sectionElement = document.querySelector(`.form-section[data-section-index="${i}"]`);
+                
+                if (!section || !sectionElement || !section.questions) continue;
+                
                 section.questions.forEach(question => {
                     const questionId = question.id;
                     const questionType = question.type;
@@ -1049,76 +1100,109 @@
                     }
                 });
             }
+            
+            localStorage.setItem('studentFormProgress', JSON.stringify(formResponses));
         }
 
-        async function submitForm() {
-            saveCurrentSectionResponses();
+    async function submitForm() {
+        const submitBtn = document.getElementById('next-section-btn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...';
 
-            const submissionData = {
-                form_index: formData.form_index,
-                student_index: studentId, // From session
-                answers: [],
-                grid_answers: []
-            };
+        saveCurrentSectionResponses(); // Ensure latest input is stored
 
-            for (const [questionId, response] of Object.entries(formResponses)) {
-                if (response.type === 'grid') {
+        const submissionData = {
+            form_index: formData.form_index,
+            answers: [],
+            grid_answers: []
+        };
+
+        for (const [questionId, response] of Object.entries(formResponses)) {
+            if (questionId === 'formId') continue; // Skip metadata
+            
+            const main_question_index = parseInt(questionId);
+
+            if (response.type === 'grid') {
+                if (Array.isArray(response.value)) {
                     response.value.forEach(gridResponse => {
                         submissionData.grid_answers.push({
-                            main_question_index: questionId,
-                            sub_question_index: gridResponse.rowIndex,
-                            choice_index: gridResponse.optionIndex
+                            main_question_index,
+                            sub_question_index: parseInt(gridResponse.rowIndex),
+                            choice_index: parseInt(gridResponse.optionIndex)
                         });
-                    });
-                } else if (response.type === 'checkbox' || response.type === 'multiple' || response.type === 'dropdown') {
-                    if (response.value === 'other' && response.otherText) {
-                        submissionData.answers.push({
-                            main_question_index: questionId,
-                            text_answer: response.otherText
-                        });
-                    } else {
-                        submissionData.answers.push({
-                            main_question_index: questionId,
-                            choice_index: response.value,
-                            text_answer: null
-                        });
-                    }
-                } else {
-                    submissionData.answers.push({
-                        main_question_index: questionId,
-                        text_answer: response.value
                     });
                 }
-            }
-
-            try {
-                const response = await fetch('http://localhost/cgcc-system/backend/forms/submit_response.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(submissionData)
+            } else if (response.type === 'checkbox') {
+                if (Array.isArray(response.value)) {
+                    response.value.forEach(value => {
+                        submissionData.answers.push({
+                            main_question_index,
+                            choice_index: null,
+                            text_answer: value === 'other' ? (response.otherText || '') : value
+                        });
+                    });
+                }
+            } else if (response.type === 'multiple' || response.type === 'dropdown') {
+                submissionData.answers.push({
+                    main_question_index,
+                    choice_index: null,
+                    text_answer: response.value === 'other' ? (response.otherText || '') : (response.value || '')
                 });
-
-                if (!response.ok) {
-                    throw new Error('Failed to submit form');
-                }
-
-                const result = await response.json();
-                alert('Form submitted successfully!');
-                window.location.href = 'submission-success.html';
-            } catch (error) {
-                console.error('Submission error:', error);
-                alert('Error submitting form. Please try again.');
+            } else {
+                submissionData.answers.push({
+                    main_question_index,
+                    choice_index: null,
+                    text_answer: response.value || ''
+                });
             }
         }
+
+        try {
+            const response = await fetch('http://localhost/cgcc-system/backend/forms/submit_response.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(submissionData),
+                credentials: 'include' // Important for session
+            });
+
+            if (!response.ok) throw new Error('Failed to submit form');
+
+            // ✅ Clear local progress after successful submission
+            localStorage.removeItem('studentFormProgress');
+
+            alert('Form submitted successfully!');
+            window.location.href = 'submission-success.html';
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Failed to submit form. Please try again.');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Submit';
+        }
+    }
 
         function highlightRequired(element) {
             if (!element) return;
+            
             element.style.borderColor = 'red';
             setTimeout(() => {
                 element.style.borderColor = '';
             }, 2000);
+            
             element.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
+
+        // Auto-save functionality
+        document.getElementById('form-container').addEventListener('input', () => {
+            saveCurrentSectionResponses();
+        });
+
+        // Handle beforeunload to warn about unsaved changes
+        window.addEventListener('beforeunload', (e) => {
+            if (Object.keys(formResponses).length > 1) { // More than just formId
+                e.preventDefault();
+                e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+            }
+        });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
