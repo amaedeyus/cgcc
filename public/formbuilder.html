@@ -1567,20 +1567,18 @@
                         questionCard.find('.options-container').removeClass('d-none');
 
                         // Add initial option
-                        const questionType = questionCard.find('.question-type').val(); // ✅ Get from DOM
-
                         const optionHtml = `
                             <div class="option-row mb-2 d-flex align-items-center">
-                                <div class="form-check me-2" style="display: ${questionType === 'grid' ? 'none' : 'block'}">
+                                <div class="form-check me-2" style="display: ${questionData.type === 'grid' ? 'none' : 'block'}">
                                     <input class="form-check-input" type="${questionType === 'multiple' ? 'radio' : 'checkbox'}" disabled>
                                 </div>
-                                <input type="text" class="form-control option-input" placeholder="Option ${optionCount + 1}">
-                                <button type="button" class="btn btn-sm btn-outline-danger ms-2 delete-option">
+                                <input type="text" class="form-control option-input" placeholder="Option 1">
+                                <button type="button" class="btn btn-outline-danger ms-2 remove-option">
                                     <i class="fas fa-trash"></i>
                                 </button>
-                            </div>`;
-
-                        $(this).before(optionHtml);
+                            </div>
+                        `;
+                        questionCard.find('.options-container').html(optionHtml);
 
                         // Add "Add Option" button
                         questionCard.find('.options-container').append(`
@@ -1847,20 +1845,20 @@
                 if (['multiple', 'checkbox', 'dropdown', 'grid'].includes(questionData.type)) {
                     const optionsContainer = questionCard.find('.options-container');
 
-                    const questionType = questionCard.find('.question-type').val(); // ✅ Get from DOM
-
-                    const optionHtml = `
+                    questionData.options.forEach((option, idx) => {
+                        const optionHtml = `
                         <div class="option-row mb-2 d-flex align-items-center">
-                            <div class="form-check me-2" style="display: ${questionType === 'grid' ? 'none' : 'block'}">
-                                <input class="form-check-input" type="${questionType === 'multiple' ? 'radio' : 'checkbox'}" disabled>
+                            <div class="form-check me-2" style="display: ${questionData.type === 'grid' ? 'none' : 'block'}">
+                                <input class="form-check-input" type="${questionData.type === 'multiple' ? 'radio' : 'checkbox'}" disabled>
                             </div>
-                            <input type="text" class="form-control option-input" placeholder="Option ${optionCount + 1}">
-                            <button type="button" class="btn btn-sm btn-outline-danger ms-2 delete-option">
+                            <input type="text" class="form-control option-input" placeholder="Option ${idx + 1}" value="${option}">
+                            <button type="button" class="btn btn-outline-danger ms-2 remove-option">
                                 <i class="fas fa-trash"></i>
                             </button>
-                        </div>`;
-
-                    $(this).before(optionHtml);
+                        </div>
+                    `;
+                        optionsContainer.append(optionHtml);
+                    });
 
                     // Add "Add Option" button
                     optionsContainer.append(`
