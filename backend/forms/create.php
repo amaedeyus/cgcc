@@ -1,4 +1,18 @@
 <?php
+
+session_start();
+
+if (!isset($_SESSION['user_index'])) {
+    http_response_code(401);
+    echo json_encode(['error' => 'Unauthorized']);
+    exit;
+}
+
+$userType = $_SESSION['user_type'];
+
+// Optional: Log user type
+error_log("User type: " . $userType);
+
 // create.php
 
 header("Access-Control-Allow-Methods: POST, OPTIONS");
@@ -29,10 +43,10 @@ if (!isset($data['form_name'])) {
 try {
     $conn->begin_transaction();
 
-    // 1. Insert the form into the forms table
+    // 1. Insert the form
     $formName = $data['form_name'];
     $description = $data['description'] ?? '';
-
+    
     $stmt = $conn->prepare("INSERT INTO forms (form_name, description) VALUES (?, ?)");
     if (!$stmt) throw new Exception("Insert form prepare failed: " . $conn->error);
 
@@ -79,6 +93,7 @@ try {
                     $questionText = $question['question'] ?? '';
                     $questionType = $type;
 
+                    // Insert question
                     $questionInsert->bind_param(
                         "iissii",
                         $formId,
@@ -106,7 +121,7 @@ try {
                         }
                     }
 
-                    // Insert rows (for grid questions)
+                    // Insert rows (for grid)
                     if (isset($question['rows']) && is_array($question['rows'])) {
                         foreach ($question['rows'] as $row) {
                             $r = $row;
@@ -124,6 +139,65 @@ try {
         $questionInsert->close();
         $choiceInsert->close();
         $subQuestionInsert->close();
+    }
+
+    // 3. ✅ Create a snapshot of this new form
+    try {
+        // Build the full form structure as JSON
+        $formStructure = [
+            'form_index' => $formId,
+            'form_name' => $formName,
+            'description' => $description,
+            'sections' => []
+        ];
+
+        // Rebuild sections and questions for snapshot
+        $formStructure['sections'] = array_map(function ($sectionData) use (&$conn) {
+            $section = [
+                'section_index' => $sectionData['title'],
+                'section_title' => $sectionData['title'],
+                'section_description' => $sectionData['description'] ?? '',
+                'behavior' => $sectionData['behavior'] ?? 'next-page',
+                'questions' => []
+            ];
+
+            if (isset($sectionData['questions']) && is_array($sectionData['questions'])) {
+                foreach ($sectionData['questions'] as $question) {
+                    $section['questions'][] = [
+                        'main_question_index' => null, // Will be assigned by DB
+                        'main_question_text' => $question['question'] ?? '',
+                        'type' => $question['type'] ?? 'short',
+                        'is_required' => $question['required'] ? 1 : 0,
+                        'include_other' => isset($question['includeOther']) ? (int)$question['includeOther'] : 0,
+                        'options' => $question['options'] ?? [],
+                        'rows' => $question['rows'] ?? []
+                    ];
+                }
+            }
+
+            return $section;
+        }, $data['sections']);
+
+        $snapshotData = json_encode($formStructure, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        if ($snapshotData === false) {
+            throw new Exception("Failed to encode snapshot: " . json_last_error_msg());
+        }
+
+        // Insert into form_snapshots
+        $stmtSnapshot = $conn->prepare("INSERT INTO form_snapshots (form_index, snapshot_data, is_active) VALUES (?, ?, 1)");
+        if (!$stmtSnapshot) {
+            throw new Exception("Snapshot prepare failed: " . $conn->error);
+        }
+
+        $stmtSnapshot->bind_param("is", $formId, $snapshotData);
+        if (!$stmtSnapshot->execute()) {
+            throw new Exception("Snapshot insert failed: " . $stmtSnapshot->error);
+        }
+        $stmtSnapshot->close();
+
+    } catch (Exception $e) {
+        error_log("Snapshot creation failed during create: " . $e->getMessage());
+        // Continue even if snapshot fails
     }
 
     $conn->commit();

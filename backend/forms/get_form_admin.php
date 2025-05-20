@@ -1,4 +1,18 @@
 <?php
+
+session_start();
+
+if (!isset($_SESSION['user_index'])) {
+    http_response_code(401);
+    echo json_encode(['error' => 'Unauthorized']);
+    exit;
+}
+
+$userType = $_SESSION['user_type'];
+
+// Optional: Log user type
+error_log("User type: " . $userType);
+
 // Enable CORS and set headers
 header("Access-Control-Allow-Methods: GET, OPTIONS");
 header("Access-Control-Allow-Credentials: true");

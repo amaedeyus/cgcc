@@ -317,6 +317,28 @@
     </div>
 
     <script>
+
+        let studentId = null;
+
+        // Load studentId on page load
+        async function loadStudentId() {
+            try {
+                const response = await fetch('http://localhost/cgcc-system/backend/forms/get_student.php');
+                const data = await response.json();
+
+                if (data.error) {
+                    alert(data.error);
+                    window.location.href = '/cgcc-system/public/front-end.html';
+                    return;
+                }
+
+                studentId = data.studentId;
+            } catch (err) {
+                alert('Failed to load student info');
+                console.error(err);
+                window.location.href = '/cgcc-system/public/front-end.html';
+            }
+        }
         // Global variables
         let currentSectionIndex = 0;
         let formData = null;
@@ -337,9 +359,25 @@
             document.getElementById('next-section-btn').addEventListener('click', handleNextAction);
         });
 
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const formId = urlParams.get('id');
+
+            if (!formId) {
+                alert('No form ID specified.');
+                return;
+            }
+
+            // First load student ID
+            loadStudentId().then(() => {
+                fetchFormData(formId);
+                setupEventListeners(); // Attach button events
+            });
+        });
+
         async function fetchFormData(formId) {
             try {
-                const response = await fetch(`http://localhost/cgcc-system/backend/forms/get_form.php?id=${formId}`);
+                const response = await fetch(`http://localhost/cgcc-system/backend/forms/get_form_student.php?id=${formId}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch form data');
                 }
@@ -702,20 +740,29 @@
             saveCurrentSectionResponses();
 
             const nextIndex = findNextLogicalPage(currentSectionIndex);
+
             if (nextIndex >= sections.length) {
-                submitForm();
+                submitForm(); // This should run when no more sections exist
             } else {
                 currentSectionIndex = nextIndex;
-                renderSectionsStartingAt(currentSectionIndex);
+                renderSectionsStartingAt(nextIndex);
             }
         }
 
-        function findNextLogicalPage(index) {
-            while (index + 1 < sections.length) {
-                index++;
-                if (sections[index].behavior !== 'same-page') break;
+        function findNextLogicalPage(currentIndex) {
+            let i = currentIndex + 1;
+
+            // Stop at last section even if it's same-page
+            if (i >= sections.length) {
+                return sections.length;
             }
-            return index;
+
+            // For same-page sections, skip ahead to non-same-page
+            while (i < sections.length && sections[i].behavior === 'same-page') {
+                i++;
+            }
+
+            return i;
         }
 
         function showPreviousSection() {
@@ -736,64 +783,61 @@
         }
 
         function validateCurrentSection() {
-            let isValid = true;
-            for (let i = currentSectionIndex; i >= 0 && sections[i].behavior === 'same-page'; i--) {
-                const section = sections[i];
-                const sectionElement = document.querySelector(`.form-section[data-section-index="${i}"]`);
-                section.questions.forEach(question => {
-                    if (!question.required) return;
-                    const questionId = question.id;
-                    const questionType = question.type;
-                    if (questionType === 'checkbox') {
-                        const checkboxes = sectionElement.querySelectorAll(
-                            `input[type="checkbox"][name^="question_${questionId}_"]:checked`
-                        );
-                        if (checkboxes.length === 0) {
-                            isValid = false;
-                            highlightRequired(sectionElement.querySelector(`input[type="checkbox"]`));
-                        }
-                    } else if (questionType === 'multiple') {
-                        const radio = sectionElement.querySelector(
-                            `input[type="radio"][name="question_${questionId}"]:checked`
-                        );
-                        if (!radio) {
-                            isValid = false;
-                            highlightRequired(sectionElement.querySelector(`input[type="radio"]`));
-                        }
-                    } else if (questionType === 'dropdown') {
-                        const select = sectionElement.querySelector(
-                            `select[data-question-id="${questionId}"]`
-                        );
-                        if (!select || !select.value) {
-                            isValid = false;
-                            highlightRequired(select);
-                        }
-                    } else if (questionType === 'grid') {
-                        question.rows.forEach((row, rowIndex) => {
-                            const radioGroup = sectionElement.querySelectorAll(
-                                `input[type="radio"][name="question_${questionId}_row_${rowIndex}"]`
-                            );
-                            const isChecked = Array.from(radioGroup).some(radio => radio.checked);
-                            if (!isChecked) {
-                                isValid = false;
-                                const rowElement = radioGroup[0].closest('tr');
-                                rowElement.style.backgroundColor = 'rgba(255, 0, 0, 0.1)';
-                                setTimeout(() => {
-                                    rowElement.style.backgroundColor = '';
-                                }, 2000);
-                            }
-                        });
-                    } else {
-                        const input = sectionElement.querySelector(
-                            `[data-question-id="${questionId}"]`
-                        );
-                        if (!input || !input.value.trim()) {
-                            isValid = false;
-                            highlightRequired(input);
-                        }
-                    }
-                });
+            const currentSection = sections[currentSectionIndex];
+
+            const sectionElement = document.querySelector(`.form-section[data-section-index="${currentSectionIndex}"]`);
+            
+            if (!sectionElement) {
+                console.error(`Section element not found for index ${currentSectionIndex}`);
+                alert('Form structure not fully loaded – cannot validate');
+                return false;
             }
+
+            let isValid = true;
+
+            currentSection.questions.forEach(question => {
+                if (!question.required) return;
+
+                const questionId = question.id;
+                const questionType = question.type;
+
+                if (questionType === 'checkbox') {
+                    const checkboxes = sectionElement.querySelectorAll(`input[type="checkbox"][name^="question_${questionId}_"]:checked`);
+                    if (checkboxes.length === 0) {
+                        isValid = false;
+                        highlightRequired(sectionElement.querySelector(`input[type="checkbox"][name^="question_${questionId}_"]`));
+                    }
+                } else if (questionType === 'multiple') {
+                    const radio = sectionElement.querySelector(`input[type="radio"][name="question_${questionId}"]:checked`);
+                    if (!radio) {
+                        isValid = false;
+                        highlightRequired(sectionElement.querySelector(`input[type="radio"][name="question_${questionId}"]`));
+                    }
+                } else if (questionType === 'dropdown') {
+                    const select = sectionElement.querySelector(`select[data-question-id="${questionId}"]`);
+                    if (!select || !select.value) {
+                        isValid = false;
+                        highlightRequired(select);
+                    }
+                } else if (questionType === 'grid') {
+                    let hasSelection = false;
+                    sectionElement.querySelectorAll(`input[type="radio"][name^="question_${questionId}_row_"]`).forEach(radio => {
+                        if (radio.checked) hasSelection = true;
+                    });
+
+                    if (!hasSelection) {
+                        isValid = false;
+                        alert('Please complete all required grid selections.');
+                    }
+                } else {
+                    const input = sectionElement.querySelector(`[data-question-id="${questionId}"]`);
+                    if (!input || !input.value.trim()) {
+                        isValid = false;
+                        highlightRequired(input);
+                    }
+                }
+            });
+
             return isValid;
         }
 
@@ -805,15 +849,17 @@
             prevBtn.disabled = currentSectionIndex <= 0;
 
             const nextSection = sections[currentSectionIndex + 1];
-            if (nextSection?.behavior === 'same-page') {
+            const currentBehavior = sections[currentSectionIndex]?.behavior || 'next-page';
+
+            if (currentSectionIndex === sections.length - 1) {
+                nextBtn.textContent = currentBehavior === 'same-page' ? 'Save and Submit' : 'Submit';
+            } else if (nextSection?.behavior === 'same-page') {
                 nextBtn.textContent = 'Save Responses';
-            } else if (currentSectionIndex === sections.length - 1) {
-                nextBtn.textContent = 'Submit';
             } else {
                 nextBtn.textContent = 'Next Section';
             }
 
-            clearBtn.textContent = sections[currentSectionIndex]?.behavior === 'same-page' ? 'Clear Responses' : 'Clear Section';
+            clearBtn.textContent = currentBehavior === 'same-page' ? 'Clear Responses' : 'Clear Section';
         }
 
         function updateProgress() {
@@ -1007,43 +1053,39 @@
 
         async function submitForm() {
             saveCurrentSectionResponses();
+
             const submissionData = {
-                form_id: formData.form_index,
-                responses: []
+                form_index: formData.form_index,
+                student_index: studentId, // From session
+                answers: [],
+                grid_answers: []
             };
 
             for (const [questionId, response] of Object.entries(formResponses)) {
                 if (response.type === 'grid') {
                     response.value.forEach(gridResponse => {
-                        submissionData.responses.push({
-                            question_id: questionId,
-                            type: response.type,
-                            row_index: gridResponse.rowIndex,
-                            option_index: gridResponse.optionIndex,
-                            text_answer: null
+                        submissionData.grid_answers.push({
+                            main_question_index: questionId,
+                            sub_question_index: gridResponse.rowIndex,
+                            choice_index: gridResponse.optionIndex
                         });
                     });
-                } else if (response.type === 'checkbox') {
-                    response.value.forEach(value => {
-                        submissionData.responses.push({
-                            question_id: questionId,
-                            type: response.type,
-                            choice_text: value === 'other' ? (response.otherText || '') : value,
+                } else if (response.type === 'checkbox' || response.type === 'multiple' || response.type === 'dropdown') {
+                    if (response.value === 'other' && response.otherText) {
+                        submissionData.answers.push({
+                            main_question_index: questionId,
+                            text_answer: response.otherText
+                        });
+                    } else {
+                        submissionData.answers.push({
+                            main_question_index: questionId,
+                            choice_index: response.value,
                             text_answer: null
                         });
-                    });
-                } else if (response.type === 'multiple' || response.type === 'dropdown') {
-                    submissionData.responses.push({
-                        question_id: questionId,
-                        type: response.type,
-                        choice_text: response.value === 'other' ? (response.otherText || '') : response.value,
-                        text_answer: null
-                    });
+                    }
                 } else {
-                    submissionData.responses.push({
-                        question_id: questionId,
-                        type: response.type,
-                        choice_text: null,
+                    submissionData.answers.push({
+                        main_question_index: questionId,
                         text_answer: response.value
                     });
                 }
@@ -1056,13 +1098,16 @@
                     body: JSON.stringify(submissionData)
                 });
 
-                if (!response.ok) throw new Error('Failed to submit form');
+                if (!response.ok) {
+                    throw new Error('Failed to submit form');
+                }
 
+                const result = await response.json();
                 alert('Form submitted successfully!');
                 window.location.href = 'submission-success.html';
             } catch (error) {
-                console.error('Error:', error);
-                alert('Failed to submit form. Please try again.');
+                console.error('Submission error:', error);
+                alert('Error submitting form. Please try again.');
             }
         }
 
