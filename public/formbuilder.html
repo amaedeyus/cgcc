@@ -734,7 +734,12 @@
         // Function to update question preview
         function updatePreview(questionCard) {
             const questionText = questionCard.find('.question-text').val().trim() || 'Untitled Question';
-            const questionType = questionCard.find('.question-type').val();
+            const questionType = questionCard.find('.question-type').val(); // get type
+            const questionData = {
+                type: questionType,
+                options: [],
+                rows: []
+            };
             const isRequired = questionCard.find('.required-switch').is(':checked');
 
             // Update question text and required indicator
@@ -823,7 +828,12 @@
         }
 
         function generateNewOptionElement(questionCard) {
-            const questionType = questionCard.find('.question-type').val();
+            const questionType = questionCard.find('.question-type').val(); // get type
+            const questionData = {
+                type: questionType,
+                options: [],
+                rows: []
+            };
             const inputType = questionType === 'multiple' ? 'radio' : 'checkbox';
 
             return `
@@ -1113,7 +1123,12 @@
                             const optionsContainer = questionCard.find('.options-container');
                             optionsContainer.empty();
 
-                            const questionType = questionCard.find('.question-type').val(); // ✅ Get from DOM
+                            const questionType = questionCard.find('.question-type').val(); // get type
+                            const questionData = {
+                                type: questionType,
+                                options: [],
+                                rows: []
+                            };
 
                             const optionHtml = `
                                 <div class="option-row mb-2 d-flex align-items-center">
@@ -1492,7 +1507,12 @@
             // Function to update question type UI
             function updateQuestionType(questionCard) {
 
-                const questionType = questionCard.find('.question-type').val();
+                const questionType = questionCard.find('.question-type').val(); // get type
+                const questionData = {
+                    type: questionType,
+                    options: [],
+                    rows: []
+                };
 
                 // Remove existing dynamic fields
                 questionCard.find('.short-answer, .paragraph-answer, .options-container, .grid-rows-container, .display-text, .date-answer').addClass('d-none');
@@ -2276,7 +2296,12 @@
                 const optionsContainer = questionCard.find('.options-container');
                 const optionCount = optionsContainer.find('.option-row').length;
 
-                const questionType = questionCard.find('.question-type').val(); // ✅ Get from DOM
+                const questionType = questionCard.find('.question-type').val(); // get type
+                const questionData = {
+                    type: questionType,
+                    options: [],
+                    rows: []
+                };
 
                 const optionHtml = `
                     <div class="option-row mb-2 d-flex align-items-center">
