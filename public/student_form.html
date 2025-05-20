@@ -58,7 +58,7 @@
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 20px;
-            border-left: 4px solid #4CAF50; /* Green accent border */
+            border-left: 4px solid #4fbc9c; /* Green accent border */
             transition: all 0.3s ease;
             box-shadow: 0 2px 6px rgba(0,0,0,0.05);
         }
@@ -140,14 +140,14 @@
 
         /* Buttons */
         .btn-outline-primary {
-            border-color: #4CAF50;
-            color: #4CAF50;
+            border-color: #4fbc9c;
+            color: #4fbc9c;
             padding: 8px 20px;
             font-weight: 500;
         }
 
         .btn-outline-primary:hover {
-            background-color: #4CAF50;
+            background-color:#4fbc9c;
             color: #ffffff;
         }
 
@@ -164,8 +164,8 @@
         }
 
         .btn-primary {
-            background-color: #4CAF50;
-            border-color: #4CAF50;
+            background-color: #4fbc9c;
+            border-color: #4fbc9c;
             padding: 8px 20px;
             font-weight: 500;
         }
@@ -190,7 +190,7 @@
 
         /* Progress bar */
         .progress-bar {
-            background-color: #4CAF50;
+            background-color: #4fbc9c;
         }
 
         /* Interactive elements */
@@ -208,8 +208,8 @@
         }
 
         .form-check-input:checked {
-            background-color: #4CAF50;
-            border-color: #4CAF50;
+            background-color: #4fbc9c;
+            border-color: #4fbc9c;
         }
 
         /* Layout */
@@ -250,7 +250,7 @@
             right: 20px;
             z-index: 1000;
             padding: 12px 20px;
-            background-color: #4CAF50;
+            background-color: #4fbc9c;
             color: white;
             border-radius: 6px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
@@ -339,7 +339,7 @@
 
         async function fetchFormData(formId) {
             try {
-                const response = await fetch(`http://localhost/cgcc-system/backend/forms/get_form1.php?id=${formId}`);
+                const response = await fetch(`http://localhost/cgcc-system/backend/forms/get_form.php?id=${formId}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch form data');
                 }

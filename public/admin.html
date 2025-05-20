@@ -63,7 +63,7 @@
                 </button>
             </div>
             <div class="update">
-                <button class="button-class" onclick="window.location.href='http://localhost:3000'">
+                <button class="button-class" onclick="http://localhost/cgcc-system/public/formbuilder.html">
                     Create a new form
                 </button>
             </div>
@@ -111,7 +111,7 @@ fetch('http://localhost/cgcc-system/backend/forms/form.php')
       card.innerHTML = `
         <h3>${form.form_name}</h3>
         <p>${form.description || 'No description'}</p>
-        <a href="http://localhost:3000/edit-form/${form.form_index}" target="_blank">Open Form</a>
+        <a href="http://localhost/cgcc-system/public/formbuilder.html?id=${form.form_index}" target="_blank">Open Form</a>
       `;
 
       container.appendChild(card);

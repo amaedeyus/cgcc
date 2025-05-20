@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .header {
-            background-color: #4CAF50;
+            background-color: #4fbc9c;
             color: #e9f5e9;
             margin-bottom: 20px;
         }
@@ -21,7 +21,7 @@
         }
 
         .instructions .card {
-            border-left: 5px solid #4CAF50;
+            border-left: 5px solid #4fbc9c;
         }
 
         .instructions ol {
@@ -55,7 +55,7 @@
 
         /* For the form title/description card */
         .form-title-card {
-            border-left: 5px solid #4CAF50;
+            border-left: 5px solid #4fbc9c;
         }
 
         /* Section cards - from form builder with improvements */
@@ -67,7 +67,7 @@
             border: 1px solid #C8E6C9;
             /* Green border from form builder */
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-            border-left: 5px solid #4CAF50;
+            border-left: 5px solid #4fbc9c;
             position: relative;
             overflow: hidden;
             transition: all 0.3s ease;
@@ -109,7 +109,7 @@
         .section-title-input:focus {
             outline: none;
             box-shadow: none;
-            border-bottom: 2px solid #4CAF50;
+            border-bottom: 2px solid #4fbc9c;
         }
 
         /* Section description input - from form builder */
@@ -153,7 +153,7 @@
         /* Drag handle - from form builder */
         .drag-handle {
             cursor: grab;
-            color: #4CAF50;
+            color: #4fbc9c;
         }
 
         .drag-handle:active {
@@ -182,7 +182,7 @@
         .question-text:focus {
             outline: none;
             box-shadow: none;
-            border-bottom: 2px solid #4CAF50;
+            border-bottom: 2px solid #4fbc9c;
         }
 
         /* Form elements - combined styles */
@@ -292,14 +292,14 @@
 
         /* Buttons - combined styles */
         .btn-outline-primary {
-            border-color: #4CAF50;
-            color: #4CAF50;
+            border-color: #4fbc9c;
+            color: #4fbc9c;
             padding: 8px 20px;
             font-weight: 500;
         }
 
         .btn-outline-primary:hover {
-            background-color: #4CAF50;
+            background-color: #4fbc9c;
             color: #ffffff;
         }
 
@@ -316,8 +316,8 @@
         }
 
         .btn-primary {
-            background-color: #4CAF50;
-            border-color: #4CAF50;
+            background-color: #4fbc9c;
+            border-color: #4fbc9c;
             padding: 8px 20px;
             font-weight: 500;
         }
@@ -366,7 +366,7 @@
         }
 
         .progress-bar {
-            background-color: #4CAF50;
+            background-color: #4fbc9c;
         }
 
         #progress-text {
@@ -384,7 +384,7 @@
             right: 20px;
             z-index: 1000;
             padding: 12px 20px;
-            background-color: #4CAF50;
+            background-color: #4fbc9c;
             color: white;
             border-radius: 6px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -440,7 +440,7 @@
 
 
         #form-title:focus {
-            border-bottom-color: #4CAF50;
+            border-bottom-color: #4fbc9c;
             box-shadow: none;
         }
 
@@ -497,8 +497,8 @@
         }
 
         .floating-save-btn {
-            background-color: #4CAF50;
-            border-color: #4CAF50;
+            background-color: #4fbc9c;
+            border-color: #4fbc9c;
             color: white;
         }
 
@@ -1670,7 +1670,7 @@
                 const API_BASE_URL = 'http://localhost/cgcc-system/backend/forms';
 
                 $.ajax({
-                    url: `${API_BASE_URL}/get_form1.php?id=${formId}`,
+                    url: `${API_BASE_URL}/get_form.php?id=${formId}`,
                     type: 'GET',
                     dataType: 'json',
                     success: function (response) {
