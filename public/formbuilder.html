@@ -729,7 +729,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
 
     <script>
-        
+
 
         // Function to update question preview
         function updatePreview(questionCard) {
@@ -873,6 +873,34 @@
             // Check if we're editing an existing form (URL has ?id= parameter)
             const urlParams = new URLSearchParams(window.location.search);
             const formId = urlParams.get('id');
+            
+
+            $(document).on('keydown', function (e) {
+                // Check for Ctrl/Cmd + Z or Ctrl/Cmd + Y
+                const isUndo = (e.ctrlKey || e.metaKey) && e.key === 'z';
+                const isRedo = (e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.shiftKey && e.key === 'Z'));
+
+                if (isUndo || isRedo) {
+                    // Prevent browser's default undo/redo in inputs
+                    const tag = e.target.tagName.toLowerCase();
+                    const inputTypes = ['input', 'textarea'];
+
+                    if (inputTypes.includes(tag)) {
+                        e.preventDefault();
+                    }
+
+                    if (isUndo && historyIndex > 0) {
+                        historyIndex--;
+                        restoreState(history[historyIndex]);
+                    } else if (isRedo && historyIndex < history.length - 1) {
+                        historyIndex++;
+                        restoreState(history[historyIndex]);
+                    }
+
+                    updateUndoRedoButtons();
+                }
+            });
+
 
 
             $('#floating-back-btn').click(function (e) {
@@ -918,6 +946,28 @@
 
                 // Update button states
                 updateUndoRedoButtons();
+            }
+
+            function trackWordInputAndSaveState(selector) {
+                let lastValue = '';
+
+                $('body').on('input', selector, function () {
+                    const currentValue = $(this).val();
+                    if (currentValue.endsWith(' ') || currentValue.endsWith('\n')) {
+                        // Save state only after space or enter
+                        if (currentValue !== lastValue) {
+                            lastValue = currentValue;
+                            saveState();
+                        }
+                    }
+                });
+            }
+
+
+            function bindInputSaveState() {
+                $('body').on('input', '.question-text, .section-title-input, .section-description-input, .option-input, .grid-row-input', function () {
+                    saveState();
+                });
             }
 
             // Function to get current form state
@@ -1296,88 +1346,88 @@
             function addNewQuestion(container) {
                 const questionId = nextQuestionId++;
                 const questionHtml = `
-    <div class="card question-card mb-3" data-question-id="${questionId}">
-        <div class="card-body">
-            <div class="d-flex align-items-start">
-                <div class="me-2 mt-1 drag-handle">
-                    <i class="fas fa-grip-vertical"></i>
-                </div>
-                <div style="flex: 1;">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <label>New Question</label>
-                        <div>
-                            <button type="button" class="btn btn-outline-danger btn-sm me-2 delete-question">
-                                Delete
-                            </button>
-                            <button type="button" class="btn btn-outline-secondary btn-sm toggle-preview">
-                                Preview
-                            </button>
-                        </div>
-                    </div>
+                    <div class="card question-card mb-3" data-question-id="${questionId}">
+                        <div class="card-body">
+                            <div class="d-flex align-items-start">
+                                <div class="me-2 mt-1 drag-handle">
+                                    <i class="fas fa-grip-vertical"></i>
+                                </div>
+                                <div style="flex: 1;">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <label>New Question</label>
+                                        <div>
+                                            <button type="button" class="btn btn-outline-danger btn-sm me-2 delete-question">
+                                                Delete
+                                            </button>
+                                            <button type="button" class="btn btn-outline-secondary btn-sm toggle-preview">
+                                                Preview
+                                            </button>
+                                        </div>
+                                    </div>
 
-                    <div class="edit-mode">
-                        <div class="mb-2">
-                            <textarea class="question-text auto-expand" placeholder="Enter your question"></textarea>
-                        </div>
+                                    <div class="edit-mode">
+                                        <div class="mb-2">
+                                            <textarea class="question-text auto-expand" placeholder="Enter your question"></textarea>
+                                        </div>
 
-                        <div class="row mb-2">
-                            <label class="col-sm-2 col-form-label">Type</label>
-                            <div class="col-sm-10">
-                                <select class="form-select question-type">
-                                    <option value="short" selected>Short Answer</option>
-                                    <option value="paragraph">Paragraph</option>
-                                    <option value="multiple">Multiple Choice</option>
-                                    <option value="checkbox">Checkboxes</option>
-                                    <option value="dropdown">Dropdown</option>
-                                    <option value="grid">Multiple Choice Grid</option>
-                                    <option value="date">Date</option>
-                                    <option value="display">Display Text</option>
-                                </select>
+                                        <div class="row mb-2">
+                                            <label class="col-sm-2 col-form-label">Type</label>
+                                            <div class="col-sm-10">
+                                                <select class="form-select question-type">
+                                                    <option value="short" selected>Short Answer</option>
+                                                    <option value="paragraph">Paragraph</option>
+                                                    <option value="multiple">Multiple Choice</option>
+                                                    <option value="checkbox">Checkboxes</option>
+                                                    <option value="dropdown">Dropdown</option>
+                                                    <option value="grid">Multiple Choice Grid</option>
+                                                    <option value="date">Date</option>
+                                                    <option value="display">Display Text</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="short-answer">
+                                            <input type="text" class="form-control" placeholder="Short answer text" disabled>
+                                        </div>
+
+                                        <div class="paragraph-answer d-none">
+                                            <textarea class="form-control" placeholder="Long answer text" disabled rows="3"></textarea>
+                                        </div>
+
+                                        <div class="options-container d-none">
+                                            <!-- Options will be added here -->
+                                        </div>
+
+                                        <div class="grid-rows-container d-none">
+                                            <!-- Rows will be added here -->
+                                        </div>
+
+                                        <div class="display-text d-none">
+                                            <!-- Display text only -->
+                                        </div>
+
+                                        <div class="date-answer d-none">
+                                            <input type="date" class="form-control" disabled>
+                                        </div>
+
+                                        <div class="form-check form-switch mt-3 me-2">
+                                            <input class="form-check-input required-switch" type="checkbox" id="required-switch-${questionId}">
+                                            <label class="form-check-label" for="required-switch-${questionId}">Required</label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="preview-mode d-none">
+                                        <h5 class="preview-question-text mb-3">Untitled Question</h5>
+                                        <div class="preview-content">
+                                            <input type="text" class="form-control" placeholder="Short answer text">
+                                        </div>
+                                        <small class="text-muted preview-required-text d-none">* Required</small>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-
-                        <div class="short-answer">
-                            <input type="text" class="form-control" placeholder="Short answer text" disabled>
-                        </div>
-
-                        <div class="paragraph-answer d-none">
-                            <textarea class="form-control" placeholder="Long answer text" disabled rows="3"></textarea>
-                        </div>
-
-                        <div class="options-container d-none">
-                            <!-- Options will be added here -->
-                        </div>
-
-                        <div class="grid-rows-container d-none">
-                            <!-- Rows will be added here -->
-                        </div>
-
-                        <div class="display-text d-none">
-                            <!-- Display text only -->
-                        </div>
-
-                        <div class="date-answer d-none">
-                            <input type="date" class="form-control" disabled>
-                        </div>
-
-                        <div class="form-check form-switch mt-3 me-2">
-                            <input class="form-check-input required-switch" type="checkbox" id="required-switch-${questionId}">
-                            <label class="form-check-label" for="required-switch-${questionId}">Required</label>
-                        </div>
                     </div>
-                    
-                    <div class="preview-mode d-none">
-                        <h5 class="preview-question-text mb-3">Untitled Question</h5>
-                        <div class="preview-content">
-                            <input type="text" class="form-control" placeholder="Short answer text">
-                        </div>
-                        <small class="text-muted preview-required-text d-none">* Required</small>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    `;
+                    `;
 
                 container.append(questionHtml);
                 const questionCard = $(`[data-question-id="${questionId}"]`);
@@ -1401,21 +1451,22 @@
                 $('#redo-btn').prop('disabled', historyIndex >= history.length - 1);
             }
 
-            // Undo action
             $('#undo-btn').on('click', function () {
                 if (historyIndex > 0) {
                     historyIndex--;
                     restoreState(history[historyIndex]);
+                    updateUndoRedoButtons();
                 }
             });
 
-            // Redo action
             $('#redo-btn').on('click', function () {
                 if (historyIndex < history.length - 1) {
                     historyIndex++;
                     restoreState(history[historyIndex]);
+                    updateUndoRedoButtons();
                 }
             });
+
 
             // Function to initialize all form elements and event handlers
             // Update initializeFormElements() to handle all dynamic elements
@@ -2393,6 +2444,7 @@
                     }
                 }
             });
+            trackWordInputAndSaveState('.question-text, .section-title-input, .section-description-input, .option-input, .grid-row-input');
         });
     </script>
     <div class="modal fade" id="deleteSectionModal" tabindex="-1">

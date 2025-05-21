@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" type="image/png" href="cgcc2.png">
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="css/base.css">
+        <link rel="stylesheet" href="css/manage-counselors.css">
+        <base href="Media/">
+        <title>Manage Counselors | CGCC</title>
+    </head>
+
+    <body>
+        <header>
+            <div class="logo">
+                <img src="cgcc.png" alt="cgcc-logo" class="logo-img">
+                College Guidance and Counseling Center
+            </div>
+            <nav class="navigation">
+                <a href="../admin-manage-forms.html">Home</a>
+                <a href="#">Contact</a>
+                <a href="#">About Mental Health</a>
+                <a href="#">FAQ</a>
+            </nav>
+        </header>
+
+        <div class="grid-body">
+            <div class="left-bg"></div>
+            <div class="page-left">
+                <div class="profile">
+                    <div class="profile-picture"></div>
+                    <span id="user-name"></span>
+                    <div class="edit">
+                        <a href="#">✎Edit Profile</a>
+                    </div>
+                </div>
+                <div class="sidebar-nav">
+                    <a href="../admin-manage-forms.html" class="nav-link">Manage Forms</a>
+                    <a href="../admin-manage-counselor.html" class="nav-link active">Manage Counselors</a>
+                </div>
+            </div>
+
+            <div class="page-right">
+                <div class="header-section">
+                    <h1>Counselor Management</h1>
+                    <p>Add, edit, and manage counselor accounts and assignments</p>
+                </div>
+
+                <div class="action-bar">
+                    <button id="add-counselor-btn" class="primary-btn">
+                        <span>+</span> Add New Counselor
+                    </button>
+                    <div class="search-box">
+                        <input type="text" placeholder="Search counselors..." id="counselor-search">
+                        <button class="search-btn">🔍</button>
+                    </div>
+                </div>
+
+                <div class="counselor-table-container">
+                    <table id="counselors-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Program Assigned</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="counselors-list">
+                            <!-- Counselor data will be loaded here -->
+                        </tbody>
+                    </table>
+                    <div class="pagination">
+                        <button id="prev-page" disabled>Previous</button>
+                        <span id="page-info">Page 1 of 1</span>
+                        <button id="next-page" disabled>Next</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add/Edit Counselor Modal -->
+        <div id="counselor-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn">&times;</span>
+                <h2 id="modal-title">Add New Counselor</h2>
+                <form id="counselor-form">
+                    <input type="hidden" id="counselor-id">
+                    
+                    <div class="form-group">
+                        <label for="first-name">First Name</label>
+                        <input type="text" id="first-name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="last-name">Last Name</label>
+                        <input type="text" id="last-name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">DLSL Email</label>
+                        <input type="email" id="email" required placeholder="user@dlsl.edu.ph">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="program">Assigned Program</label>
+                        <select id="program" required>
+                            <option value="">Select Program</option>
+                            <option value="BSIT">BS Information Technology</option>
+                            <option value="BSCS">BS Computer Science</option>
+                            <option value="BSA">BS Accountancy</option>
+                            <option value="BSBA">BS Business Administration</option>
+                            <option value="BSE">BS Education</option>
+                            <option value="BSN">BS Nursing</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="status">Account Status</label>
+                        <select id="status" required>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="cancel-btn">Cancel</button>
+                        <button type="submit" class="save-btn">Save Counselor</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Confirmation Modal -->
+        <div id="confirm-modal" class="modal">
+            <div class="modal-content confirm-modal">
+                <h3 id="confirm-message">Are you sure you want to delete this counselor?</h3>
+                <div class="confirm-actions">
+                    <button id="confirm-cancel" class="cancel-btn">Cancel</button>
+                    <button id="confirm-ok" class="delete-btn">Delete</button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Set username from localStorage
+                const userName = localStorage.getItem('username') || 'Admin';
+                document.getElementById('user-name').innerText = userName;
+
+                // DOM Elements
+                const addCounselorBtn = document.getElementById('add-counselor-btn');
+                const counselorModal = document.getElementById('counselor-modal');
+                const confirmModal = document.getElementById('confirm-modal');
+                const closeModalBtns = document.querySelectorAll('.close-btn, .cancel-btn');
+                const counselorForm = document.getElementById('counselor-form');
+                const counselorsTable = document.getElementById('counselors-list');
+                const prevPageBtn = document.getElementById('prev-page');
+                const nextPageBtn = document.getElementById('next-page');
+                const pageInfo = document.getElementById('page-info');
+                const searchInput = document.getElementById('counselor-search');
+                const searchBtn = document.querySelector('.search-btn');
+
+                // State variables
+                let counselors = [];
+                let currentPage = 1;
+                const counselorsPerPage = 8;
+                let currentAction = 'add';
+                let counselorToDelete = null;
+
+                // Event Listeners
+                addCounselorBtn.addEventListener('click', openAddCounselorModal);
+                closeModalBtns.forEach(btn => {
+                    btn.addEventListener('click', closeModal);
+                });
+                counselorForm.addEventListener('submit', handleCounselorFormSubmit);
+                prevPageBtn.addEventListener('click', goToPrevPage);
+                nextPageBtn.addEventListener('click', goToNextPage);
+                searchBtn.addEventListener('click', filterCounselors);
+                searchInput.addEventListener('keyup', function(e) {
+                    if (e.key === 'Enter') filterCounselors();
+                });
+
+                // Initialize
+                fetchCounselors();
+
+                // Functions
+                function fetchCounselors() {
+                    // In a real app, this would be an API call
+                    // For demo purposes, we'll use mock data
+                    const mockCounselors = [
+                        { id: 1, firstName: 'Maria', lastName: 'Santos', email: 'msantos@dlsl.edu.ph', program: 'BSIT', status: 'active' },
+                        { id: 2, firstName: 'Juan', lastName: 'Dela Cruz', email: 'jdelacruz@dlsl.edu.ph', program: 'BSCS', status: 'active' },
+                        { id: 3, firstName: 'Ana', lastName: 'Reyes', email: 'areyes@dlsl.edu.ph', program: 'BSA', status: 'inactive' },
+                        { id: 4, firstName: 'Carlos', lastName: 'Gonzales', email: 'cgonzales@dlsl.edu.ph', program: 'BSBA', status: 'active' },
+                        { id: 5, firstName: 'Lourdes', lastName: 'Fernandez', email: 'lfernandez@dlsl.edu.ph', program: 'BSE', status: 'active' },
+                        { id: 6, firstName: 'Ricardo', lastName: 'Lim', email: 'rlim@dlsl.edu.ph', program: 'BSN', status: 'inactive' },
+                        { id: 7, firstName: 'Elena', lastName: 'Tan', email: 'etan@dlsl.edu.ph', program: 'BSIT', status: 'active' },
+                        { id: 8, firstName: 'Fernando', lastName: 'Ong', email: 'fong@dlsl.edu.ph', program: 'BSCS', status: 'active' },
+                        { id: 9, firstName: 'Grace', lastName: 'Chua', email: 'gchua@dlsl.edu.ph', program: 'BSA', status: 'active' },
+                        { id: 10, firstName: 'Hector', lastName: 'Sy', email: 'hsy@dlsl.edu.ph', program: 'BSBA', status: 'inactive' },
+                        { id: 11, firstName: 'Isabel', lastName: 'Uy', email: 'iuy@dlsl.edu.ph', program: 'BSE', status: 'active' },
+                        { id: 12, firstName: 'Jose', lastName: 'Wong', email: 'jwong@dlsl.edu.ph', program: 'BSN', status: 'active' }
+                    ];
+
+                    counselors = mockCounselors;
+                    displayCounselors();
+                }
+
+                function displayCounselors(filteredCounselors = null) {
+                    const dataToDisplay = filteredCounselors || counselors;
+                    const startIndex = (currentPage - 1) * counselorsPerPage;
+                    const endIndex = startIndex + counselorsPerPage;
+                    const paginatedCounselors = dataToDisplay.slice(startIndex, endIndex);
+
+                    counselorsTable.innerHTML = '';
+
+                    if (paginatedCounselors.length === 0) {
+                        counselorsTable.innerHTML = '<tr><td colspan="6" class="no-results">No counselors found</td></tr>';
+                        return;
+                    }
+
+                    paginatedCounselors.forEach(counselor => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${counselor.id}</td>
+                            <td>${counselor.firstName} ${counselor.lastName}</td>
+                            <td>${counselor.email}</td>
+                            <td>${getProgramName(counselor.program)}</td>
+                            <td><span class="status-badge status-${counselor.status}">${counselor.status.charAt(0).toUpperCase() + counselor.status.slice(1)}</span></td>
+                            <td class="action-btns">
+                                <button class="action-btn edit-btn" data-id="${counselor.id}">Edit</button>
+                                <button class="action-btn delete-btn" data-id="${counselor.id}">Delete</button>
+                            </td>
+                        `;
+                        counselorsTable.appendChild(row);
+                    });
+
+                    // Add event listeners to action buttons
+                    document.querySelectorAll('.edit-btn').forEach(btn => {
+                        btn.addEventListener('click', () => openEditCounselorModal(btn.dataset.id));
+                    });
+
+                    document.querySelectorAll('.delete-btn').forEach(btn => {
+                        btn.addEventListener('click', () => confirmDeleteCounselor(btn.dataset.id));
+                    });
+
+                    // Update pagination controls
+                    updatePaginationControls(dataToDisplay.length);
+                }
+
+                function getProgramName(programCode) {
+                    const programs = {
+                        'BSIT': 'BS Information Technology',
+                        'BSCS': 'BS Computer Science',
+                        'BSA': 'BS Accountancy',
+                        'BSBA': 'BS Business Administration',
+                        'BSE': 'BS Education',
+                        'BSN': 'BS Nursing'
+                    };
+                    return programs[programCode] || programCode;
+                }
+
+                function updatePaginationControls(totalCounselors) {
+                    const totalPages = Math.ceil(totalCounselors / counselorsPerPage);
+                    
+                    pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+                    prevPageBtn.disabled = currentPage === 1;
+                    nextPageBtn.disabled = currentPage === totalPages || totalPages === 0;
+                }
+
+                function goToPrevPage() {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        displayCounselors();
+                    }
+                }
+
+                function goToNextPage() {
+                    const totalPages = Math.ceil(counselors.length / counselorsPerPage);
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        displayCounselors();
+                    }
+                }
+
+                function filterCounselors() {
+                    const searchTerm = searchInput.value.toLowerCase();
+                    if (!searchTerm) {
+                        currentPage = 1;
+                        displayCounselors();
+                        return;
+                    }
+
+                    const filtered = counselors.filter(counselor => {
+                        return (
+                            counselor.firstName.toLowerCase().includes(searchTerm) ||
+                            counselor.lastName.toLowerCase().includes(searchTerm) ||
+                            counselor.email.toLowerCase().includes(searchTerm) ||
+                            counselor.program.toLowerCase().includes(searchTerm) ||
+                            counselor.status.toLowerCase().includes(searchTerm)
+                        );
+                    });
+
+                    currentPage = 1;
+                    displayCounselors(filtered);
+                }
+
+                function openAddCounselorModal() {
+                    currentAction = 'add';
+                    document.getElementById('modal-title').textContent = 'Add New Counselor';
+                    counselorForm.reset();
+                    document.getElementById('counselor-id').value = '';
+                    counselorModal.style.display = 'block';
+                }
+
+                function openEditCounselorModal(id) {
+                    currentAction = 'edit';
+                    document.getElementById('modal-title').textContent = 'Edit Counselor';
+                    
+                    const counselor = counselors.find(c => c.id == id);
+                    if (counselor) {
+                        document.getElementById('counselor-id').value = counselor.id;
+                        document.getElementById('first-name').value = counselor.firstName;
+                        document.getElementById('last-name').value = counselor.lastName;
+                        document.getElementById('email').value = counselor.email;
+                        document.getElementById('program').value = counselor.program;
+                        document.getElementById('status').value = counselor.status;
+                        
+                        counselorModal.style.display = 'block';
+                    }
+                }
+
+                function confirmDeleteCounselor(id) {
+                    counselorToDelete = id;
+                    document.getElementById('confirm-message').textContent = 
+                        'Are you sure you want to delete this counselor? This action cannot be undone.';
+                    confirmModal.style.display = 'block';
+                    
+                    // Set up event listeners for confirmation modal
+                    document.getElementById('confirm-cancel').onclick = closeModal;
+                    document.getElementById('confirm-ok').onclick = deleteCounselor;
+                }
+
+                function deleteCounselor() {
+                    // In a real app, this would be an API call
+                    counselors = counselors.filter(c => c.id != counselorToDelete);
+                    
+                    // Reset to first page if current page would be empty
+                    const totalPages = Math.ceil(counselors.length / counselorsPerPage);
+                    if (currentPage > totalPages && totalPages > 0) {
+                        currentPage = totalPages;
+                    } else if (totalPages === 0) {
+                        currentPage = 1;
+                    }
+                    
+                    displayCounselors();
+                    closeModal();
+                    counselorToDelete = null;
+                    
+                    // Show success message
+                    alert('Counselor deleted successfully');
+                }
+
+                function handleCounselorFormSubmit(e) {
+                    e.preventDefault();
+                    
+                    const formData = {
+                        id: document.getElementById('counselor-id').value,
+                        firstName: document.getElementById('first-name').value.trim(),
+                        lastName: document.getElementById('last-name').value.trim(),
+                        email: document.getElementById('email').value.trim(),
+                        program: document.getElementById('program').value,
+                        status: document.getElementById('status').value
+                    };
+                    
+                    // Validate email format
+                    if (!formData.email.endsWith('@dlsl.edu.ph')) {
+                        alert('Please use a valid DLSL email address');
+                        return;
+                    }
+                    
+                    if (currentAction === 'add') {
+                        // Generate new ID (in a real app, this would come from the server)
+                        formData.id = counselors.length > 0 ? Math.max(...counselors.map(c => c.id)) + 1 : 1;
+                        counselors.push(formData);
+                    } else {
+                        // Update existing counselor
+                        const index = counselors.findIndex(c => c.id == formData.id);
+                        if (index !== -1) {
+                            counselors[index] = formData;
+                        }
+                    }
+                    
+                    displayCounselors();
+                    closeModal();
+                    
+                    // Show success message
+                    alert(`Counselor ${currentAction === 'add' ? 'added' : 'updated'} successfully`);
+                }
+
+                function closeModal() {
+                    counselorModal.style.display = 'none';
+                    confirmModal.style.display = 'none';
+                }
+
+                // Close modal when clicking outside of it
+                window.addEventListener('click', function(e) {
+                    if (e.target === counselorModal) {
+                        closeModal();
+                    }
+                    if (e.target === confirmModal) {
+                        closeModal();
+                    }
+                });
+            });
+        </script>
+    </body>
+
+    </html>
