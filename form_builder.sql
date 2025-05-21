@@ -3,16 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
-<<<<<<< HEAD
--- Generation Time: May 04, 2025 at 03:22 PM
-=======
--- Generation Time: May 13, 2025 at 09:17 PM
->>>>>>> bb1a99688932b26fc363d14e1eeaa3c75b8d6cea
+-- Generation Time: May 20, 2025 at 08:01 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
-
-CREATE DATABASE IF NOT EXISTS form_builder;
-USE form_builder;
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -27,8 +20,7 @@ SET time_zone = "+00:00";
 --
 -- Database: `form_builder`
 --
-CREATE DATABASE IF NOT EXISTS `form_builder`;
-USE `form_builder`;
+
 -- --------------------------------------------------------
 
 --
@@ -61,9 +53,99 @@ CREATE TABLE `choices` (
 
 INSERT INTO `choices` (`choice_index`, `main_question_index`, `choice_text`) VALUES
 (1, 2, 'fsdfsdfdfsdf'),
-(15, 18, 'Row 2'),
-(16, 20, 'ads'),
-(17, 20, 'das');
+(18, 21, 'Yes'),
+(19, 22, 'Adjusting to change'),
+(20, 22, 'Experiencing Bullying/Discrimination'),
+(21, 22, 'Struggling with Relationship Problems'),
+(22, 22, 'Issues with self-image'),
+(23, 22, 'Concerns about sexuality/gender identity'),
+(24, 22, 'Finding it difficult to express one\'s thoughts/feelings'),
+(25, 22, 'Struggling in getting along with others/making friends'),
+(26, 22, 'Spiritual/Religious issues'),
+(27, 22, 'Lack of decision making skills'),
+(28, 22, 'Lack of social support'),
+(29, 22, 'Lacking of self-confidence'),
+(30, 22, 'Lacks effective communication skills'),
+(31, 22, 'Need to develop leadership skills'),
+(32, 22, 'Need to have better self-concept'),
+(33, 22, 'Experiencing harassment'),
+(34, 22, 'Trust issue'),
+(35, 22, 'Feeling very strong emotions'),
+(36, 22, 'No social/emotional concern'),
+(37, 23, 'Absence of father/mother'),
+(38, 23, 'Dealing with a loss'),
+(39, 23, 'Feeling of being unloved'),
+(40, 23, 'Financial difficulties'),
+(41, 23, 'Struggling with parents’ marital conflicts/separationz'),
+(42, 23, 'Health of a family member'),
+(43, 23, 'Home environment is not conducive to study'),
+(44, 23, 'Homesickness/Living away from home'),
+(45, 23, 'Lacking parents\' appreciation'),
+(46, 23, 'Not getting along well with a family member/relative'),
+(47, 23, 'Feeling pressured by high expectations from parents/family'),
+(48, 23, 'Feeling invalidated by family members'),
+(49, 23, 'Concerned about the health of a family member'),
+(50, 23, 'Too many responsibilities at home'),
+(51, 23, 'No Family/Home Concern'),
+(52, 24, 'Struggling with addiction (substance use, internet, gaming, gambling, shopping)'),
+(53, 24, 'Difficulty in managing emotions'),
+(54, 24, 'Feeling burned out'),
+(55, 24, 'Feeling tired/fatigued most of the time (physically/emotionally)'),
+(56, 24, 'Having a physical illness that needs medical attention'),
+(57, 24, 'Racing thoughts'),
+(58, 24, 'Overthinking / Anxiety'),
+(59, 24, 'Having panic attacks'),
+(60, 24, 'Experiencing stress'),
+(61, 24, 'Difficulty coping with stress'),
+(62, 24, 'Deep feelings of sadness'),
+(63, 24, 'Self-harm behavior (cutting, scratching, burning, etc.)'),
+(64, 24, 'Erratic sleeping patterns'),
+(65, 24, 'Suicidal thoughts'),
+(66, 24, 'Suicide attempt'),
+(67, 24, 'Difficulty concentrating/being more forgetful'),
+(68, 24, 'Avoiding people, situations, or responsibilities'),
+(69, 24, 'Unable to enjoy/loss of interest in activities'),
+(70, 24, 'Feeling empty/Not feeling anything'),
+(71, 24, 'Increased irritability'),
+(72, 24, 'Crying spells'),
+(73, 24, 'Changes in appetite (eating more or less)'),
+(74, 24, 'No Mental/Physical Health Concerns'),
+(75, 25, 'Difficulty in adjusting to learning modality'),
+(76, 25, 'Difficulty in meeting academic requirements'),
+(77, 25, 'Difficulty working independently'),
+(78, 25, 'Difficulty working in a group/pair'),
+(79, 25, 'Dissatisfaction with academic performance/grades'),
+(80, 25, 'Lacking effective study habits (note-taking, time management)'),
+(81, 25, 'Difficulty overcoming distractions'),
+(82, 25, 'Lacking motivation'),
+(83, 25, 'Struggling with procrastination'),
+(84, 25, 'Struggling to balance academics with extracurricular/non-academic activities'),
+(85, 25, 'Test anxiety'),
+(86, 25, 'No Academic concern'),
+(87, 26, 'Favoritism/ unfair treatment'),
+(88, 26, 'Inadequate background knowledge about the subjects'),
+(89, 26, 'Unavailable most of the time'),
+(90, 26, 'Difficult to reach or communicate with'),
+(91, 26, 'Unethical/unprofessional behavior'),
+(92, 26, 'Does not provide timely feedback'),
+(93, 26, 'No Professor issues/concerns'),
+(94, 27, 'Uncertainty about career choice/ wanting to shift to another program'),
+(95, 27, 'Career choice is limited by financial resources'),
+(96, 27, 'Unaware of strengths, abilities, or interests'),
+(97, 27, 'Feeling lost and overwhelmed about making a career decision'),
+(98, 27, 'Feeling pressured by peers/family to succeed'),
+(99, 27, 'Need help with career planning'),
+(100, 27, 'Dissatisfied with the present college program'),
+(101, 27, 'Anxious about the future/world of work'),
+(102, 27, 'No Career concern'),
+(103, 28, 'Yes'),
+(104, 28, 'No'),
+(105, 30, 'I Certify'),
+(106, 31, 'Agree'),
+(107, 31, 'Disagree'),
+(108, 34, 'I allow the College Guidance and Counseling Center to use the data from my record for outcome research given that my identity is protected.'),
+(109, 34, 'I do not allow the College Guidance and Counseling Center to use the data from my record for outcome research.'),
+(110, 35, 'Yes');
 
 -- --------------------------------------------------------
 
@@ -71,17 +153,10 @@ INSERT INTO `choices` (`choice_index`, `main_question_index`, `choice_text`) VAL
 -- Table structure for table `counselors`
 --
 
-<<<<<<< HEAD
-CREATE TABLE `counselor` (
-  `counselor_index` int(11) NOT NULL,
-  `user_index` int(11) NOT NULL,
-  `counselor_id` bigint(15) NOT NULL,
-=======
 CREATE TABLE `counselors` (
   `counselor_index` int(11) NOT NULL,
   `user_index` int(11) NOT NULL,
   `counselor_number` varchar(255) DEFAULT NULL,
->>>>>>> bb1a99688932b26fc363d14e1eeaa3c75b8d6cea
   `last_name` varchar(50) NOT NULL,
   `first_name` varchar(50) NOT NULL,
   `calendar_link` varchar(200) NOT NULL
@@ -129,7 +204,7 @@ CREATE TABLE `forms` (
 --
 
 INSERT INTO `forms` (`form_index`, `form_name`, `description`, `created_at`) VALUES
-(1, 'Form1', 'fsdf', '2025-04-30 05:28:30'),
+(1, 'STUDENT INDIVIDUAL INVENTORY (SII) & CLIENT CONSENT FORM AY 2024-2025', 'This form would only take 15- 20 minutes of your time.\n\nEvery person\'s life is a developing story. The person you are today is a result of your upbringing and experiences, joys and sorrows, desires, and dreams. While we know that it\'s tempting to rush at times, please take some time to reflect on your life.', '2025-04-30 05:28:30'),
 (2, 'fsdfsdfs', 'fsdfsdfsdf', '2025-04-30 12:25:24');
 
 -- --------------------------------------------------------
@@ -152,7 +227,11 @@ CREATE TABLE `form_sections` (
 
 INSERT INTO `form_sections` (`section_index`, `form_index`, `section_title`, `section_description`, `section_order`) VALUES
 (2, 2, 'Title', 'This is a description', 1),
-(5, 1, 'Section 1 Title', 'This is a description of section 1.', 1);
+(6, 1, 'Consent', 'This section outlines the terms and conditions regarding the collection, processing, and storage of personal information by the College Guidance and Counseling Center (CGCC) at De La Salle Lipa (DLSL).', 1),
+(7, 1, 'DETAILED CONCERNS', 'The items below describe some of the concerns that students your age might experience. Please check your top five concerns in which the guidance counselor can help you with.', 2),
+(8, 1, 'CLIENT CONSENT FORM', 'This form is a document provided by the CGCC to students in order to properly acquire consent for Counseling. The form contains information about the counseling service and the agreement between the counselor and the student.\n\nAPPOINTMENT\nYour sessions are scheduled and agreed upon by you and your counselors. When you need to cancel or reschedule an appointment, please give us at least 24-hours notice.\n\nCOUNSELING and ASSESSMENT\nCounseling is an opportunity to identify and build on current strengths, learn problem-solving strategies, develop or enhance coping skills, learn more effective ways to communicate with others, and receive support and feedback. Assessment is crucial in facilitating the counselor’s understanding of the client. The counseling relationship is designed to be one that will promote change and growth. The counselor and client both have active roles. A record of the counseling and assessment services provided to each client is maintained.\n\nThe goal of the counselor is to provide a comfortable and supportive environment conducive to insight, healing, and personal growth. Your role, as the client, will be to identify goals you would like to achieve during the course of counseling and be willing to examine any potential obstacles and strengths that will either hinder or help you achieve your desired goals.\n\nRISKS\nCounseling and assessment can have benefits and risks and it is important to consider both when making any treatment decisions. Since counseling involves discussing unpleasant aspects of your life, there is a risk that you may experience temporary uncomfortable feelings like sadness, guilt, anger, frustration, loneliness, and helplessness. Disclosing personal information during an assessment may likewise feel uncomfortable and might make you feel vulnerable.\n\nCOUNSELOR CONTACT INFORMATION\nThe primary way to get in touch with us is by contacting your counselor through Canvas or email. If you are in a crisis and need immediate assistance, please go to your nearest emergency room.', 3),
+(9, 1, 'CONFIDENTIALITY and RELEASE of INFORMATION', 'Protecting your privacy is very important. The information in your record is confidential and will not be disclosed to anyone without your written consent unless required by law.\n\nThe exceptions to confidentiality include:\nIf you tell your counselor that you are going to harm or kill yourself or someone else, we are required by law to do whatever we can do to prevent that from happening and to ensure your safety and the safety of others. This may require notifying family members, parents, legal guardians, legal authorities, and/or potential victims.\n\nIf you tell us about incidents of abuse, we are required to report this to proper authorities.\n\nWe are required to release your records if they are subpoenaed by a court of law.\n\nIn addition to the above, there are several other situations where confidentiality cannot be insured, including:\n\nIf you provide us with a request to release your records\n\nIf you are in family counseling, we cannot guarantee confidentiality will be maintained by other family members.\n\nIf you are a child/minor or unable to voluntarily consent, a guardian must give written consent and can access your records.', 4),
+(10, 1, 'USE of CLIENT INFORMATION on OUTCOME RESEARCH', '', 5);
 
 -- --------------------------------------------------------
 
@@ -189,31 +268,26 @@ CREATE TABLE `main_questions` (
 
 INSERT INTO `main_questions` (`main_question_index`, `form_index`, `main_question_text`, `type_index`, `is_required`, `section_index`) VALUES
 (2, 2, 'fsdfsfd', 6, 0, 2),
-(18, 1, 'Question 1', 6, 0, 5),
-(19, 1, 'fsdfsdfd', 1, 0, 5),
-(20, 1, 'nnkjigyh', 6, 1, 5);
+(21, 1, 'I understand that this form is considered an official record of De La Salle Lipa and that College Guidance and Counseling Center (CGCC) is required to keep my personal information and records until such time that these documents are due for disposal based on the DLSL data privacy retention policy. Some of the services of CGCC that would utilize this data are Counseling, Referral, and Research and Development. This form shall only be accessed by the CGCC team. CGCC shall retain the data in accordance with Document Retention Period and will be deleted upon disposal. By answering this form, you are giving CGCC consent to process and store this information. Please answer carefully and truthfully.', 4, 1, 6),
+(22, 1, 'SOCIAL/EMOTIONAL CONCERNS', 4, 1, 7),
+(23, 1, 'FAMILY & HOME CONCERNS', 4, 1, 7),
+(24, 1, 'MENTAL/PHYSICAL HEALTH CONCERNS', 4, 1, 7),
+(25, 1, 'ACADEMIC CONCERNS', 4, 1, 7),
+(26, 1, 'PROFESSOR ISSUE CONCERNS', 4, 1, 7),
+(27, 1, 'CAREER CONCERNS', 4, 1, 7),
+(28, 1, 'I have other concerns/questions that I want to directly consult or discuss with my counselor.', 3, 1, 7),
+(29, 1, 'We appreciate your feedback. Please let us know how we can best improve our CGCC Student Individual Inventory (SII) Form. If you have comments/suggestions, please indicate them below:', 1, 1, 7),
+(30, 1, 'By submitting this form, I certify that the above information are true and correct. FALSIFICATION of any information will be subjected to DISCIPLINARY ACTION.', 4, 1, 7),
+(31, 1, 'I understand the nature and limits of confidentiality stated above and accept them as part of the benefits and conditions of participating in counseling. In the event that my counselor reasonably believes that there is evidence of clear and imminent danger of harm to myself and/or others, physically or emotionally, I give consent to my counselor to contact the following persons, in addition to the school and medical personnel.', 3, 1, 9),
+(32, 1, 'Name of Father/Mother or Legal Guardian', 1, 1, 9),
+(33, 1, 'Contact number of parent/guardian', 1, 1, 9),
+(34, 1, 'When client information is utilized on outcome research purposes, client names are not disclosed.', 3, 1, 10),
+(35, 1, 'Counseling Guidelines Please review the Counseling Guidelines through this link: https://bit.ly/counselingguide By accomplishing this form you understand and agree to the guidelines set by CGCC. This document has provided the information required to address expectations about counseling. I have read and fully understand this document. All questions that I had have been answered to my satisfaction. By filling out this form, I voluntarily agree to accept counseling.', 4, 1, 10);
 
 -- --------------------------------------------------------
 
 --
-<<<<<<< HEAD
--- Table structure for table `program`
---
-
-CREATE TABLE `program` (
-  `program_index` int(11) NOT NULL,
-  `counselor_index` int(11) NOT NULL,
-  `program_id` varchar(20) NOT NULL,
-  `program_name` varchar(50) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `question_type`
-=======
 -- Table structure for table `programs`
->>>>>>> bb1a99688932b26fc363d14e1eeaa3c75b8d6cea
 --
 
 CREATE TABLE `programs` (
@@ -302,12 +376,6 @@ CREATE TABLE `responses` (
 -- Table structure for table `sections`
 --
 
-<<<<<<< HEAD
-CREATE TABLE `student` (
-  `student_index` int(11) NOT NULL,
-  `user_index` int(11) NOT NULL,
-  `student_id` bigint(15) NOT NULL,
-=======
 CREATE TABLE `sections` (
   `section_index` int(11) NOT NULL,
   `section_name` varchar(50) NOT NULL,
@@ -390,7 +458,6 @@ CREATE TABLE `students` (
   `student_index` int(11) NOT NULL,
   `user_index` int(11) NOT NULL,
   `student_number` varchar(255) DEFAULT NULL,
->>>>>>> bb1a99688932b26fc363d14e1eeaa3c75b8d6cea
   `last_name` varchar(50) NOT NULL,
   `first_name` varchar(50) NOT NULL,
   `year_level` int(1) NOT NULL,
@@ -401,11 +468,6 @@ CREATE TABLE `students` (
 -- Dumping data for table `students`
 --
 
-<<<<<<< HEAD
-INSERT INTO `student` (`student_index`, `user_index`, `student_id`, `last_name`, `first_name`, `year_level`) VALUES
-(1, 1, 2023351801, 'Balion', 'Angel Amaya', 2),
-(2, 4, 2023350761, 'Del Rosario', 'Renz Andrei', 2);
-=======
 INSERT INTO `students` (`student_index`, `user_index`, `student_number`, `last_name`, `first_name`, `year_level`, `section_id`) VALUES
 (1, 1, '2023351801', 'Balion', 'Angel Amaya', 2, 20),
 (2, 4, '2023350761', 'Del Rosario', 'Renz Andrei', 2, 21),
@@ -419,7 +481,6 @@ INSERT INTO `students` (`student_index`, `user_index`, `student_number`, `last_n
 (10, 12, '2023362341', 'Paray', 'Jane Allyson', 2, 48),
 (11, 13, '2023358411', 'Sahagun', 'Daniel Luis', 2, 12),
 (12, 14, '2023352411', 'Tenorio', 'Jhon Paulo', 2, 21);
->>>>>>> bb1a99688932b26fc363d14e1eeaa3c75b8d6cea
 
 -- --------------------------------------------------------
 
@@ -438,9 +499,7 @@ CREATE TABLE `sub_questions` (
 --
 
 INSERT INTO `sub_questions` (`sub_question_index`, `main_question_index`, `sub_question_text`) VALUES
-(1, 2, 'fsdfdsf'),
-(9, 18, 'Row 1'),
-(10, 20, 'dasd');
+(1, 2, 'fsdfdsf');
 
 -- --------------------------------------------------------
 
@@ -466,9 +525,6 @@ INSERT INTO `users` (`user_index`, `email`, `password`, `type`, `created_at`) VA
 (3, 'balionamaya01@gmail.com', '$2y$10$.ugAqIwocz1sb1wE4k9p/.OQ.VQfqOiy/8YrMyXk7l1sTDNUe19s6', 'counselor', '2025-04-30 07:35:57'),
 (4, 'renz_andrei_delrosario@dlsl.edu.ph', '$2y$10$ZtzitJGInBQZl.LYAS4cxuS5v31acCrUuuUSLsO1ehjNLXQgF4Iza', 'student', '2025-05-02 02:29:55'),
 (5, 'xyrelle_dominique_talens@dlsl.edu.ph', '$2y$10$YEayWrIWlENsw6wqLxI8EuBasWFOds0yK3uLla04ZgjCmo3V4hHa6', 'student', '2025-05-04 08:13:56'),
-<<<<<<< HEAD
-(6, 'lyrus_lei_doctolero@dlsl.edu.ph', '$2y$10$I0jZ6DYNZU3nzf/qPlq7K.dzNCEdnYFJKF3w48iAeN6rzCagJVQ2C', 'student', '2025-05-04 08:13:56');
-=======
 (6, 'lyrus_lei_doctolero@dlsl.edu.ph', '$2y$10$I0jZ6DYNZU3nzf/qPlq7K.dzNCEdnYFJKF3w48iAeN6rzCagJVQ2C', 'student', '2025-05-04 08:13:56'),
 (7, 'enjey_kashlee_alonzo@dlsl.edu.ph', '', 'student', '2025-05-07 12:42:20'),
 (8, 'jhenelle_alonzo@dlsl.edu.ph', '', 'student', '2025-05-07 12:45:54'),
@@ -478,7 +534,6 @@ INSERT INTO `users` (`user_index`, `email`, `password`, `type`, `created_at`) VA
 (12, 'jane_allyson_paray@dlsl.edu.ph', '', 'student', '2025-05-07 12:45:54'),
 (13, 'daniel_luis_sahagun@dlsl.edu.ph', '', 'student', '2025-05-07 12:45:54'),
 (14, 'jhon_paulo_tenorio@dlsl.edu.ph', '', 'student', '2025-05-07 12:45:54');
->>>>>>> bb1a99688932b26fc363d14e1eeaa3c75b8d6cea
 
 --
 -- Indexes for dumped tables
@@ -503,11 +558,6 @@ ALTER TABLE `choices`
 --
 -- Indexes for table `counselors`
 --
-<<<<<<< HEAD
-ALTER TABLE `counselor`
-  ADD PRIMARY KEY (`counselor_index`),
-  ADD KEY `fk2` (`user_index`);
-=======
 ALTER TABLE `counselors`
   ADD PRIMARY KEY (`counselor_index`),
   ADD KEY `fk2` (`user_index`);
@@ -517,7 +567,6 @@ ALTER TABLE `counselors`
 --
 ALTER TABLE `departments`
   ADD PRIMARY KEY (`dept_index`);
->>>>>>> bb1a99688932b26fc363d14e1eeaa3c75b8d6cea
 
 --
 -- Indexes for table `forms`
@@ -552,18 +601,7 @@ ALTER TABLE `main_questions`
   ADD KEY `section_index` (`section_index`);
 
 --
-<<<<<<< HEAD
--- Indexes for table `program`
---
-ALTER TABLE `program`
-  ADD PRIMARY KEY (`program_index`),
-  ADD KEY `fk3` (`counselor_index`);
-
---
--- Indexes for table `question_type`
-=======
 -- Indexes for table `programs`
->>>>>>> bb1a99688932b26fc363d14e1eeaa3c75b8d6cea
 --
 ALTER TABLE `programs`
   ADD PRIMARY KEY (`program_index`),
@@ -586,14 +624,9 @@ ALTER TABLE `responses`
 --
 -- Indexes for table `sections`
 --
-<<<<<<< HEAD
-ALTER TABLE `student`
-  ADD PRIMARY KEY (`student_index`);
-=======
 ALTER TABLE `sections`
   ADD PRIMARY KEY (`section_index`),
   ADD KEY `program_id` (`program_id`);
->>>>>>> bb1a99688932b26fc363d14e1eeaa3c75b8d6cea
 
 --
 -- Indexes for table `students`
@@ -631,15 +664,11 @@ ALTER TABLE `answers`
 -- AUTO_INCREMENT for table `choices`
 --
 ALTER TABLE `choices`
-  MODIFY `choice_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `choice_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=111;
 
 --
 -- AUTO_INCREMENT for table `counselors`
 --
-<<<<<<< HEAD
-ALTER TABLE `counselor`
-  MODIFY `counselor_index` int(11) NOT NULL AUTO_INCREMENT;
-=======
 ALTER TABLE `counselors`
   MODIFY `counselor_index` int(11) NOT NULL AUTO_INCREMENT;
 
@@ -648,19 +677,18 @@ ALTER TABLE `counselors`
 --
 ALTER TABLE `departments`
   MODIFY `dept_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
->>>>>>> bb1a99688932b26fc363d14e1eeaa3c75b8d6cea
 
 --
 -- AUTO_INCREMENT for table `forms`
 --
 ALTER TABLE `forms`
-  MODIFY `form_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `form_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `form_sections`
 --
 ALTER TABLE `form_sections`
-  MODIFY `section_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `section_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `grid_answers`
@@ -672,20 +700,10 @@ ALTER TABLE `grid_answers`
 -- AUTO_INCREMENT for table `main_questions`
 --
 ALTER TABLE `main_questions`
-  MODIFY `main_question_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `main_question_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
-<<<<<<< HEAD
--- AUTO_INCREMENT for table `program`
---
-ALTER TABLE `program`
-  MODIFY `program_index` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `question_type`
-=======
 -- AUTO_INCREMENT for table `programs`
->>>>>>> bb1a99688932b26fc363d14e1eeaa3c75b8d6cea
 --
 ALTER TABLE `programs`
   MODIFY `program_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
@@ -705,13 +723,8 @@ ALTER TABLE `responses`
 --
 -- AUTO_INCREMENT for table `sections`
 --
-<<<<<<< HEAD
-ALTER TABLE `student`
-  MODIFY `student_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-=======
 ALTER TABLE `sections`
   MODIFY `section_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
->>>>>>> bb1a99688932b26fc363d14e1eeaa3c75b8d6cea
 
 --
 -- AUTO_INCREMENT for table `students`
@@ -729,11 +742,7 @@ ALTER TABLE `sub_questions`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-<<<<<<< HEAD
-  MODIFY `user_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
-=======
   MODIFY `user_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
->>>>>>> bb1a99688932b26fc363d14e1eeaa3c75b8d6cea
 
 --
 -- Constraints for dumped tables
@@ -756,11 +765,7 @@ ALTER TABLE `choices`
 --
 -- Constraints for table `counselors`
 --
-<<<<<<< HEAD
-ALTER TABLE `counselor`
-=======
 ALTER TABLE `counselors`
->>>>>>> bb1a99688932b26fc363d14e1eeaa3c75b8d6cea
   ADD CONSTRAINT `fk2` FOREIGN KEY (`user_index`) REFERENCES `users` (`user_index`) ON DELETE CASCADE;
 
 --
@@ -793,12 +798,6 @@ ALTER TABLE `programs`
   ADD CONSTRAINT `programs_ibfk_1` FOREIGN KEY (`dept_index`) REFERENCES `departments` (`dept_index`);
 
 --
--- Constraints for table `program`
---
-ALTER TABLE `program`
-  ADD CONSTRAINT `fk3` FOREIGN KEY (`counselor_index`) REFERENCES `counselor` (`counselor_index`) ON DELETE CASCADE;
-
---
 -- Constraints for table `responses`
 --
 ALTER TABLE `responses`
@@ -807,13 +806,8 @@ ALTER TABLE `responses`
 --
 -- Constraints for table `sections`
 --
-<<<<<<< HEAD
-ALTER TABLE `student`
-  ADD CONSTRAINT `fk1` FOREIGN KEY (`user_index`) REFERENCES `users` (`user_index`) ON DELETE CASCADE;
-=======
 ALTER TABLE `sections`
   ADD CONSTRAINT `sections_ibfk_1` FOREIGN KEY (`program_id`) REFERENCES `programs` (`program_index`);
->>>>>>> bb1a99688932b26fc363d14e1eeaa3c75b8d6cea
 
 --
 -- Constraints for table `students`
