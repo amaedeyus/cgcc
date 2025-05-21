@@ -1,6 +1,10 @@
 <?php
 session_start();
 
+// Debugging: Log session data
+file_put_contents('session_debug.log', print_r($_SESSION, true), FILE_APPEND);
+
+
 if (!isset($_SESSION['user_index'])) {
     http_response_code(401);
     echo json_encode(['error' => 'Unauthorized']);
@@ -19,7 +23,7 @@ if ($userType !== 'admin') {
 // Optional: Log user type
 error_log("User type: " . $userType);
 // update_form.php
-
+header("Access-Control-Allow-Credentials: true");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Content-Type: application/json");
 
@@ -58,12 +62,13 @@ try {
                 fs.section_index,
                 fs.section_title,
                 fs.section_description,
-                fs.behavior,
+                fs.section_order,
+                IFNULL(fs.behavior, 'same-page') as behavior,
                 q.main_question_index,
                 q.main_question_text,
-                qt.type_name AS type,
+                qt.type_name AS type_name,
                 q.is_required,
-                q.include_other,
+                IFNULL(q.include_other, 0) AS include_other,
                 c.choice_index,
                 c.choice_text,
                 sq.sub_question_index,
@@ -75,78 +80,111 @@ try {
             LEFT JOIN choices c ON q.main_question_index = c.main_question_index
             LEFT JOIN sub_questions sq ON q.main_question_index = sq.main_question_index
             WHERE f.form_index = ?
-            ORDER BY fs.section_index, q.main_question_index, c.choice_index, sq.sub_question_index
+            ORDER BY fs.section_order, q.main_question_index, c.choice_index, sq.sub_question_index
         ");
+
         $stmt->bind_param("i", $formId);
         $stmt->execute();
         $result = $stmt->get_result();
 
         if ($result->num_rows === 0) {
-            throw new Exception("No form data found to snapshot");
+            throw new Exception("No form data found");
         }
 
+        $form = null;
         $sections = [];
+        $allQuestions = [];
+
         $sectionMap = [];
+        $questionMap = [];
 
         while ($row = $result->fetch_assoc()) {
-            $sectionIndex = $row['section_index'];
-            if (!isset($sectionMap[$sectionIndex])) {
-                $sectionMap[$sectionIndex] = [
-                    'section_index' => $sectionIndex,
-                    'section_title' => $row['section_title'],
-                    'section_description' => $row['section_description'],
+            if (!$form) {
+                $form = [
+                    'form_index' => $row['form_index'],
+                    'form_name' => $row['form_name'],
+                    'description' => $row['description']
+                ];
+            }
+
+            $sectionId = $row['section_index'];
+            if (!isset($sectionMap[$sectionId])) {
+                $sectionMap[$sectionId] = [
+                    'id' => (string)$sectionId,
+                    'title' => $row['section_title'],
+                    'description' => $row['section_description'] ?? '',
+                    'order' => $row['section_order'],
                     'behavior' => $row['behavior'],
                     'questions' => []
                 ];
             }
 
-            $questionIndex = $row['main_question_index'];
-            if ($questionIndex && !in_array($questionIndex, array_column($sectionMap[$sectionIndex]['questions'], 'main_question_index'))) {
-                $question = [
-                    'main_question_index' => $questionIndex,
-                    'main_question_text' => $row['main_question_text'],
-                    'type' => $row['type'],
-                    'is_required' => (bool)$row['is_required'],
-                    'include_other' => (bool)$row['include_other'],
+            $questionId = $row['main_question_index'];
+            if ($questionId && !isset($questionMap[$questionId])) {
+                $questionMap[$questionId] = [
+                    'id' => (string)$questionId,
+                    'question' => $row['main_question_text'],
+                    'type' => $row['type_name'],
+                    'required' => (bool)$row['is_required'],
+                    'includeOther' => (bool)$row['include_other'],
                     'options' => [],
-                    'rows' => []
+                    'rows' => [],
+                    'section_index' => $sectionId  // ← Add this
                 ];
+            }
 
-                // Get options
-                $optStmt = $conn->prepare("SELECT choice_text FROM choices WHERE main_question_index = ?");
-                $optStmt->bind_param("i", $questionIndex);
-                $optStmt->execute();
-                $optResult = $optStmt->get_result();
-                while ($optRow = $optResult->fetch_assoc()) {
-                    $question['options'][] = $optRow['choice_text'];
+            if ($row['choice_index'] !== null && $row['choice_text'] !== null) {
+                $choiceExists = array_filter($questionMap[$questionId]['options'], function ($opt) use ($row) {
+                    return $opt['choice_index'] == $row['choice_index'];
+                });
+                if (empty($choiceExists)) {
+                    $questionMap[$questionId]['options'][] = [
+                        'choice_index' => $row['choice_index'],
+                        'choice_text' => $row['choice_text']
+                    ];
                 }
+            }
 
-                // Get rows
-                $rowStmt = $conn->prepare("SELECT sub_question_text FROM sub_questions WHERE main_question_index = ?");
-                $rowStmt->bind_param("i", $questionIndex);
-                $rowStmt->execute();
-                $rowResult = $rowStmt->get_result();
-                while ($rowRow = $rowResult->fetch_assoc()) {
-                    $question['rows'][] = $rowRow['sub_question_text'];
+            if ($row['sub_question_index'] !== null && $row['sub_question_text'] !== null) {
+                if (!in_array($row['sub_question_text'], $questionMap[$questionId]['rows'])) {
+                    $questionMap[$questionId]['rows'][] = $row['sub_question_text'];
                 }
-
-                $sectionMap[$sectionIndex]['questions'][] = $question;
             }
         }
 
-        // Convert section map to array
-        foreach ($sectionMap as $s) {
-            $sections[] = $s;
+        // Assign questions to their respective sections and build allQuestions list
+        foreach ($questionMap as $qid => $qdata) {
+            $sectionId = $qdata['section_index'];
+            if (isset($sectionMap[$sectionId])) {
+                $sectionMap[$sectionId]['questions'][] = $qdata;
+                $allQuestions[] = $qdata;
+            }
         }
 
-        // Build snapshot data
+        $sections = array_values($sectionMap);
+
+        // If no sections, create a default one
+        if (empty($sections)) {
+            $sections[] = [
+                'id' => '0',
+                'title' => 'Default Section',
+                'description' => '',
+                'order' => 1,
+                'behavior' => 'same-page',
+                'questions' => $allQuestions
+            ];
+        }
+
+        // Final JSON output
         $snapshotData = json_encode([
-            'form_index' => $formId,
-            'form_name' => $data['form_name'] ?? 'Untitled',
-            'description' => $data['description'] ?? '',
+            'form_index' => $form['form_index'],
+            'form_name' => $form['form_name'],
+            'description' => $form['description'],
             'sections' => $sections,
+            'questions' => $allQuestions,
             'timestamp' => date('c')
-        ]);
+        ], JSON_NUMERIC_CHECK);
+
 
         if (!$snapshotData || json_last_error() !== JSON_ERROR_NONE) {
             throw new Exception("Failed to encode snapshot: " . json_last_error_msg());
