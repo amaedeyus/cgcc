@@ -3,16 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
-<<<<<<< HEAD
--- Generation Time: May 04, 2025 at 03:22 PM
-=======
--- Generation Time: May 13, 2025 at 09:17 PM
->>>>>>> bb1a99688932b26fc363d14e1eeaa3c75b8d6cea
+-- Generation Time: May 21, 2025 at 05:04 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
-
-CREATE DATABASE IF NOT EXISTS form_builder;
-USE form_builder;
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -27,8 +20,7 @@ SET time_zone = "+00:00";
 --
 -- Database: `form_builder`
 --
-CREATE DATABASE IF NOT EXISTS `form_builder`;
-USE `form_builder`;
+
 -- --------------------------------------------------------
 
 --
@@ -61,55 +53,99 @@ CREATE TABLE `choices` (
 
 INSERT INTO `choices` (`choice_index`, `main_question_index`, `choice_text`) VALUES
 (1, 2, 'fsdfsdfdfsdf'),
-(15, 18, 'Row 2'),
-(16, 20, 'ads'),
-(17, 20, 'das');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `counselors`
---
-
-<<<<<<< HEAD
-CREATE TABLE `counselor` (
-  `counselor_index` int(11) NOT NULL,
-  `user_index` int(11) NOT NULL,
-  `counselor_id` bigint(15) NOT NULL,
-=======
-CREATE TABLE `counselors` (
-  `counselor_index` int(11) NOT NULL,
-  `user_index` int(11) NOT NULL,
-  `counselor_number` varchar(255) DEFAULT NULL,
->>>>>>> bb1a99688932b26fc363d14e1eeaa3c75b8d6cea
-  `last_name` varchar(50) NOT NULL,
-  `first_name` varchar(50) NOT NULL,
-  `calendar_link` varchar(200) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `departments`
---
-
-CREATE TABLE `departments` (
-  `dept_index` int(11) NOT NULL,
-  `dept_code` varchar(255) DEFAULT NULL,
-  `dept_title` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `departments`
---
-
-INSERT INTO `departments` (`dept_index`, `dept_code`, `dept_title`) VALUES
-(1, 'CBEAM', 'College of Business, Economics, Accountancy and Management'),
-(2, 'CEAS', 'College of Education, Arts and Sciences'),
-(3, 'CIHTM', 'College of International Hospitality and Tourism Management'),
-(4, 'CITE', 'College of Information Technology and Engineering'),
-(5, 'CON', 'College of Nursing'),
-(6, 'COL', 'College of Law');
+(18, 21, 'Yes'),
+(19, 22, 'Adjusting to change'),
+(20, 22, 'Experiencing Bullying/Discrimination'),
+(21, 22, 'Struggling with Relationship Problems'),
+(22, 22, 'Issues with self-image'),
+(23, 22, 'Concerns about sexuality/gender identity'),
+(24, 22, 'Finding it difficult to express one\'s thoughts/feelings'),
+(25, 22, 'Struggling in getting along with others/making friends'),
+(26, 22, 'Spiritual/Religious issues'),
+(27, 22, 'Lack of decision making skills'),
+(28, 22, 'Lack of social support'),
+(29, 22, 'Lacking of self-confidence'),
+(30, 22, 'Lacks effective communication skills'),
+(31, 22, 'Need to develop leadership skills'),
+(32, 22, 'Need to have better self-concept'),
+(33, 22, 'Experiencing harassment'),
+(34, 22, 'Trust issue'),
+(35, 22, 'Feeling very strong emotions'),
+(36, 22, 'No social/emotional concern'),
+(37, 23, 'Absence of father/mother'),
+(38, 23, 'Dealing with a loss'),
+(39, 23, 'Feeling of being unloved'),
+(40, 23, 'Financial difficulties'),
+(41, 23, 'Struggling with parents’ marital conflicts/separationz'),
+(42, 23, 'Health of a family member'),
+(43, 23, 'Home environment is not conducive to study'),
+(44, 23, 'Homesickness/Living away from home'),
+(45, 23, 'Lacking parents\' appreciation'),
+(46, 23, 'Not getting along well with a family member/relative'),
+(47, 23, 'Feeling pressured by high expectations from parents/family'),
+(48, 23, 'Feeling invalidated by family members'),
+(49, 23, 'Concerned about the health of a family member'),
+(50, 23, 'Too many responsibilities at home'),
+(51, 23, 'No Family/Home Concern'),
+(52, 24, 'Struggling with addiction (substance use, internet, gaming, gambling, shopping)'),
+(53, 24, 'Difficulty in managing emotions'),
+(54, 24, 'Feeling burned out'),
+(55, 24, 'Feeling tired/fatigued most of the time (physically/emotionally)'),
+(56, 24, 'Having a physical illness that needs medical attention'),
+(57, 24, 'Racing thoughts'),
+(58, 24, 'Overthinking / Anxiety'),
+(59, 24, 'Having panic attacks'),
+(60, 24, 'Experiencing stress'),
+(61, 24, 'Difficulty coping with stress'),
+(62, 24, 'Deep feelings of sadness'),
+(63, 24, 'Self-harm behavior (cutting, scratching, burning, etc.)'),
+(64, 24, 'Erratic sleeping patterns'),
+(65, 24, 'Suicidal thoughts'),
+(66, 24, 'Suicide attempt'),
+(67, 24, 'Difficulty concentrating/being more forgetful'),
+(68, 24, 'Avoiding people, situations, or responsibilities'),
+(69, 24, 'Unable to enjoy/loss of interest in activities'),
+(70, 24, 'Feeling empty/Not feeling anything'),
+(71, 24, 'Increased irritability'),
+(72, 24, 'Crying spells'),
+(73, 24, 'Changes in appetite (eating more or less)'),
+(74, 24, 'No Mental/Physical Health Concerns'),
+(75, 25, 'Difficulty in adjusting to learning modality'),
+(76, 25, 'Difficulty in meeting academic requirements'),
+(77, 25, 'Difficulty working independently'),
+(78, 25, 'Difficulty working in a group/pair'),
+(79, 25, 'Dissatisfaction with academic performance/grades'),
+(80, 25, 'Lacking effective study habits (note-taking, time management)'),
+(81, 25, 'Difficulty overcoming distractions'),
+(82, 25, 'Lacking motivation'),
+(83, 25, 'Struggling with procrastination'),
+(84, 25, 'Struggling to balance academics with extracurricular/non-academic activities'),
+(85, 25, 'Test anxiety'),
+(86, 25, 'No Academic concern'),
+(87, 26, 'Favoritism/ unfair treatment'),
+(88, 26, 'Inadequate background knowledge about the subjects'),
+(89, 26, 'Unavailable most of the time'),
+(90, 26, 'Difficult to reach or communicate with'),
+(91, 26, 'Unethical/unprofessional behavior'),
+(92, 26, 'Does not provide timely feedback'),
+(93, 26, 'No Professor issues/concerns'),
+(94, 27, 'Uncertainty about career choice/ wanting to shift to another program'),
+(95, 27, 'Career choice is limited by financial resources'),
+(96, 27, 'Unaware of strengths, abilities, or interests'),
+(97, 27, 'Feeling lost and overwhelmed about making a career decision'),
+(98, 27, 'Feeling pressured by peers/family to succeed'),
+(99, 27, 'Need help with career planning'),
+(100, 27, 'Dissatisfied with the present college program'),
+(101, 27, 'Anxious about the future/world of work'),
+(102, 27, 'No Career concern'),
+(103, 28, 'Yes'),
+(104, 28, 'No'),
+(105, 30, 'I Certify'),
+(106, 31, 'Agree'),
+(107, 31, 'Disagree'),
+(108, 34, 'I allow the College Guidance and Counseling Center to use the data from my record for outcome research given that my identity is protected.'),
+(109, 34, 'I do not allow the College Guidance and Counseling Center to use the data from my record for outcome research.'),
+(110, 35, 'Yes');
 
 -- --------------------------------------------------------
 
@@ -129,7 +165,7 @@ CREATE TABLE `forms` (
 --
 
 INSERT INTO `forms` (`form_index`, `form_name`, `description`, `created_at`) VALUES
-(1, 'Form1', 'fsdf', '2025-04-30 05:28:30'),
+(1, 'STUDENT INDIVIDUAL INVENTORY (SII) & CLIENT CONSENT FORM AY 2024-2025', 'This form would only take 15- 20 minutes of your time.\n\nEvery person\'s life is a developing story. The person you are today is a result of your upbringing and experiences, joys and sorrows, desires, and dreams. While we know that it\'s tempting to rush at times, please take some time to reflect on your life.', '2025-04-30 05:28:30'),
 (2, 'fsdfsdfs', 'fsdfsdfsdf', '2025-04-30 12:25:24');
 
 -- --------------------------------------------------------
@@ -152,7 +188,11 @@ CREATE TABLE `form_sections` (
 
 INSERT INTO `form_sections` (`section_index`, `form_index`, `section_title`, `section_description`, `section_order`) VALUES
 (2, 2, 'Title', 'This is a description', 1),
-(5, 1, 'Section 1 Title', 'This is a description of section 1.', 1);
+(6, 1, 'Consent', 'This section outlines the terms and conditions regarding the collection, processing, and storage of personal information by the College Guidance and Counseling Center (CGCC) at De La Salle Lipa (DLSL).', 1),
+(7, 1, 'DETAILED CONCERNS', 'The items below describe some of the concerns that students your age might experience. Please check your top five concerns in which the guidance counselor can help you with.', 2),
+(8, 1, 'CLIENT CONSENT FORM', 'This form is a document provided by the CGCC to students in order to properly acquire consent for Counseling. The form contains information about the counseling service and the agreement between the counselor and the student.\n\nAPPOINTMENT\nYour sessions are scheduled and agreed upon by you and your counselors. When you need to cancel or reschedule an appointment, please give us at least 24-hours notice.\n\nCOUNSELING and ASSESSMENT\nCounseling is an opportunity to identify and build on current strengths, learn problem-solving strategies, develop or enhance coping skills, learn more effective ways to communicate with others, and receive support and feedback. Assessment is crucial in facilitating the counselor’s understanding of the client. The counseling relationship is designed to be one that will promote change and growth. The counselor and client both have active roles. A record of the counseling and assessment services provided to each client is maintained.\n\nThe goal of the counselor is to provide a comfortable and supportive environment conducive to insight, healing, and personal growth. Your role, as the client, will be to identify goals you would like to achieve during the course of counseling and be willing to examine any potential obstacles and strengths that will either hinder or help you achieve your desired goals.\n\nRISKS\nCounseling and assessment can have benefits and risks and it is important to consider both when making any treatment decisions. Since counseling involves discussing unpleasant aspects of your life, there is a risk that you may experience temporary uncomfortable feelings like sadness, guilt, anger, frustration, loneliness, and helplessness. Disclosing personal information during an assessment may likewise feel uncomfortable and might make you feel vulnerable.\n\nCOUNSELOR CONTACT INFORMATION\nThe primary way to get in touch with us is by contacting your counselor through Canvas or email. If you are in a crisis and need immediate assistance, please go to your nearest emergency room.', 3),
+(9, 1, 'CONFIDENTIALITY and RELEASE of INFORMATION', 'Protecting your privacy is very important. The information in your record is confidential and will not be disclosed to anyone without your written consent unless required by law.\n\nThe exceptions to confidentiality include:\nIf you tell your counselor that you are going to harm or kill yourself or someone else, we are required by law to do whatever we can do to prevent that from happening and to ensure your safety and the safety of others. This may require notifying family members, parents, legal guardians, legal authorities, and/or potential victims.\n\nIf you tell us about incidents of abuse, we are required to report this to proper authorities.\n\nWe are required to release your records if they are subpoenaed by a court of law.\n\nIn addition to the above, there are several other situations where confidentiality cannot be insured, including:\n\nIf you provide us with a request to release your records\n\nIf you are in family counseling, we cannot guarantee confidentiality will be maintained by other family members.\n\nIf you are a child/minor or unable to voluntarily consent, a guardian must give written consent and can access your records.', 4),
+(10, 1, 'USE of CLIENT INFORMATION on OUTCOME RESEARCH', '', 5);
 
 -- --------------------------------------------------------
 
@@ -189,75 +229,21 @@ CREATE TABLE `main_questions` (
 
 INSERT INTO `main_questions` (`main_question_index`, `form_index`, `main_question_text`, `type_index`, `is_required`, `section_index`) VALUES
 (2, 2, 'fsdfsfd', 6, 0, 2),
-(18, 1, 'Question 1', 6, 0, 5),
-(19, 1, 'fsdfsdfd', 1, 0, 5),
-(20, 1, 'nnkjigyh', 6, 1, 5);
-
--- --------------------------------------------------------
-
---
-<<<<<<< HEAD
--- Table structure for table `program`
---
-
-CREATE TABLE `program` (
-  `program_index` int(11) NOT NULL,
-  `counselor_index` int(11) NOT NULL,
-  `program_id` varchar(20) NOT NULL,
-  `program_name` varchar(50) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `question_type`
-=======
--- Table structure for table `programs`
->>>>>>> bb1a99688932b26fc363d14e1eeaa3c75b8d6cea
---
-
-CREATE TABLE `programs` (
-  `program_index` int(11) NOT NULL,
-  `dept_index` int(11) NOT NULL,
-  `program_code` varchar(20) NOT NULL,
-  `program_name` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `programs`
---
-
-INSERT INTO `programs` (`program_index`, `dept_index`, `program_code`, `program_name`) VALUES
-(1, 1, 'BSA', 'Bachelor of Science in Accountancy'),
-(2, 1, 'BSAIS', 'Bachelor of Science in Accounting Information Systems'),
-(3, 1, 'BSLM', 'Bachelor of Science in Legal Management'),
-(4, 1, 'BSE', 'Bachelor of Science in Entrepreneurship'),
-(5, 1, 'BSMT', 'Bachelor of Science in Management Technology'),
-(6, 1, 'BSBA-FM', 'Bachelor of Science in Business Administration major in Financial Management'),
-(7, 1, 'BSBA-MM', 'Bachelor of Science in Business Administration major in Marketing Management'),
-(8, 1, 'CE', 'Certificate in Entrepreneurship'),
-(9, 2, 'BEED', 'Bachelor of Elementary Education'),
-(10, 2, 'BSED', 'Bachelor of Secondary Education'),
-(11, 2, 'AB COM', 'Bachelor of Arts in Communication'),
-(12, 2, 'BMMA', 'Bachelor of Multimedia Arts'),
-(13, 2, 'BS BIO', 'Bachelor of Science in Biology'),
-(14, 2, 'BSFS', 'Bachelor of Science in Forensic Science'),
-(15, 2, 'BS MATH', 'Bachelor of Science in Mathematics'),
-(16, 2, 'BS PSYCH', 'Bachelor of Science in Psychology'),
-(17, 3, 'BSHM', 'Bachelor of Science in Hospitality Management'),
-(18, 3, 'BSTM', 'Bachelor of Science in Tourism Management'),
-(19, 3, 'CCA', 'Certificate in Culinary Arts'),
-(20, 4, 'BS ARCHI', 'Bachelor of Science in Architecture'),
-(21, 4, 'BS CpE', 'Bachelor of Science in Computer Engineering'),
-(22, 4, 'BSCS', 'Bachelor of Science in Computer Science'),
-(23, 4, 'BSEE', 'Bachelor of Science in Electrical Engineering'),
-(24, 4, 'BSECE', 'Bachelor of Science in Electronics Engineering'),
-(25, 4, 'BSEMC', 'Bachelor of Science in Entertainment and Multimedia Computing'),
-(26, 4, 'BSIE', 'Bachelor of Science in Industrial Engineering'),
-(27, 4, 'BSIT', 'Bachelor of Science in Information Technology'),
-(28, 4, 'ACT', 'Associate in Computer Technology'),
-(29, 5, 'BSN', 'Bachelor of Science in Nursing'),
-(30, 6, 'JD', 'Juris Doctor');
+(21, 1, 'I understand that this form is considered an official record of De La Salle Lipa and that College Guidance and Counseling Center (CGCC) is required to keep my personal information and records until such time that these documents are due for disposal based on the DLSL data privacy retention policy. Some of the services of CGCC that would utilize this data are Counseling, Referral, and Research and Development. This form shall only be accessed by the CGCC team. CGCC shall retain the data in accordance with Document Retention Period and will be deleted upon disposal. By answering this form, you are giving CGCC consent to process and store this information. Please answer carefully and truthfully.', 4, 1, 6),
+(22, 1, 'SOCIAL/EMOTIONAL CONCERNS', 4, 1, 7),
+(23, 1, 'FAMILY & HOME CONCERNS', 4, 1, 7),
+(24, 1, 'MENTAL/PHYSICAL HEALTH CONCERNS', 4, 1, 7),
+(25, 1, 'ACADEMIC CONCERNS', 4, 1, 7),
+(26, 1, 'PROFESSOR ISSUE CONCERNS', 4, 1, 7),
+(27, 1, 'CAREER CONCERNS', 4, 1, 7),
+(28, 1, 'I have other concerns/questions that I want to directly consult or discuss with my counselor.', 3, 1, 7),
+(29, 1, 'We appreciate your feedback. Please let us know how we can best improve our CGCC Student Individual Inventory (SII) Form. If you have comments/suggestions, please indicate them below:', 1, 1, 7),
+(30, 1, 'By submitting this form, I certify that the above information are true and correct. FALSIFICATION of any information will be subjected to DISCIPLINARY ACTION.', 4, 1, 7),
+(31, 1, 'I understand the nature and limits of confidentiality stated above and accept them as part of the benefits and conditions of participating in counseling. In the event that my counselor reasonably believes that there is evidence of clear and imminent danger of harm to myself and/or others, physically or emotionally, I give consent to my counselor to contact the following persons, in addition to the school and medical personnel.', 3, 1, 9),
+(32, 1, 'Name of Father/Mother or Legal Guardian', 1, 1, 9),
+(33, 1, 'Contact number of parent/guardian', 1, 1, 9),
+(34, 1, 'When client information is utilized on outcome research purposes, client names are not disclosed.', 3, 1, 10),
+(35, 1, 'Counseling Guidelines Please review the Counseling Guidelines through this link: https://bit.ly/counselingguide By accomplishing this form you understand and agree to the guidelines set by CGCC. This document has provided the information required to address expectations about counseling. I have read and fully understand this document. All questions that I had have been answered to my satisfaction. By filling out this form, I voluntarily agree to accept counseling.', 4, 1, 10);
 
 -- --------------------------------------------------------
 
@@ -299,26 +285,262 @@ CREATE TABLE `responses` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `sections`
+-- Table structure for table `sub_questions`
 --
 
-<<<<<<< HEAD
-CREATE TABLE `student` (
+CREATE TABLE `sub_questions` (
+  `sub_question_index` int(11) NOT NULL,
+  `main_question_index` int(11) DEFAULT NULL,
+  `sub_question_text` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `sub_questions`
+--
+
+INSERT INTO `sub_questions` (`sub_question_index`, `main_question_index`, `sub_question_text`) VALUES
+(1, 2, 'fsdfdsf');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users`
+--
+
+CREATE TABLE `users` (
+  `user_index` int(11) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `password` varchar(100) NOT NULL,
+  `type` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`user_index`, `email`, `password`, `type`, `created_at`) VALUES
+(1, 'amybalion533@gmail.com', '$2y$10$.ugAqIwocz1sb1wE4k9p/.OQ.VQfqOiy/8YrMyXk7l1sTDNUe19s6', 'admin', '2025-04-30 07:34:49'),
+(2, 'john_andrei_agustin@dlsl.edu.ph', '$2y$10$8cN7C6R49VZ5Kk3LbqT5CeHJpQvXhFmzOjUw2tIaS9oPdYxgBZuOW', 'student', '2025-05-21 14:08:04'),
+(3, 'janna_mikhaela_alcantara@dlsl.edu.ph', '$2y$10$GtA3eKsDnTqWvLlM7.hEVePZr5fHcWzT1uJvXwS0qYmOeZbUdL8Di', 'student', '2025-05-21 14:08:04'),
+(4, 'enjey_kashlee_alonzo@dlsl.edu.ph', '$2y$10$7iK8sPpY.fJZV2B7zYR8ae4mXZ.b9VZ6gqNvW7hU1oLkTmS5jVzOW', 'student', '2025-05-21 14:08:04'),
+(5, 'jhenelle_alonzo@dlsl.edu.ph', '$2y$10$R0vF.6Z9ZV0mTz2mFzK4Fe8sD9VZa3yZ7XwS8uJvXqNvW7hU1oLkT', 'student', '2025-05-21 14:08:04'),
+(6, 'angel_amaya_balion@dlsl.edu.ph', '$2y$10$aZ3KpQvXhFmzOjUw2tIaS9oPdYxgBZuOW8cN7C6R49VZ5Kk3LbqT5', 'student', '2025-05-21 14:08:04'),
+(7, 'alfonso_rafael_barte@dlsl.edu.ph', '$2y$10$PZr5fHcWzT1uJvXqNvW7hU1oLkTmS5jVzOW8cN7C6R49VZ5Kk3Lbq', 'student', '2025-05-21 14:08:04'),
+(8, 'regina_angeli_cadelina@dlsl.edu.ph', '$2y$10$VePZr5fHcWzT1uJvXqNvW7hU1oLkTmS5jVzOW8cN7C6R49VZ5Kk3L', 'student', '2025-05-21 14:08:04'),
+(9, 'djan_matthew_catibog@dlsl.edu.ph', '$2y$10$zT1uJvXqNvW7hU1oLkTmS5jVzOW8cN7C6R49VZ5Kk3LbqT5CeHJpQ', 'student', '2025-05-21 14:08:04'),
+(10, 'renz_andrei_delrosario@dlsl.edu.ph', '$2y$10$mzOjUw2tIaS9oPdYxgBZuOW8cN7C6R49VZ5Kk3LbqT5CeHJpQvXhF', 'student', '2025-05-21 14:08:04'),
+(11, 'marc_lawrence_delapena@dlsl.edu.ph', '$2y$10$Iw2tIaS9oPdYxgBZuOW8cN7C6R49VZ5Kk3LbqT5CeHJpQvXhFmzOj', 'student', '2025-05-21 14:08:04'),
+(12, 'princess_mihaela_delavega@dlsl.edu.ph', '$2y$10$9oPdYxgBZuOW8cN7C6R49VZ5Kk3LbqT5CeHJpQvXhFmzOjUw2tIaS', 'student', '2025-05-21 14:08:04'),
+(13, 'lyrus_lei_doctolero@dlsl.edu.ph', '$2y$10$gBZuOW8cN7C6R49VZ5Kk3LbqT5CeHJpQvXhFmzOjUw2tIaS9oPdYx', 'student', '2025-05-21 14:08:04'),
+(14, 'kyle_gabriel_dones@dlsl.edu.ph', '$2y$10$Uw2tIaS9oPdYxgBZuOW8cN7C6R49VZ5Kk3LbqT5CeHJpQvXhFmzOj', 'student', '2025-05-21 14:08:04'),
+(15, 'juan_benjo_estrella@dlsl.edu.ph', '$2y$10$oPdYxgBZuOW8cN7C6R49VZ5Kk3LbqT5CeHJpQvXhFmzOjUw2tIaS9', 'student', '2025-05-21 14:08:04'),
+(16, 'lenard_lance_fedelicio@dlsl.edu.ph', '$2y$10$xgBZuOW8cN7C6R49VZ5Kk3LbqT5CeHJpQvXhFmzOjUw2tIaS9oPdY', 'student', '2025-05-21 14:08:04'),
+(17, 'harry_garcia@dlsl.edu.ph', '$2y$10$w2tIaS9oPdYxgBZuOW8cN7C6R49VZ5Kk3LbqT5CeHJpQvXhFmzOjU', 'student', '2025-05-21 14:08:04'),
+(18, 'ivan_joseph_jaurigue@dlsl.edu.ph', '$2y$10$9oPdYxgBZuOW8cN7C6R49VZ5Kk3LbqT5CeHJpQvXhFmzOjUw2tIaS', 'student', '2025-05-21 14:08:04'),
+(19, 'mark_jerome_kinchasan@dlsl.edu.ph', '$2y$10$gBZuOW8cN7C6R49VZ5Kk3LbqT5CeHJpQvXhFmzOjUw2tIaS9oPdYx', 'student', '2025-05-21 14:08:04'),
+(20, 'jeric_lique@dls.edu.ph', '$2y$10$tIaS9oPdYxgBZuOW8cN7C6R49VZ5Kk3LbqT5CeHJpQvXhFmzOjUw2', 'student', '2025-05-21 14:08:04'),
+(21, 'sean_calvin_theo_lirio@dlsl.edu.ph', '$2y$10$PdYxgBZuOW8cN7C6R49VZ5Kk3LbqT5CeHJpQvXhFmzOjUw2tIaS9o', 'student', '2025-05-21 14:08:04'),
+(22, 'katherine_anne_liwanag@dlsl.edu.ph', '$2y$10$YxgBZuOW8cN7C6R49VZ5Kk3LbqT5CeHJpQvXhFmzOjUw2tIaS9oPd', 'student', '2025-05-21 14:08:04'),
+(23, 'chester_boriz_macalintal@dlsl.edu.ph', '$2y$10$xgBZuOW8cN7C6R49VZ5Kk3LbqT5CeHJpQvXhFmzOjUw2tIaS9oPdY', 'student', '2025-05-21 14:08:04'),
+(24, 'john_rafhael_steven_macasaet@dlsl.edu.ph', '$2y$10$gBZuOW8cN7C6R49VZ5Kk3LbqT5CeHJpQvXhFmzOjUw2tIaS9oPdYx', 'student', '2025-05-21 14:08:04'),
+(25, 'alexie_chyle_magbuhat@dlsl.edu.ph', '$2y$10$w2tIaS9oPdYxgBZuOW8cN7C6R49VZ5Kk3LbqT5CeHJpQvXhFmzOjU', 'student', '2025-05-21 14:08:04'),
+(26, 'john_aaron_manalo@dlsl.edu.ph', '$2y$10$IaS9oPdYxgBZuOW8cN7C6R49VZ5Kk3LbqT5CeHJpQvXhFmzOjUw2t', 'student', '2025-05-21 14:08:04'),
+(27, 'ian_karvey_manimtim@dlsl.edu.ph', '$2y$10$PdYxgBZuOW8cN7C6R49VZ5Kk3LbqT5CeHJpQvXhFmzOjUw2tIaS9o', 'student', '2025-05-21 14:08:04'),
+(28, 'isiah_joseph_marquinez@dlsl.edu.ph', '$2y$10$YxgBZuOW8cN7C6R49VZ5Kk3LbqT5CeHJpQvXhFmzOjUw2tIaS9oPd', 'student', '2025-05-21 14:08:04'),
+(29, 'sebastian_angelo_meer@dlsl.edu.ph', '$2y$10$xgBZuOW8cN7C6R49VZ5Kk3LbqT5CeHJpQvXhFmzOjUw2tIaS9oPdY', 'student', '2025-05-21 14:08:04'),
+(30, 'wyeth_irish_mendez@dlsl.edu.ph', '$2y$10$gBZuOW8cN7C6R49VZ5Kk3LbqT5CeHJpQvXhFmzOjUw2tIaS9oPdYx', 'student', '2025-05-21 14:08:04'),
+(31, 'jan_ernest_pacey_nario@dlsl.edu.ph', '$2y$10$w2tIaS9oPdYxgBZuOW8cN7C6R49VZ5Kk3LbqT5CeHJpQvXhFmzOjU', 'student', '2025-05-21 14:08:04'),
+(32, 'keith_justin_nario@dlsl.edu.ph', '$2y$10$IaS9oPdYxgBZuOW8cN7C6R49VZ5Kk3LbqT5CeHJpQvXhFmzOjUw2t', 'student', '2025-05-21 14:08:04'),
+(33, 'michael_josh_panuela@dlsl.edu.ph', '$2y$10$PdYxgBZuOW8cN7C6R49VZ5Kk3LbqT5CeHJpQvXhFmzOjUw2tIaS9o', 'student', '2025-05-21 14:08:04'),
+(34, 'jane_allyson_paray@dlsl.edu.ph', '$2y$10$YxgBZuOW8cN7C6R49VZ5Kk3LbqT5CeHJpQvXhFmzOjUw2tIaS9oPd', 'student', '2025-05-21 14:08:04'),
+(35, 'daniel_luis_sahagun@dlsl.edu.ph', '$2y$10$xgBZuOW8cN7C6R49VZ5Kk3LbqT5CeHJpQvXhFmzOjUw2tIaS9oPdY', 'student', '2025-05-21 14:08:04'),
+(36, 'thomas_alexandre_siman@dlsl.edu.ph', '$2y$10$gBZuOW8cN7C6R49VZ5Kk3LbqT5CeHJpQvXhFmzOjUw2tIaS9oPdYx', 'student', '2025-05-21 14:08:04'),
+(37, 'xyrelle_dominique_talens@dlsl.edu.ph', '$2y$10$w2tIaS9oPdYxgBZuOW8cN7C6R49VZ5Kk3LbqT5CeHJpQvXhFmzOjU', 'student', '2025-05-21 14:08:04'),
+(38, 'jhon_paulo_tenorio@dlsl.edu.ph', '$2y$10$IaS9oPdYxgBZuOW8cN7C6R49VZ5Kk3LbqT5CeHJpQvXhFmzOjUw2t', 'student', '2025-05-21 14:08:04'),
+(39, 'kyan_prince_torres@dlsl.edu.ph', '$2y$10$PdYxgBZuOW8cN7C6R49VZ5Kk3LbqT5CeHJpQvXhFmzOjUw2tIaS9o', 'student', '2025-05-21 14:08:04');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_counselor_information`
+--
+
+CREATE TABLE `user_counselor_information` (
+  `counselor_index` int(11) NOT NULL,
+  `user_index` int(11) NOT NULL,
+  `counselor_number` varchar(255) DEFAULT NULL,
+  `last_name` varchar(50) NOT NULL,
+  `first_name` varchar(50) NOT NULL,
+  `calendar_link` varchar(200) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_student_department`
+--
+
+CREATE TABLE `user_student_department` (
+  `dept_index` int(11) NOT NULL,
+  `dept_code` varchar(255) DEFAULT NULL,
+  `dept_title` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `user_student_department`
+--
+
+INSERT INTO `user_student_department` (`dept_index`, `dept_code`, `dept_title`) VALUES
+(1, 'CBEAM', 'College of Business, Economics, Accountancy and Management'),
+(2, 'CEAS', 'College of Education, Arts and Sciences'),
+(3, 'CIHTM', 'College of International Hospitality and Tourism Management'),
+(4, 'CITE', 'College of Information Technology and Engineering'),
+(5, 'CON', 'College of Nursing'),
+(6, 'COL', 'College of Law');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_student_guardian`
+--
+
+CREATE TABLE `user_student_guardian` (
+  `guardian_index` int(11) NOT NULL,
+  `last_name` varchar(50) NOT NULL,
+  `first_name` varchar(50) NOT NULL,
+  `contact_number` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `user_student_guardian`
+--
+
+INSERT INTO `user_student_guardian` (`guardian_index`, `last_name`, `first_name`, `contact_number`) VALUES
+(1, 'Agustin', 'Rias', '4218391312'),
+(2, 'Alcantara', 'Rachelle', '9157091187'),
+(3, 'Alonzo', 'Kia', '421839218'),
+(4, 'Katigbak', 'Elizabeth', '9952144589'),
+(5, 'Balion', 'Dareen', '9916873009'),
+(6, 'Barte', 'Eden', '9215747674'),
+(7, 'Cadeliña', 'Emie', '9178042206'),
+(8, 'Catibog', 'Eme', '42141234124'),
+(9, 'Del Rosario', 'Raquel', '9194087360'),
+(10, 'Dela Peña', 'Mayra', '4142131245'),
+(11, 'Dela Vega', 'Lourdes', '9214566458'),
+(12, 'Doctolero', 'Breb Claude', '995401561'),
+(13, 'Maninang', 'Sheila', '9171705367'),
+(14, 'Estrella', 'Elenita', '4134213412'),
+(15, 'Fedelicio', 'Jovencio', '9055989302'),
+(16, 'Garcia', 'Reynaldo', '9302232851'),
+(17, 'Jaurigue', 'Maria Luisa', '9360410172'),
+(18, 'Guevarra', 'Audrey', '9166686257'),
+(19, 'Lique', 'Jimmy', '9273391738'),
+(20, 'Lirio', 'Amy', '656345456'),
+(21, 'Liwanag', 'Magdalena', '9178765184'),
+(22, 'Macalintal', 'Rizza', '9369354163'),
+(23, 'Macasaet', 'John Paul Verlann', '9075169764'),
+(24, 'Magbuhat', 'Cheryvel', '9874850109'),
+(25, 'Manalo', 'Ronaldo', '9563360392'),
+(26, 'Manimtim', 'Maricar', '9989031690'),
+(27, 'Marquinez', 'Test', '54326531'),
+(28, 'Meer', 'Elem', '64262656'),
+(29, 'Mendez', 'Jethro', '938677662'),
+(30, 'Nario', 'Joel', '9272747559'),
+(31, 'Nario', 'Jayson', '9052294676'),
+(32, 'Panuela', 'Robelyn', '9482517698'),
+(33, 'Paray', 'Arlene', '9292437343'),
+(34, 'Sahagun', 'Precious Claire', '9263009576'),
+(35, 'Siman', 'Gloria', '9658065263'),
+(36, 'Talens', 'Rochelle', '9478229099'),
+(37, 'Tenorio', 'Norely', '9076473654'),
+(38, 'Torres', 'Joselito', '6555433214');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_student_information`
+--
+
+CREATE TABLE `user_student_information` (
   `student_index` int(11) NOT NULL,
   `user_index` int(11) NOT NULL,
-  `student_id` bigint(15) NOT NULL,
-=======
-CREATE TABLE `sections` (
+  `image_path` varchar(200) NOT NULL COMMENT 'Profile picture of the student',
+  `student_number` varchar(255) DEFAULT NULL,
+  `last_name` varchar(50) NOT NULL,
+  `first_name` varchar(50) NOT NULL,
+  `contact_number` varchar(50) NOT NULL COMMENT 'phone number of the student',
+  `year_level` int(1) NOT NULL,
+  `program_index` int(11) NOT NULL,
+  `guardian_index` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_student_program`
+--
+
+CREATE TABLE `user_student_program` (
+  `program_index` int(11) NOT NULL,
+  `dept_index` int(11) NOT NULL,
+  `program_code` varchar(20) NOT NULL,
+  `program_name` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `user_student_program`
+--
+
+INSERT INTO `user_student_program` (`program_index`, `dept_index`, `program_code`, `program_name`) VALUES
+(1, 1, 'BSA', 'Bachelor of Science in Accountancy'),
+(2, 1, 'BSAIS', 'Bachelor of Science in Accounting Information Systems'),
+(3, 1, 'BSLM', 'Bachelor of Science in Legal Management'),
+(4, 1, 'BSE', 'Bachelor of Science in Entrepreneurship'),
+(5, 1, 'BSMT', 'Bachelor of Science in Management Technology'),
+(6, 1, 'BSBA-FM', 'Bachelor of Science in Business Administration major in Financial Management'),
+(7, 1, 'BSBA-MM', 'Bachelor of Science in Business Administration major in Marketing Management'),
+(8, 1, 'CE', 'Certificate in Entrepreneurship'),
+(9, 2, 'BEED', 'Bachelor of Elementary Education'),
+(10, 2, 'BSED', 'Bachelor of Secondary Education'),
+(11, 2, 'AB COM', 'Bachelor of Arts in Communication'),
+(12, 2, 'BMMA', 'Bachelor of Multimedia Arts'),
+(13, 2, 'BS BIO', 'Bachelor of Science in Biology'),
+(14, 2, 'BSFS', 'Bachelor of Science in Forensic Science'),
+(15, 2, 'BS MATH', 'Bachelor of Science in Mathematics'),
+(16, 2, 'BS PSYCH', 'Bachelor of Science in Psychology'),
+(17, 3, 'BSHM', 'Bachelor of Science in Hospitality Management'),
+(18, 3, 'BSTM', 'Bachelor of Science in Tourism Management'),
+(19, 3, 'CCA', 'Certificate in Culinary Arts'),
+(20, 4, 'BS ARCHI', 'Bachelor of Science in Architecture'),
+(21, 4, 'BS CpE', 'Bachelor of Science in Computer Engineering'),
+(22, 4, 'BSCS', 'Bachelor of Science in Computer Science'),
+(23, 4, 'BSEE', 'Bachelor of Science in Electrical Engineering'),
+(24, 4, 'BSECE', 'Bachelor of Science in Electronics Engineering'),
+(25, 4, 'BSEMC', 'Bachelor of Science in Entertainment and Multimedia Computing'),
+(26, 4, 'BSIE', 'Bachelor of Science in Industrial Engineering'),
+(27, 4, 'BSIT', 'Bachelor of Science in Information Technology'),
+(28, 4, 'ACT', 'Associate in Computer Technology'),
+(29, 5, 'BSN', 'Bachelor of Science in Nursing'),
+(30, 6, 'JD', 'Juris Doctor');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_student_section`
+--
+
+CREATE TABLE `user_student_section` (
   `section_index` int(11) NOT NULL,
   `section_name` varchar(50) NOT NULL,
   `program_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `sections`
+-- Dumping data for table `user_student_section`
 --
 
-INSERT INTO `sections` (`section_index`, `section_name`, `program_id`) VALUES
+INSERT INTO `user_student_section` (`section_index`, `section_name`, `program_id`) VALUES
 (1, 'BSA-1A', 1),
 (2, 'BSA-1B', 1),
 (3, 'BSAIS-1A', 2),
@@ -380,106 +602,6 @@ INSERT INTO `sections` (`section_index`, `section_name`, `program_id`) VALUES
 (59, 'JD-1A', 30),
 (60, 'JD-1B', 30);
 
--- --------------------------------------------------------
-
---
--- Table structure for table `students`
---
-
-CREATE TABLE `students` (
-  `student_index` int(11) NOT NULL,
-  `user_index` int(11) NOT NULL,
-  `student_number` varchar(255) DEFAULT NULL,
->>>>>>> bb1a99688932b26fc363d14e1eeaa3c75b8d6cea
-  `last_name` varchar(50) NOT NULL,
-  `first_name` varchar(50) NOT NULL,
-  `year_level` int(1) NOT NULL,
-  `section_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `students`
---
-
-<<<<<<< HEAD
-INSERT INTO `student` (`student_index`, `user_index`, `student_id`, `last_name`, `first_name`, `year_level`) VALUES
-(1, 1, 2023351801, 'Balion', 'Angel Amaya', 2),
-(2, 4, 2023350761, 'Del Rosario', 'Renz Andrei', 2);
-=======
-INSERT INTO `students` (`student_index`, `user_index`, `student_number`, `last_name`, `first_name`, `year_level`, `section_id`) VALUES
-(1, 1, '2023351801', 'Balion', 'Angel Amaya', 2, 20),
-(2, 4, '2023350761', 'Del Rosario', 'Renz Andrei', 2, 21),
-(3, 5, '2023359771', 'Talens', 'Xyrelle Dominique', 2, 23),
-(4, 6, '2023352471', 'Doctolero', 'Lyrus Lei', 2, 37),
-(5, 7, '20233621', 'Alonzo', 'Enjey Kashlee', 2, 26),
-(6, 8, '2023363891', 'Alonzo', 'Jhenelle', 2, 57),
-(7, 9, '2023350511', 'Dela Vega', 'Princess Mihaela', 2, 60),
-(8, 10, '2023348471', 'Estrella', 'Juan Benjo', 2, 46),
-(9, 11, '2023362901', 'Liwanag', 'Katherine Anne', 2, 3),
-(10, 12, '2023362341', 'Paray', 'Jane Allyson', 2, 48),
-(11, 13, '2023358411', 'Sahagun', 'Daniel Luis', 2, 12),
-(12, 14, '2023352411', 'Tenorio', 'Jhon Paulo', 2, 21);
->>>>>>> bb1a99688932b26fc363d14e1eeaa3c75b8d6cea
-
--- --------------------------------------------------------
-
---
--- Table structure for table `sub_questions`
---
-
-CREATE TABLE `sub_questions` (
-  `sub_question_index` int(11) NOT NULL,
-  `main_question_index` int(11) DEFAULT NULL,
-  `sub_question_text` text DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `sub_questions`
---
-
-INSERT INTO `sub_questions` (`sub_question_index`, `main_question_index`, `sub_question_text`) VALUES
-(1, 2, 'fsdfdsf'),
-(9, 18, 'Row 1'),
-(10, 20, 'dasd');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `users`
---
-
-CREATE TABLE `users` (
-  `user_index` int(11) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `password` varchar(100) NOT NULL,
-  `type` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `users`
---
-
-INSERT INTO `users` (`user_index`, `email`, `password`, `type`, `created_at`) VALUES
-(1, 'angel_amaya_balion@dlsl.edu.ph', '$2y$10$.ugAqIwocz1sb1wE4k9p/.OQ.VQfqOiy/8YrMyXk7l1sTDNUe19s6', 'student', '2025-04-30 06:48:52'),
-(2, 'amybalion533@gmail.com', '$2y$10$.ugAqIwocz1sb1wE4k9p/.OQ.VQfqOiy/8YrMyXk7l1sTDNUe19s6', 'admin', '2025-04-30 07:34:49'),
-(3, 'balionamaya01@gmail.com', '$2y$10$.ugAqIwocz1sb1wE4k9p/.OQ.VQfqOiy/8YrMyXk7l1sTDNUe19s6', 'counselor', '2025-04-30 07:35:57'),
-(4, 'renz_andrei_delrosario@dlsl.edu.ph', '$2y$10$ZtzitJGInBQZl.LYAS4cxuS5v31acCrUuuUSLsO1ehjNLXQgF4Iza', 'student', '2025-05-02 02:29:55'),
-(5, 'xyrelle_dominique_talens@dlsl.edu.ph', '$2y$10$YEayWrIWlENsw6wqLxI8EuBasWFOds0yK3uLla04ZgjCmo3V4hHa6', 'student', '2025-05-04 08:13:56'),
-<<<<<<< HEAD
-(6, 'lyrus_lei_doctolero@dlsl.edu.ph', '$2y$10$I0jZ6DYNZU3nzf/qPlq7K.dzNCEdnYFJKF3w48iAeN6rzCagJVQ2C', 'student', '2025-05-04 08:13:56');
-=======
-(6, 'lyrus_lei_doctolero@dlsl.edu.ph', '$2y$10$I0jZ6DYNZU3nzf/qPlq7K.dzNCEdnYFJKF3w48iAeN6rzCagJVQ2C', 'student', '2025-05-04 08:13:56'),
-(7, 'enjey_kashlee_alonzo@dlsl.edu.ph', '', 'student', '2025-05-07 12:42:20'),
-(8, 'jhenelle_alonzo@dlsl.edu.ph', '', 'student', '2025-05-07 12:45:54'),
-(9, 'princess_mihaela_delavega@dlsl.edu.ph', '', 'student', '2025-05-07 12:45:54'),
-(10, 'juan_benjo_estrella@dlsl.edu.ph', '', 'student', '2025-05-07 12:45:54'),
-(11, 'katherine_anne_liwanag@dlsl.edu.ph', '', 'student', '2025-05-07 12:45:54'),
-(12, 'jane_allyson_paray@dlsl.edu.ph', '', 'student', '2025-05-07 12:45:54'),
-(13, 'daniel_luis_sahagun@dlsl.edu.ph', '', 'student', '2025-05-07 12:45:54'),
-(14, 'jhon_paulo_tenorio@dlsl.edu.ph', '', 'student', '2025-05-07 12:45:54');
->>>>>>> bb1a99688932b26fc363d14e1eeaa3c75b8d6cea
-
 --
 -- Indexes for dumped tables
 --
@@ -499,25 +621,6 @@ ALTER TABLE `answers`
 ALTER TABLE `choices`
   ADD PRIMARY KEY (`choice_index`),
   ADD KEY `Main_Question_ID` (`main_question_index`);
-
---
--- Indexes for table `counselors`
---
-<<<<<<< HEAD
-ALTER TABLE `counselor`
-  ADD PRIMARY KEY (`counselor_index`),
-  ADD KEY `fk2` (`user_index`);
-=======
-ALTER TABLE `counselors`
-  ADD PRIMARY KEY (`counselor_index`),
-  ADD KEY `fk2` (`user_index`);
-
---
--- Indexes for table `departments`
---
-ALTER TABLE `departments`
-  ADD PRIMARY KEY (`dept_index`);
->>>>>>> bb1a99688932b26fc363d14e1eeaa3c75b8d6cea
 
 --
 -- Indexes for table `forms`
@@ -552,25 +655,6 @@ ALTER TABLE `main_questions`
   ADD KEY `section_index` (`section_index`);
 
 --
-<<<<<<< HEAD
--- Indexes for table `program`
---
-ALTER TABLE `program`
-  ADD PRIMARY KEY (`program_index`),
-  ADD KEY `fk3` (`counselor_index`);
-
---
--- Indexes for table `question_type`
-=======
--- Indexes for table `programs`
->>>>>>> bb1a99688932b26fc363d14e1eeaa3c75b8d6cea
---
-ALTER TABLE `programs`
-  ADD PRIMARY KEY (`program_index`),
-  ADD UNIQUE KEY `program_code` (`program_code`),
-  ADD KEY `dept_index` (`dept_index`);
-
---
 -- Indexes for table `question_types`
 --
 ALTER TABLE `question_types`
@@ -582,26 +666,6 @@ ALTER TABLE `question_types`
 ALTER TABLE `responses`
   ADD PRIMARY KEY (`response_index`),
   ADD KEY `Form_ID` (`form_index`);
-
---
--- Indexes for table `sections`
---
-<<<<<<< HEAD
-ALTER TABLE `student`
-  ADD PRIMARY KEY (`student_index`);
-=======
-ALTER TABLE `sections`
-  ADD PRIMARY KEY (`section_index`),
-  ADD KEY `program_id` (`program_id`);
->>>>>>> bb1a99688932b26fc363d14e1eeaa3c75b8d6cea
-
---
--- Indexes for table `students`
---
-ALTER TABLE `students`
-  ADD PRIMARY KEY (`student_index`),
-  ADD KEY `fk1` (`user_index`),
-  ADD KEY `fk_student_section` (`section_id`);
 
 --
 -- Indexes for table `sub_questions`
@@ -618,6 +682,49 @@ ALTER TABLE `users`
   ADD UNIQUE KEY `email` (`email`);
 
 --
+-- Indexes for table `user_counselor_information`
+--
+ALTER TABLE `user_counselor_information`
+  ADD PRIMARY KEY (`counselor_index`),
+  ADD KEY `fk2` (`user_index`);
+
+--
+-- Indexes for table `user_student_department`
+--
+ALTER TABLE `user_student_department`
+  ADD PRIMARY KEY (`dept_index`);
+
+--
+-- Indexes for table `user_student_guardian`
+--
+ALTER TABLE `user_student_guardian`
+  ADD PRIMARY KEY (`guardian_index`);
+
+--
+-- Indexes for table `user_student_information`
+--
+ALTER TABLE `user_student_information`
+  ADD PRIMARY KEY (`student_index`),
+  ADD KEY `fk1` (`user_index`),
+  ADD KEY `fk_student_program` (`program_index`),
+  ADD KEY `fk_student_guardian` (`guardian_index`);
+
+--
+-- Indexes for table `user_student_program`
+--
+ALTER TABLE `user_student_program`
+  ADD PRIMARY KEY (`program_index`),
+  ADD UNIQUE KEY `program_code` (`program_code`),
+  ADD KEY `dept_index` (`dept_index`);
+
+--
+-- Indexes for table `user_student_section`
+--
+ALTER TABLE `user_student_section`
+  ADD PRIMARY KEY (`section_index`),
+  ADD KEY `program_id` (`program_id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -631,36 +738,19 @@ ALTER TABLE `answers`
 -- AUTO_INCREMENT for table `choices`
 --
 ALTER TABLE `choices`
-  MODIFY `choice_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
-
---
--- AUTO_INCREMENT for table `counselors`
---
-<<<<<<< HEAD
-ALTER TABLE `counselor`
-  MODIFY `counselor_index` int(11) NOT NULL AUTO_INCREMENT;
-=======
-ALTER TABLE `counselors`
-  MODIFY `counselor_index` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `departments`
---
-ALTER TABLE `departments`
-  MODIFY `dept_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
->>>>>>> bb1a99688932b26fc363d14e1eeaa3c75b8d6cea
+  MODIFY `choice_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=111;
 
 --
 -- AUTO_INCREMENT for table `forms`
 --
 ALTER TABLE `forms`
-  MODIFY `form_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `form_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `form_sections`
 --
 ALTER TABLE `form_sections`
-  MODIFY `section_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `section_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `grid_answers`
@@ -672,23 +762,7 @@ ALTER TABLE `grid_answers`
 -- AUTO_INCREMENT for table `main_questions`
 --
 ALTER TABLE `main_questions`
-  MODIFY `main_question_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
-
---
-<<<<<<< HEAD
--- AUTO_INCREMENT for table `program`
---
-ALTER TABLE `program`
-  MODIFY `program_index` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `question_type`
-=======
--- AUTO_INCREMENT for table `programs`
->>>>>>> bb1a99688932b26fc363d14e1eeaa3c75b8d6cea
---
-ALTER TABLE `programs`
-  MODIFY `program_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `main_question_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT for table `question_types`
@@ -703,23 +777,6 @@ ALTER TABLE `responses`
   MODIFY `response_index` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `sections`
---
-<<<<<<< HEAD
-ALTER TABLE `student`
-  MODIFY `student_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-=======
-ALTER TABLE `sections`
-  MODIFY `section_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
->>>>>>> bb1a99688932b26fc363d14e1eeaa3c75b8d6cea
-
---
--- AUTO_INCREMENT for table `students`
---
-ALTER TABLE `students`
-  MODIFY `student_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
-
---
 -- AUTO_INCREMENT for table `sub_questions`
 --
 ALTER TABLE `sub_questions`
@@ -729,11 +786,43 @@ ALTER TABLE `sub_questions`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-<<<<<<< HEAD
-  MODIFY `user_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
-=======
-  MODIFY `user_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
->>>>>>> bb1a99688932b26fc363d14e1eeaa3c75b8d6cea
+  MODIFY `user_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+
+--
+-- AUTO_INCREMENT for table `user_counselor_information`
+--
+ALTER TABLE `user_counselor_information`
+  MODIFY `counselor_index` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `user_student_department`
+--
+ALTER TABLE `user_student_department`
+  MODIFY `dept_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `user_student_guardian`
+--
+ALTER TABLE `user_student_guardian`
+  MODIFY `guardian_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+
+--
+-- AUTO_INCREMENT for table `user_student_information`
+--
+ALTER TABLE `user_student_information`
+  MODIFY `student_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
+-- AUTO_INCREMENT for table `user_student_program`
+--
+ALTER TABLE `user_student_program`
+  MODIFY `program_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+
+--
+-- AUTO_INCREMENT for table `user_student_section`
+--
+ALTER TABLE `user_student_section`
+  MODIFY `section_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
 
 --
 -- Constraints for dumped tables
@@ -752,16 +841,6 @@ ALTER TABLE `answers`
 --
 ALTER TABLE `choices`
   ADD CONSTRAINT `choices_ibfk_1` FOREIGN KEY (`main_question_index`) REFERENCES `main_questions` (`main_question_index`) ON DELETE CASCADE;
-
---
--- Constraints for table `counselors`
---
-<<<<<<< HEAD
-ALTER TABLE `counselor`
-=======
-ALTER TABLE `counselors`
->>>>>>> bb1a99688932b26fc363d14e1eeaa3c75b8d6cea
-  ADD CONSTRAINT `fk2` FOREIGN KEY (`user_index`) REFERENCES `users` (`user_index`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `form_sections`
@@ -787,46 +866,42 @@ ALTER TABLE `main_questions`
   ADD CONSTRAINT `main_questions_ibfk_3` FOREIGN KEY (`section_index`) REFERENCES `form_sections` (`section_index`) ON DELETE SET NULL;
 
 --
--- Constraints for table `programs`
---
-ALTER TABLE `programs`
-  ADD CONSTRAINT `programs_ibfk_1` FOREIGN KEY (`dept_index`) REFERENCES `departments` (`dept_index`);
-
---
--- Constraints for table `program`
---
-ALTER TABLE `program`
-  ADD CONSTRAINT `fk3` FOREIGN KEY (`counselor_index`) REFERENCES `counselor` (`counselor_index`) ON DELETE CASCADE;
-
---
 -- Constraints for table `responses`
 --
 ALTER TABLE `responses`
   ADD CONSTRAINT `responses_ibfk_1` FOREIGN KEY (`form_index`) REFERENCES `forms` (`form_index`) ON DELETE CASCADE;
 
 --
--- Constraints for table `sections`
---
-<<<<<<< HEAD
-ALTER TABLE `student`
-  ADD CONSTRAINT `fk1` FOREIGN KEY (`user_index`) REFERENCES `users` (`user_index`) ON DELETE CASCADE;
-=======
-ALTER TABLE `sections`
-  ADD CONSTRAINT `sections_ibfk_1` FOREIGN KEY (`program_id`) REFERENCES `programs` (`program_index`);
->>>>>>> bb1a99688932b26fc363d14e1eeaa3c75b8d6cea
-
---
--- Constraints for table `students`
---
-ALTER TABLE `students`
-  ADD CONSTRAINT `fk1` FOREIGN KEY (`user_index`) REFERENCES `users` (`user_index`) ON DELETE CASCADE,
-  ADD CONSTRAINT `fk_student_section` FOREIGN KEY (`section_id`) REFERENCES `sections` (`section_index`);
-
---
 -- Constraints for table `sub_questions`
 --
 ALTER TABLE `sub_questions`
   ADD CONSTRAINT `sub_questions_ibfk_1` FOREIGN KEY (`main_question_index`) REFERENCES `main_questions` (`main_question_index`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `user_counselor_information`
+--
+ALTER TABLE `user_counselor_information`
+  ADD CONSTRAINT `fk2` FOREIGN KEY (`user_index`) REFERENCES `users` (`user_index`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `user_student_information`
+--
+ALTER TABLE `user_student_information`
+  ADD CONSTRAINT `fk1` FOREIGN KEY (`user_index`) REFERENCES `users` (`user_index`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_student_guardian` FOREIGN KEY (`guardian_index`) REFERENCES `user_student_guardian` (`guardian_index`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_student_program` FOREIGN KEY (`program_index`) REFERENCES `user_student_program` (`program_index`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `user_student_program`
+--
+ALTER TABLE `user_student_program`
+  ADD CONSTRAINT `user_student_program_ibfk_1` FOREIGN KEY (`dept_index`) REFERENCES `user_student_department` (`dept_index`);
+
+--
+-- Constraints for table `user_student_section`
+--
+ALTER TABLE `user_student_section`
+  ADD CONSTRAINT `user_student_section_ibfk_1` FOREIGN KEY (`program_id`) REFERENCES `user_student_program` (`program_index`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
