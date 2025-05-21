@@ -486,29 +486,29 @@
 
         function createMultipleChoiceInput(question) {
             const container = document.createElement('div');
-            
+
             if (question.options && question.options.length > 0) {
                 question.options.forEach((option, index) => {
                     const div = document.createElement('div');
                     div.className = 'form-check';
-                    
+
                     const inputId = `question_${question.id}_option_${index}`;
                     const input = document.createElement('input');
                     input.className = 'form-check-input';
                     input.type = 'radio';
                     input.name = `question_${question.id}`;
                     input.id = inputId;
-                    input.value = option;
+                    input.value = option.choice_index;  // Correct usage
                     input.dataset.questionId = question.id;
                     input.dataset.questionType = question.type;
                     input.required = question.required || false;
-                    
+
                     const label = document.createElement('label');
                     label.className = 'form-check-label';
                     label.htmlFor = inputId;
-                    label.textContent = option;
+                    label.textContent = option.choice_text;  // Correct usage
                     label.style.cursor = 'pointer';
-                    
+
                     div.appendChild(input);
                     div.appendChild(label);
                     container.appendChild(div);
@@ -518,7 +518,7 @@
             if (question.includeOther) {
                 const div = document.createElement('div');
                 div.className = 'form-check';
-                
+
                 const inputId = `question_${question.id}_option_other`;
                 const input = document.createElement('input');
                 input.className = 'form-check-input';
@@ -528,13 +528,13 @@
                 input.value = 'other';
                 input.dataset.questionId = question.id;
                 input.dataset.questionType = question.type;
-                
+
                 const label = document.createElement('label');
                 label.className = 'form-check-label';
                 label.htmlFor = inputId;
                 label.textContent = 'Other:';
                 label.style.cursor = 'pointer';
-                
+
                 const otherInput = document.createElement('input');
                 otherInput.type = 'text';
                 otherInput.className = 'form-control mt-2';
@@ -542,47 +542,46 @@
                 otherInput.style.width = 'calc(100% - 2em)';
                 otherInput.dataset.otherFor = question.id;
                 otherInput.disabled = true;
-                
-                container.querySelectorAll(`input[name="question_${question.id}"]`).forEach(radio => {
-                    radio.addEventListener('change', function() {
-                        otherInput.disabled = this.value !== 'other';
-                        if (this.value === 'other') otherInput.focus();
-                    });
+
+                // Attach event listeners for "Other"
+                input.addEventListener('change', function () {
+                    otherInput.disabled = this.value !== 'other';
+                    if (this.value === 'other') otherInput.focus();
                 });
-                
+
                 div.appendChild(input);
                 div.appendChild(label);
                 div.appendChild(otherInput);
                 container.appendChild(div);
             }
-            
+
             return container;
         }
 
         function createCheckboxInput(question) {
             const container = document.createElement('div');
-            
+
             if (question.options && question.options.length > 0) {
                 question.options.forEach((option, index) => {
                     const div = document.createElement('div');
                     div.className = 'form-check';
-                    
+
                     const inputId = `question_${question.id}_option_${index}`;
                     const input = document.createElement('input');
                     input.className = 'form-check-input';
                     input.type = 'checkbox';
                     input.name = `question_${question.id}_${index}`;
                     input.id = inputId;
-                    input.value = option;
+                    input.value = option.choice_index;
                     input.dataset.questionId = question.id;
                     input.dataset.questionType = question.type;
-                    
+
                     const label = document.createElement('label');
                     label.className = 'form-check-label';
                     label.htmlFor = inputId;
-                    label.textContent = option;
+                    label.textContent = option.choice_text;
                     label.style.cursor = 'pointer';
-                    
+
                     div.appendChild(input);
                     div.appendChild(label);
                     container.appendChild(div);
@@ -592,7 +591,7 @@
             if (question.includeOther) {
                 const div = document.createElement('div');
                 div.className = 'form-check';
-                
+
                 const inputId = `question_${question.id}_option_other`;
                 const input = document.createElement('input');
                 input.className = 'form-check-input';
@@ -602,13 +601,13 @@
                 input.value = 'other';
                 input.dataset.questionId = question.id;
                 input.dataset.questionType = question.type;
-                
+
                 const label = document.createElement('label');
                 label.className = 'form-check-label';
                 label.htmlFor = inputId;
                 label.textContent = 'Other:';
                 label.style.cursor = 'pointer';
-                
+
                 const otherInput = document.createElement('input');
                 otherInput.type = 'text';
                 otherInput.className = 'form-control mt-2';
@@ -616,18 +615,18 @@
                 otherInput.style.width = 'calc(100% - 2em)';
                 otherInput.dataset.otherFor = question.id;
                 otherInput.disabled = true;
-                
-                input.addEventListener('change', function() {
+
+                input.addEventListener('change', function () {
                     otherInput.disabled = !this.checked;
                     if (this.checked) otherInput.focus();
                 });
-                
+
                 div.appendChild(input);
                 div.appendChild(label);
                 div.appendChild(otherInput);
                 container.appendChild(div);
             }
-            
+
             return container;
         }
 
@@ -637,79 +636,79 @@
             select.dataset.questionId = question.id;
             select.dataset.questionType = question.type;
             select.required = question.required || false;
-            
+
             const defaultOption = document.createElement('option');
             defaultOption.value = '';
             defaultOption.textContent = '-- Select an option --';
             defaultOption.selected = true;
             defaultOption.disabled = true;
             select.appendChild(defaultOption);
-            
+
             if (question.options && question.options.length > 0) {
-                question.options.forEach((option, index) => {
+                question.options.forEach((option) => {
                     const opt = document.createElement('option');
-                    opt.value = option;
-                    opt.textContent = option;
+                    opt.value = option.choice_index;
+                    opt.textContent = option.choice_text;
                     select.appendChild(opt);
                 });
             }
-            
+
             return select;
         }
 
         function createGridInput(question) {
             const table = document.createElement('table');
             table.className = 'grid-table table table-bordered';
-            
+
             // Create table header
             const thead = document.createElement('thead');
             const headerRow = document.createElement('tr');
             headerRow.appendChild(document.createElement('th')); // Empty top-left cell
-            
+
             if (question.options && question.options.length > 0) {
                 question.options.forEach(option => {
                     const th = document.createElement('th');
-                    th.textContent = option;
+                    th.textContent = option.choice_text;
                     headerRow.appendChild(th);
                 });
             }
-            
+
             thead.appendChild(headerRow);
             table.appendChild(thead);
-            
+
             // Create table body
             const tbody = document.createElement('tbody');
-            
+
             if (question.rows && question.rows.length > 0) {
                 question.rows.forEach((row, rowIndex) => {
                     const tr = document.createElement('tr');
                     const labelCell = document.createElement('td');
                     labelCell.textContent = row;
                     tr.appendChild(labelCell);
-                    
+
                     if (question.options && question.options.length > 0) {
                         question.options.forEach((option, optionIndex) => {
                             const cell = document.createElement('td');
                             cell.className = 'text-center';
-                            
+
                             const input = document.createElement('input');
                             input.type = 'radio';
                             input.name = `question_${question.id}_row_${rowIndex}`;
-                            input.value = optionIndex;
+                            input.value = option.choice_index;
                             input.dataset.questionId = question.id;
                             input.dataset.rowIndex = rowIndex;
                             input.dataset.questionType = question.type;
                             if (question.required) input.dataset.required = 'true';
-                            
+
                             cell.appendChild(input);
                             tr.appendChild(cell);
                         });
                     }
-                    
+
                     tbody.appendChild(tr);
                 });
             }
-            
+
             table.appendChild(tbody);
             return table;
         }
@@ -1104,81 +1103,85 @@
             localStorage.setItem('studentFormProgress', JSON.stringify(formResponses));
         }
 
-    async function submitForm() {
-        const submitBtn = document.getElementById('next-section-btn');
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...';
+        async function submitForm() {
+            const submitBtn = document.getElementById('next-section-btn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...';
 
-        saveCurrentSectionResponses(); // Ensure latest input is stored
+            saveCurrentSectionResponses(); // Ensure latest input is stored
 
-        const submissionData = {
-            form_index: formData.form_index,
-            answers: [],
-            grid_answers: []
-        };
+            const submissionData = {
+                form_index: formData.form_index,
+                answers: [],
+                grid_answers: []
+            };
 
-        for (const [questionId, response] of Object.entries(formResponses)) {
-            if (questionId === 'formId') continue; // Skip metadata
-            
-            const main_question_index = parseInt(questionId);
+            for (const [questionId, response] of Object.entries(formResponses)) {
+                if (questionId === 'formId') continue; // Skip metadata
+                
+                const main_question_index = parseInt(questionId);
 
-            if (response.type === 'grid') {
-                if (Array.isArray(response.value)) {
-                    response.value.forEach(gridResponse => {
-                        submissionData.grid_answers.push({
-                            main_question_index,
-                            sub_question_index: parseInt(gridResponse.rowIndex),
-                            choice_index: parseInt(gridResponse.optionIndex)
+                if (response.type === 'grid') {
+                    if (Array.isArray(response.value)) {
+                        response.value.forEach(gridResponse => {
+                            submissionData.grid_answers.push({
+                                main_question_index,
+                                sub_question_index: parseInt(gridResponse.rowIndex),
+                                choice_index: parseInt(gridResponse.optionIndex)
+                            });
                         });
+                    }
+                } else if (response.type === 'checkbox') {
+                    if (Array.isArray(response.value)) {
+                        response.value.forEach(value => {
+                            const isOther = value === 'other';
+                            submissionData.answers.push({
+                                main_question_index,
+                                choice_index: isOther ? null : parseInt(value),
+                                text_answer: isOther ? (response.otherText || '') : null,
+                                is_other: isOther
+                            });
+                        });
+                    }
+                } else if (response.type === 'multiple' || response.type === 'dropdown') {
+                    const isOther = response.value === 'other';
+                    submissionData.answers.push({
+                        main_question_index,
+                        choice_index: isOther ? null : parseInt(response.choiceIndex),
+                        text_answer: isOther ? (response.otherText || '') : null,
+                        is_other: isOther
+                    });
+                } else {
+                    submissionData.answers.push({
+                        main_question_index,
+                        choice_index: null,
+                        text_answer: response.value || '',
+                        is_other: false
                     });
                 }
-            } else if (response.type === 'checkbox') {
-                if (Array.isArray(response.value)) {
-                    response.value.forEach(value => {
-                        submissionData.answers.push({
-                            main_question_index,
-                            choice_index: null,
-                            text_answer: value === 'other' ? (response.otherText || '') : value
-                        });
-                    });
-                }
-            } else if (response.type === 'multiple' || response.type === 'dropdown') {
-                submissionData.answers.push({
-                    main_question_index,
-                    choice_index: null,
-                    text_answer: response.value === 'other' ? (response.otherText || '') : (response.value || '')
+            }
+
+            try {
+                const response = await fetch('http://localhost/cgcc-system/backend/forms/submit_response.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(submissionData),
+                    credentials: 'include' // Important for session
                 });
-            } else {
-                submissionData.answers.push({
-                    main_question_index,
-                    choice_index: null,
-                    text_answer: response.value || ''
-                });
+
+                if (!response.ok) throw new Error('Failed to submit form');
+
+                localStorage.removeItem('studentFormProgress');
+                alert('Form submitted successfully!');
+                window.location.href = 'submission-success.html';
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to submit form. Please try again.');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Submit';
             }
         }
 
-        try {
-            const response = await fetch('http://localhost/cgcc-system/backend/forms/submit_response.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(submissionData),
-                credentials: 'include' // Important for session
-            });
-
-            if (!response.ok) throw new Error('Failed to submit form');
-
-            // ✅ Clear local progress after successful submission
-            localStorage.removeItem('studentFormProgress');
-
-            alert('Form submitted successfully!');
-            window.location.href = 'submission-success.html';
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Failed to submit form. Please try again.');
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = 'Submit';
-        }
-    }
 
         function highlightRequired(element) {
             if (!element) return;

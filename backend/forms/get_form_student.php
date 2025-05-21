@@ -125,13 +125,17 @@ try {
         while ($q = $questionsResult->fetch_assoc()) {
             // Get options
             $options = [];
-            $stmt3 = $conn->prepare("SELECT choice_text FROM choices WHERE main_question_index = ? ORDER BY choice_index");
+            $stmt3 = $conn->prepare("SELECT choice_index, choice_text FROM choices WHERE main_question_index = ? ORDER BY choice_index");
             if ($stmt3) {
                 $stmt3->bind_param("i", $q['main_question_index']);
                 $stmt3->execute();
                 $choicesResult = $stmt3->get_result();
                 while ($choice = $choicesResult->fetch_assoc()) {
-                    $options[] = $choice['choice_text'];
+                    $options[] = [
+                        'choice_index' => $choice['choice_index'],
+                        'choice_text' => $choice['choice_text']
+                    ];
+
                 }
                 $stmt3->close();
             }

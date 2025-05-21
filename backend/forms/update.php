@@ -64,7 +64,9 @@ try {
                 qt.type_name AS type,
                 q.is_required,
                 q.include_other,
+                c.choice_index,
                 c.choice_text,
+                sq.sub_question_index,
                 sq.sub_question_text
             FROM forms f
             LEFT JOIN form_sections fs ON f.form_index = fs.form_index
@@ -73,6 +75,7 @@ try {
             LEFT JOIN choices c ON q.main_question_index = c.main_question_index
             LEFT JOIN sub_questions sq ON q.main_question_index = sq.main_question_index
             WHERE f.form_index = ?
+            ORDER BY fs.section_index, q.main_question_index, c.choice_index, sq.sub_question_index
         ");
         $stmt->bind_param("i", $formId);
         $stmt->execute();

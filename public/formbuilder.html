@@ -1119,43 +1119,39 @@
                         updateQuestionType(questionCard);
 
                         // Add options if needed
+                        // Add options if needed
                         if (['multiple', 'checkbox', 'dropdown', 'grid'].includes(questionData.type)) {
                             const optionsContainer = questionCard.find('.options-container');
                             optionsContainer.empty();
 
-                            const questionType = questionCard.find('.question-type').val(); // get type
-                            const questionData = {
-                                type: questionType,
-                                options: [],
-                                rows: []
-                            };
-
-                            const optionHtml = `
-                                <div class="option-row mb-2 d-flex align-items-center">
-                                    <div class="form-check me-2" style="display: ${questionType === 'grid' ? 'none' : 'block'}">
-                                        <input class="form-check-input" type="${questionType === 'multiple' ? 'radio' : 'checkbox'}" disabled>
-                                    </div>
-                                    <input type="text" class="form-control option-input" placeholder="Option ${optionCount + 1}">
-                                    <button type="button" class="btn btn-sm btn-outline-danger ms-2 delete-option">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>`;
-
-                            $(this).before(optionHtml);
+                            // Add each option
+                            questionData.options.forEach((option, idx) => {
+                                const optionHtml = `
+                                    <div class="option-row mb-2 d-flex align-items-center">
+                                        <div class="form-check me-2" style="display: ${questionData.type === 'grid' ? 'none' : 'block'}">
+                                            <input class="form-check-input" type="${questionData.type === 'multiple' ? 'radio' : 'checkbox'}" disabled>
+                                        </div>
+                                        <input type="text" class="form-control option-input" placeholder="Option ${idx + 1}" value="${option}">
+                                        <button type="button" class="btn btn-sm btn-outline-danger ms-2 delete-option">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>`;
+                                optionsContainer.append(optionHtml);
+                            });
 
                             // Add "Add Option" button
                             optionsContainer.append(`
-                <button type="button" class="btn btn-outline-primary mt-2 add-option">
-                    <i class="fas fa-plus me-1"></i>
-                    Add Option
-                </button>
-                <div class="form-check mt-3">
-                    <input class="form-check-input include-other" type="checkbox" id="include-other-${questionId}" ${questionData.includeOther ? 'checked' : ''}>
-                    <label class="form-check-label" for="include-other-${questionId}">
-                        Include "Other" option with text input
-                    </label>
-                </div>
-                `);
+                                <button type="button" class="btn btn-outline-primary mt-2 add-option">
+                                    <i class="fas fa-plus me-1"></i>
+                                    Add Option
+                                </button>
+                                <div class="form-check mt-3">
+                                    <input class="form-check-input include-other" type="checkbox" id="include-other-${questionId}" ${questionData.includeOther ? 'checked' : ''}>
+                                    <label class="form-check-label" for="include-other-${questionId}">
+                                        Include "Other" option with text input
+                                    </label>
+                                </div>
+                            `);
                         }
 
                         // Add rows for grid questions
@@ -1864,35 +1860,36 @@
                 // Add options if needed
                 if (['multiple', 'checkbox', 'dropdown', 'grid'].includes(questionData.type)) {
                     const optionsContainer = questionCard.find('.options-container');
+                    optionsContainer.empty();
 
+                    // Add each option
                     questionData.options.forEach((option, idx) => {
                         const optionHtml = `
-                        <div class="option-row mb-2 d-flex align-items-center">
-                            <div class="form-check me-2" style="display: ${questionData.type === 'grid' ? 'none' : 'block'}">
-                                <input class="form-check-input" type="${questionData.type === 'multiple' ? 'radio' : 'checkbox'}" disabled>
-                            </div>
-                            <input type="text" class="form-control option-input" placeholder="Option ${idx + 1}" value="${option}">
-                            <button type="button" class="btn btn-outline-danger ms-2 remove-option">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    `;
+                            <div class="option-row mb-2 d-flex align-items-center">
+                                <div class="form-check me-2" style="display: ${questionData.type === 'grid' ? 'none' : 'block'}">
+                                    <input class="form-check-input" type="${questionData.type === 'multiple' ? 'radio' : 'checkbox'}" disabled>
+                                </div>
+                                <input type="text" class="form-control option-input" placeholder="Option ${idx + 1}" value="${option}">
+                                <button type="button" class="btn btn-sm btn-outline-danger ms-2 delete-option">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>`;
                         optionsContainer.append(optionHtml);
                     });
 
                     // Add "Add Option" button
                     optionsContainer.append(`
-                    <button type="button" class="btn btn-outline-primary mt-2 add-option">
-                        <i class="fas fa-plus me-1"></i>
-                        Add Option
-                    </button>
-                    <div class="form-check mt-3">
-                        <input class="form-check-input include-other" type="checkbox" id="include-other-${questionId}" ${questionData.includeOther ? 'checked' : ''}>
-                        <label class="form-check-label" for="include-other-${questionId}">
-                            Include "Other" option with text input
-                        </label>
-                    </div>
-                `);
+                        <button type="button" class="btn btn-outline-primary mt-2 add-option">
+                            <i class="fas fa-plus me-1"></i>
+                            Add Option
+                        </button>
+                        <div class="form-check mt-3">
+                            <input class="form-check-input include-other" type="checkbox" id="include-other-${questionId}" ${questionData.includeOther ? 'checked' : ''}>
+                            <label class="form-check-label" for="include-other-${questionId}">
+                                Include "Other" option with text input
+                            </label>
+                        </div>
+                    `);
                 }
 
                 // Add rows for grid questions
