@@ -1,0 +1,67 @@
+<?php
+header('Content-Type: application/json');
+
+require_once '../connect3.php'; // Your database connection
+
+// Check DB connection
+if ($conn->connect_error) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Database connection failed', 'message' => $conn->connect_error]);
+    exit;
+}
+
+// Get JSON input
+$data = json_decode(file_get_contents('php://input'), true);
+
+// Validate input
+if (!isset($data['counselor_index']) || !isset($data['program_codes'])) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Missing required parameters']);
+    exit;
+}
+
+$counselorIndex = $data['counselor_index'];
+$programCodes = $data['program_codes'];
+
+try {
+    // Start transaction
+    $conn->begin_transaction();
+
+    // Step 1: Delete existing program assignments for this counselor
+    $stmtDelete = $conn->prepare("DELETE FROM counselor_programs WHERE counselor_index = ?");
+    $stmtDelete->bind_param("i", $counselorIndex);
+    $stmtDelete->execute();
+    $stmtDelete->close();
+
+    // Step 2: Insert new program assignments
+    if (!empty($programCodes)) {
+        $stmtInsert = $conn->prepare("INSERT INTO counselor_programs (counselor_index, program_code) VALUES (?, ?)");
+        foreach ($programCodes as $programCode) {
+            $stmtInsert->bind_param("is", $counselorIndex, $programCode);
+            $stmtInsert->execute();
+        }
+        $stmtInsert->close();
+    }
+
+    // Commit transaction
+    $conn->commit();
+
+    // Success response
+    echo json_encode([
+        'success' => true,
+        'message' => 'Counselor programs updated successfully'
+    ]);
+
+} catch (Exception $e) {
+    // Rollback on error
+    $conn->rollback();
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'error' => 'Failed to update counselor programs',
+        'message' => $e->getMessage()
+    ]);
+}
+
+$conn->close();
+?>
