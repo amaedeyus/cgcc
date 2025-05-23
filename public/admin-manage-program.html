@@ -266,9 +266,15 @@
             programForm.addEventListener('submit', handleProgramFormSubmit);
             prevPageBtn.addEventListener('click', goToPrevPage);
             nextPageBtn.addEventListener('click', goToNextPage);
-            searchBtn.addEventListener('click', filterPrograms);
+            searchBtn.addEventListener('click', function(e) {
+                e.preventDefault(); // Prevent form submission if inside a form
+                filterPrograms();
+            });
             searchInput.addEventListener('keyup', function(e) {
-                if (e.key === 'Enter') filterPrograms();
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    filterPrograms();
+                }
             });
             addSectionBtn.addEventListener('click', addNewSection);
 
@@ -480,12 +486,11 @@
 
             function displayPrograms(filteredPrograms = null) {
                 let dataToDisplay = filteredPrograms || programs;
-                
-                // Apply department filter if not "all"
+
                 if (currentDeptFilter !== 'all') {
                     dataToDisplay = dataToDisplay.filter(program => program.dept_index == currentDeptFilter);
                 }
-                
+
                 const startIndex = (currentPage - 1) * programsPerPage;
                 const endIndex = startIndex + programsPerPage;
                 const paginatedPrograms = dataToDisplay.slice(startIndex, endIndex);
@@ -493,27 +498,30 @@
                 programsTable.innerHTML = '';
 
                 if (paginatedPrograms.length === 0) {
-                    programsTable.innerHTML = '<tr><td colspan="7" class="no-results">No programs found</td></tr>';
+                    programsTable.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="no-results">No programs found</td>
+                        </tr>`;
                     return;
                 }
 
                 paginatedPrograms.forEach(program => {
-                    const row = document.createElement('tr');
-                    
-                    // Find department info
                     const dept = departments.find(d => d.dept_index == program.dept_index) || {};
-                    
-                    // Find counselor info
                     const counselor = counselors.find(c => c.counselor_index == program.counselor_index) || {};
-                    const counselorName = counselor.first_name ? `${counselor.first_name} ${counselor.last_name}` : 'Not assigned';
-                    
+                    const counselorName = counselor.first_name
+                        ? `${counselor.first_name} ${counselor.last_name}`
+                        : 'Not assigned';
+
+                    const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${program.program_code}</td>
                         <td>${program.program_name}</td>
                         <td>${dept.dept_code || 'N/A'}</td>
                         <td>${counselorName}</td>
                         <td>${program.section_count || 0}</td>
-                        <td><span class="status-badge status-active">Active</span></td>
+                        <td>
+                            <span class="status-badge status-active">Active</span>
+                        </td>
                         <td class="action-btns">
                             <button class="action-btn edit-btn" data-id="${program.program_index}">Edit</button>
                             <button class="action-btn manage-sections-btn" data-id="${program.program_index}">Sections</button>
@@ -523,22 +531,20 @@
                     programsTable.appendChild(row);
                 });
 
-                // Add event listeners to action buttons
+                // Add button listeners
                 document.querySelectorAll('.edit-btn').forEach(btn => {
                     btn.addEventListener('click', () => openEditProgramModal(btn.dataset.id));
                 });
-
                 document.querySelectorAll('.manage-sections-btn').forEach(btn => {
                     btn.addEventListener('click', () => openSectionsModal(btn.dataset.id));
                 });
-
                 document.querySelectorAll('.delete-btn').forEach(btn => {
                     btn.addEventListener('click', () => confirmDeleteProgram(btn.dataset.id));
                 });
 
-                // Update pagination controls
                 updatePaginationControls(dataToDisplay.length);
             }
+
 
             function updatePaginationControls(totalPrograms) {
                 const totalPages = Math.ceil(totalPrograms / programsPerPage);
@@ -564,7 +570,7 @@
             }
 
             function filterPrograms() {
-                const searchTerm = searchInput.value.toLowerCase();
+                const searchTerm = searchInput.value.toLowerCase().trim();
                 if (!searchTerm) {
                     currentPage = 1;
                     displayPrograms();
@@ -575,12 +581,14 @@
                     const dept = departments.find(d => d.dept_index == program.dept_index) || {};
                     const counselor = counselors.find(c => c.counselor_index == program.counselor_index) || {};
                     
+                    // Check all searchable fields
                     return (
-                        program.program_code.toLowerCase().includes(searchTerm) ||
-                        program.program_name.toLowerCase().includes(searchTerm) ||
-                        dept.dept_code.toLowerCase().includes(searchTerm) ||
-                        dept.dept_title.toLowerCase().includes(searchTerm) ||
-                        `${counselor.first_name} ${counselor.last_name}`.toLowerCase().includes(searchTerm)
+                        (program.program_code && program.program_code.toLowerCase().includes(searchTerm)) ||
+                        (program.program_name && program.program_name.toLowerCase().includes(searchTerm)) ||
+                        (dept.dept_code && dept.dept_code.toLowerCase().includes(searchTerm)) ||
+                        (dept.dept_title && dept.dept_title.toLowerCase().includes(searchTerm)) ||
+                        (counselor.first_name && counselor.last_name && 
+                        `${counselor.first_name} ${counselor.last_name}`.toLowerCase().includes(searchTerm))
                     );
                 });
 
