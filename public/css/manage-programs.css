@@ -568,7 +568,7 @@ td {
 }
 
 .action-group {
-display: flex;         /* Enables Flexbox */
+  display: flex;         /* Enables Flexbox */
   flex-direction: row;   /* Ensures horizontal direction */
   gap: 8px;              /* Optional spacing between items */
   align-items: center; 

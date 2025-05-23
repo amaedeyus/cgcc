@@ -739,8 +739,8 @@
                 }
                 
                 const url = currentAction === 'add' 
-                    ? '../../backend/program/add-program.php' 
-                    : `../../backend/program/update-program.php?id=${formData.program_index}`;
+                    ? '../../backend/program/program.php' 
+                    : `../../backend/program/program.php?id=${formData.program_index}`;
                 
                 fetch(url, {
                     method: 'POST',
