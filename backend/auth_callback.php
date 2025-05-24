@@ -41,7 +41,7 @@ if (!isset($_GET['code'])) {
 
             // Redirect based on user type
             if ($row['type'] === 'admin') {
-                header("Location: ../public/admin.html");
+                header("Location: ../public/admin-manage-forms.html");
             } else if ($row['type'] === 'counselor'){
                 header("Location: ../public/student-record.php");
             } else {
