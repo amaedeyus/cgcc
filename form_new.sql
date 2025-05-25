@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 25, 2025 at 01:20 AM
+-- Generation Time: May 25, 2025 at 04:15 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -464,74 +464,75 @@ CREATE TABLE `responses` (
 CREATE TABLE `sections` (
   `section_index` int(11) NOT NULL,
   `section_name` varchar(50) NOT NULL,
-  `program_id` int(11) NOT NULL
+  `program_index` int(11) NOT NULL,
+  `year_level` enum('1','2','3','4','5') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `sections`
 --
 
-INSERT INTO `sections` (`section_index`, `section_name`, `program_id`) VALUES
-(1, 'BSA-1A', 1),
-(2, 'BSA-1B', 1),
-(3, 'BSAIS-1A', 2),
-(4, 'BSAIS-1B', 2),
-(5, 'BSLM-1A', 3),
-(6, 'BSLM-1B', 3),
-(7, 'BSE-1A', 4),
-(8, 'BSE-1B', 4),
-(9, 'BSMT-1A', 5),
-(10, 'BSMT-1B', 5),
-(11, 'BSBA-FM-1A', 6),
-(12, 'BSBA-FM-1B', 6),
-(13, 'BSBA-MM-1A', 7),
-(14, 'BSBA-MM-1B', 7),
-(15, 'CE-1A', 8),
-(16, 'CE-1B', 8),
-(17, 'BEED-1A', 9),
-(18, 'BEED-1B', 9),
-(19, 'BSED-1A', 10),
-(20, 'BSED-1B', 10),
-(21, 'ABCOM-1A', 11),
-(22, 'ABCOM-1B', 11),
-(23, 'BMMA-1A', 12),
-(24, 'BMMA-1B', 12),
-(25, 'BSBIO-1A', 13),
-(26, 'BSBIO-1B', 13),
-(27, 'BSFS-1A', 14),
-(28, 'BSFS-1B', 14),
-(29, 'BSMATH-1A', 15),
-(30, 'BSMATH-1B', 15),
-(31, 'BSPSYCH-1A', 16),
-(32, 'BSPSYCH-1B', 16),
-(33, 'BSHM-1A', 17),
-(34, 'BSHM-1B', 17),
-(35, 'BSTM-1A', 18),
-(36, 'BSTM-1B', 18),
-(37, 'CCA-1A', 19),
-(38, 'CCA-1B', 19),
-(39, 'BSARCHI-1A', 20),
-(40, 'BSARCHI-1B', 20),
-(41, 'BSCpE-1A', 21),
-(42, 'BSCpE-1B', 21),
-(43, 'BSCS-1A', 22),
-(44, 'BSCS-1B', 22),
-(45, 'BSEE-1A', 23),
-(46, 'BSEE-1B', 23),
-(47, 'BSECE-1A', 24),
-(48, 'BSECE-1B', 24),
-(49, 'BSEMC-1A', 25),
-(50, 'BSEMC-1B', 25),
-(51, 'BSIE-1A', 26),
-(52, 'BSIE-1B', 26),
-(53, 'BSIT-1A', 27),
-(54, 'BSIT-1B', 27),
-(55, 'ACT-1A', 28),
-(56, 'ACT-1B', 28),
-(57, 'BSN-1A', 29),
-(58, 'BSN-1B', 29),
-(59, 'JD-1A', 30),
-(60, 'JD-1B', 30);
+INSERT INTO `sections` (`section_index`, `section_name`, `program_index`, `year_level`) VALUES
+(1, 'BSA-1A', 1, '1'),
+(2, 'BSA-1B', 1, '1'),
+(3, 'BSAIS-1A', 2, '1'),
+(4, 'BSAIS-1B', 2, '1'),
+(5, 'BSLM-1A', 3, '1'),
+(6, 'BSLM-1B', 3, '1'),
+(7, 'BSE-1A', 4, '1'),
+(8, 'BSE-1B', 4, '1'),
+(9, 'BSMT-1A', 5, '1'),
+(10, 'BSMT-1B', 5, '1'),
+(11, 'BSBA-FM-1A', 6, '1'),
+(12, 'BSBA-FM-1B', 6, '1'),
+(13, 'BSBA-MM-1A', 7, '1'),
+(14, 'BSBA-MM-1B', 7, '1'),
+(15, 'CE-1A', 8, '1'),
+(16, 'CE-1B', 8, '1'),
+(17, 'BEED-1A', 9, '1'),
+(18, 'BEED-1B', 9, '1'),
+(19, 'BSED-1A', 10, '1'),
+(20, 'BSED-1B', 10, '1'),
+(21, 'ABCOM-1A', 11, '1'),
+(22, 'ABCOM-1B', 11, '1'),
+(23, 'BMMA-1A', 12, '1'),
+(24, 'BMMA-1B', 12, '1'),
+(25, 'BSBIO-1A', 13, '1'),
+(26, 'BSBIO-1B', 13, '1'),
+(27, 'BSFS-1A', 14, '1'),
+(28, 'BSFS-1B', 14, '1'),
+(29, 'BSMATH-1A', 15, '1'),
+(30, 'BSMATH-1B', 15, '1'),
+(31, 'BSPSYCH-1A', 16, '1'),
+(32, 'BSPSYCH-1B', 16, '1'),
+(33, 'BSHM-1A', 17, '1'),
+(34, 'BSHM-1B', 17, '1'),
+(35, 'BSTM-1A', 18, '1'),
+(36, 'BSTM-1B', 18, '1'),
+(37, 'CCA-1A', 19, '1'),
+(38, 'CCA-1B', 19, '1'),
+(39, 'BSARCHI-1A', 20, '1'),
+(40, 'BSARCHI-1B', 20, '1'),
+(41, 'BSCpE-1A', 21, '1'),
+(42, 'BSCpE-1B', 21, '1'),
+(43, 'BSCS-1A', 22, '1'),
+(44, 'BSCS-1B', 22, '1'),
+(45, 'BSEE-1A', 23, '1'),
+(46, 'BSEE-1B', 23, '1'),
+(47, 'BSECE-1A', 24, '1'),
+(48, 'BSECE-1B', 24, '1'),
+(49, 'BSEMC-1A', 25, '1'),
+(50, 'BSEMC-1B', 25, '1'),
+(51, 'BSIE-1A', 26, '1'),
+(52, 'BSIE-1B', 26, '1'),
+(53, 'BSIT-1A', 27, '1'),
+(54, 'BSIT-1B', 27, '1'),
+(55, 'ACT-1A', 28, '1'),
+(56, 'ACT-1B', 28, '1'),
+(57, 'BSN-1A', 29, '1'),
+(58, 'BSN-1B', 29, '1'),
+(59, 'JD-1A', 30, '1'),
+(60, 'JD-1B', 30, '1');
 
 -- --------------------------------------------------------
 
@@ -775,7 +776,7 @@ ALTER TABLE `responses`
 --
 ALTER TABLE `sections`
   ADD PRIMARY KEY (`section_index`),
-  ADD KEY `program_id` (`program_id`);
+  ADD KEY `program_id` (`program_index`);
 
 --
 -- Indexes for table `students`
@@ -868,7 +869,7 @@ ALTER TABLE `main_questions`
 -- AUTO_INCREMENT for table `programs`
 --
 ALTER TABLE `programs`
-  MODIFY `program_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `program_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- AUTO_INCREMENT for table `question_types`
@@ -886,7 +887,7 @@ ALTER TABLE `responses`
 -- AUTO_INCREMENT for table `sections`
 --
 ALTER TABLE `sections`
-  MODIFY `section_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
+  MODIFY `section_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 
 --
 -- AUTO_INCREMENT for table `students`
@@ -972,7 +973,7 @@ ALTER TABLE `responses`
 -- Constraints for table `sections`
 --
 ALTER TABLE `sections`
-  ADD CONSTRAINT `sections_ibfk_1` FOREIGN KEY (`program_id`) REFERENCES `programs` (`program_index`);
+  ADD CONSTRAINT `sections_ibfk_1` FOREIGN KEY (`program_index`) REFERENCES `programs` (`program_index`);
 
 --
 -- Constraints for table `students`
