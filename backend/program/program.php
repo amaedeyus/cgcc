@@ -1,5 +1,6 @@
 <?php
 header('Content-Type: application/json');
+header("Access-Control-Allow-Origin: *");
 require_once '../connect3.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
@@ -12,9 +13,11 @@ try {
                     p.program_index,
                     p.program_code,
                     p.program_name,
+                    p.counselor_index,
                     d.dept_index,
                     d.dept_code,
-                    d.dept_title
+                    d.dept_title,
+                    (SELECT COUNT(*) FROM sections WHERE program_index = p.program_index) as section_count
                 FROM programs p
                 JOIN departments d ON p.dept_index = d.dept_index
                 ORDER BY p.program_name
@@ -23,21 +26,10 @@ try {
             $result = $stmt->get_result();
             $programs = $result->fetch_all(MYSQLI_ASSOC);
             
-            // Format the data like the second script
-            $formattedPrograms = array_map(function($program) {
-                return [
-                    'program_index' => $program['program_index'],
-                    'program_code' => $program['program_code'],
-                    'program_name' => $program['program_name'],
-                    'dept_index' => $program['dept_index'],
-                ];
-            }, $programs);
-            
-            echo json_encode($formattedPrograms);
+            echo json_encode($programs);
             break;
             
         case 'POST':
-            // Add or update program
             $data = json_decode(file_get_contents('php://input'), true);
             
             if (empty($data['program_code'])) {
@@ -55,7 +47,6 @@ try {
             $counselorIndex = !empty($data['counselor_index']) ? $data['counselor_index'] : null;
             
             if (isset($data['program_index'])) {
-                // Update existing program
                 $stmt = $conn->prepare("
                     UPDATE programs 
                     SET program_code = ?, program_name = ?, dept_index = ?, counselor_index = ?
@@ -69,13 +60,7 @@ try {
                     $counselorIndex,
                     $data['program_index']
                 );
-                $stmt->execute();
-                
-                if ($stmt->affected_rows === 0) {
-                    throw new Exception("No program found with that ID");
-                }
             } else {
-                // Add new program
                 $stmt = $conn->prepare("
                     INSERT INTO programs (program_code, program_name, dept_index, counselor_index)
                     VALUES (?, ?, ?, ?)
@@ -87,22 +72,21 @@ try {
                     $data['dept_index'], 
                     $counselorIndex
                 );
-                $stmt->execute();
             }
             
+            $stmt->execute();
             echo json_encode(['success' => true]);
             break;
             
         case 'DELETE':
-            // Delete program
             $id = $_GET['id'] ?? null;
             
             if (!$id) {
                 throw new Exception("Program ID is required");
             }
             
-            // Check if program has sections
-            $stmt = $conn->prepare("SELECT COUNT(*) as section_count FROM sections WHERE program_id = ?");
+            // Check sections
+            $stmt = $conn->prepare("SELECT COUNT(*) as section_count FROM sections WHERE program_index = ?");
             $stmt->bind_param("i", $id);
             $stmt->execute();
             $result = $stmt->get_result();
@@ -115,10 +99,6 @@ try {
             $stmt = $conn->prepare("DELETE FROM programs WHERE program_index = ?");
             $stmt->bind_param("i", $id);
             $stmt->execute();
-            
-            if ($stmt->affected_rows === 0) {
-                throw new Exception("No program found with that ID");
-            }
             
             echo json_encode(['success' => true]);
             break;

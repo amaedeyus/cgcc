@@ -15,7 +15,7 @@ try {
             
             $stmt = $conn->prepare("
                 SELECT * FROM sections 
-                WHERE program_id = ?
+                WHERE program_index = ?
                 ORDER BY year_level, section_name
             ");
             $stmt->bind_param("i", $programId);
@@ -23,14 +23,18 @@ try {
             $result = $stmt->get_result();
             $sections = $result->fetch_all(MYSQLI_ASSOC);
             
-            echo json_encode($sections);
+            // Return as object with sections array for better structure
+            echo json_encode([
+                'success' => true,
+                'sections' => $sections
+            ]);
             break;
             
         case 'POST':
             // Add or update section
             $data = json_decode(file_get_contents('php://input'), true);
             
-            if (empty($data['program_id'])) {
+            if (empty($data['program_index'])) {
                 throw new Exception("Program ID is required");
             }
             
@@ -63,12 +67,12 @@ try {
             } else {
                 // Add new section
                 $stmt = $conn->prepare("
-                    INSERT INTO sections (program_id, year_level, section_name)
+                    INSERT INTO sections (program_index, year_level, section_name)
                     VALUES (?, ?, ?)
                 ");
                 $stmt->bind_param(
                     "iis", 
-                    $data['program_id'], 
+                    $data['program_index'], 
                     $data['year_level'], 
                     $data['section_name']
                 );
@@ -87,7 +91,7 @@ try {
             }
             
             // Check if section has students
-            $stmt = $conn->prepare("SELECT COUNT(*) as student_count FROM students WHERE section_id = ?");
+            $stmt = $conn->prepare("SELECT COUNT(*) as student_count FROM students WHERE section_index = ?");
             $stmt->bind_param("i", $id);
             $stmt->execute();
             $result = $stmt->get_result();

@@ -225,7 +225,17 @@
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(2, 61, 2, 0.2);
     overflow: hidden;
+    position: relative;
+    height: calc(100% - 150px); /* Adjust based on your header height */
+    display: flex;
+    flex-direction: column;
 }
+
+#programs-table {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
 
 table {
     width: 100%;
@@ -332,6 +342,9 @@ td {
     padding: 15px;
     background-color: #f8f9fa;
     border-top: 1px solid #eee;
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
 }
 
 .pagination button {
@@ -341,9 +354,13 @@ td {
     padding: 8px 15px;
     border-radius: 4px;
     cursor: pointer;
-    margin: 0 10px;
+    margin: 0 5px;
     transition: background-color 0.3s;
+    min-width: 80px; /* Ensure buttons don't get too small */
+    font-size: 0.9rem;
 }
+
+
 
 .pagination button:hover:not(:disabled) {
     background-color: #249a76;
@@ -357,6 +374,8 @@ td {
 #page-info {
     font-size: 0.9rem;
     color: #7f8c8d;
+    margin: 0 10px;
+    white-space: nowrap; /* Prevent line break */
 }
 
 /* Modal styles - Match first file's style */
@@ -586,6 +605,21 @@ td {
 }
 
 @media (max-width: 768px) {
+
+    .program-table-container {
+        height: calc(100% - 200px); /* More space for mobile */
+    }
+    
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    
+    th, td {
+        min-width: 100px; /* Ensure cells don't get too narrow */
+    }
+
     .grid-body {
         grid-template-columns: 1fr;
     }
@@ -609,14 +643,30 @@ td {
         width: 200px;
     }
     
-    table {
-        display: block;
-        overflow-x: auto;
-    }
-    
     .dept-tabs {
         flex-wrap: nowrap;
         overflow-x: auto;
         padding-bottom: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .pagination {
+        flex-wrap: wrap;
+        gap: 5px;
+        padding: 10px;
+    }
+    
+    .pagination button {
+        padding: 6px 10px;
+        min-width: 60px;
+        font-size: 0.8rem;
+    }
+    
+    #page-info {
+        order: -1; /* Move page info to top */
+        width: 100%;
+        text-align: center;
+        margin-bottom: 5px;
     }
 }

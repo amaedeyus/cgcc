@@ -103,17 +103,17 @@
             <h2 id="dept-modal-title">Add New Department</h2>
             <form id="dept-form">
                 <input type="hidden" id="dept-id">
-                
+
                 <div class="form-group">
                     <label for="dept-code">Department Code</label>
                     <input type="text" id="dept-code" required maxlength="10">
                 </div>
-                
+
                 <div class="form-group">
                     <label for="dept-title">Department Title</label>
                     <input type="text" id="dept-title" required>
                 </div>
-                
+
                 <div class="form-actions">
                     <button type="button" class="cancel-btn">Cancel</button>
                     <button type="submit" class="save-btn">Save Department</button>
@@ -129,24 +129,24 @@
             <h2 id="program-modal-title">Add New Program</h2>
             <form id="program-form">
                 <input type="hidden" id="program-id">
-                
+
                 <div class="form-group">
                     <label for="program-code">Program Code</label>
                     <input type="text" id="program-code" required maxlength="10">
                 </div>
-                
+
                 <div class="form-group">
                     <label for="program-name">Program Name</label>
                     <input type="text" id="program-name" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="program-dept">Department</label>
                     <select id="program-dept" required>
                         <!-- Departments will be loaded here -->
                     </select>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="program-counselor">Assigned Counselor</label>
                     <select id="program-counselor">
@@ -154,7 +154,7 @@
                         <!-- Counselors will be loaded here -->
                     </select>
                 </div>
-                
+
                 <div class="form-actions">
                     <button type="button" class="cancel-btn">Cancel</button>
                     <button type="submit" class="save-btn">Save Program</button>
@@ -168,12 +168,12 @@
         <div class="modal-content">
             <span class="close-btn">&times;</span>
             <h2 id="sections-modal-title">Manage Sections</h2>
-            
+
             <div class="form-group">
                 <label>Program</label>
                 <div id="sections-program-name" class="readonly-field"></div>
             </div>
-            
+
             <div class="form-group">
                 <label for="section-year-level">Year Level</label>
                 <select id="section-year-level">
@@ -184,18 +184,18 @@
                     <option value="5">5th Year</option>
                 </select>
             </div>
-            
+
             <div class="form-group">
                 <label for="section-name">Section Name</label>
                 <input type="text" id="section-name" placeholder="e.g., A, B, C...">
             </div>
-            
+
             <button id="add-section-btn" class="primary-btn">Add Section</button>
-            
+
             <div class="section-list" id="sections-list">
                 <!-- Sections will be loaded here -->
             </div>
-            
+
             <div class="form-actions">
                 <button type="button" class="cancel-btn">Close</button>
             </div>
@@ -248,13 +248,28 @@
             let counselors = [];
             let sections = [];
             let currentPage = 1;
-            const programsPerPage = 10;
+            // With this responsive calculation:
+            function getProgramsPerPage() {
+                if (window.innerWidth < 768) { // Mobile
+                    return 5;
+                } else if (window.innerWidth < 1024) { // Tablet
+                    return 8;
+                } else { // Desktop
+                    return 10;
+                }
+            }
+
+            window.addEventListener('resize', function() {
+                    currentPage = 1; // Reset to first page on resize
+                    displayPrograms();
+            });
+
             let currentAction = 'add';
             let currentDeptFilter = 'all';
             let itemToDelete = null;
             let currentProgramId = null;
 
-            
+
 
             // Event Listeners
             addDeptBtn.addEventListener('click', openAddDeptModal);
@@ -318,6 +333,7 @@
                     .catch(error => {
                         console.error('Error fetching programs:', error);
                         programs = [];
+                        displayPrograms();
                     });
             }
 
@@ -342,21 +358,37 @@
             }
 
             function fetchSections(programId) {
+                if (!programId) {
+                    console.error('No program ID provided for fetching sections');
+                    sections = [];
+                    renderSectionsList();
+                    return Promise.resolve([]);
+                }
+
                 return fetch(`../../backend/section/section.php?program_id=${programId}`)
                     .then(response => {
                         if (!response.ok) {
-                            throw new Error('Failed to load sections');
+                            throw new Error(`HTTP error! status: ${response.status}`);
                         }
                         return response.json();
                     })
                     .then(data => {
-                        sections = Array.isArray(data) ? data : [];
-                        renderSectionsList();
-                        return sections;
+                        // Handle both response formats for backward compatibility
+                        if (data && data.success !== false) {
+                            sections = Array.isArray(data.sections) ? data.sections : 
+                                    (Array.isArray(data) ? data : []);
+                            
+                            console.log('Fetched sections:', sections); // Debug log
+                            renderSectionsList();
+                            return sections;
+                        } else {
+                            throw new Error(data.error || 'Failed to load sections');
+                        }
                     })
                     .catch(error => {
                         console.error('Error fetching sections:', error);
                         sections = [];
+                        renderSectionsList();
                         return [];
                     });
             }
@@ -365,7 +397,7 @@
                 // Clear existing tabs except "All Programs"
                 const existingTabs = Array.from(deptTabs.querySelectorAll('.dept-tab')).slice(1);
                 existingTabs.forEach(tab => tab.remove());
-                
+
                 // Add department tabs
                 departments.forEach(dept => {
                     const tab = document.createElement('button');
@@ -373,19 +405,19 @@
                     tab.textContent = dept.dept_code;
                     tab.dataset.dept = dept.dept_index;
                     deptTabs.appendChild(tab);
-                    
+
                     tab.addEventListener('click', () => {
                         // Set active tab
                         document.querySelectorAll('.dept-tab').forEach(t => t.classList.remove('active'));
                         tab.classList.add('active');
-                        
+
                         // Filter programs
                         currentDeptFilter = dept.dept_index;
                         currentPage = 1;
                         displayPrograms();
                     });
                 });
-                
+
                 // Add event listener to "All Programs" tab
                 const allTab = deptTabs.querySelector('.dept-tab[data-dept="all"]');
                 allTab.addEventListener('click', () => {
@@ -421,12 +453,12 @@
 
             function renderSectionsList() {
                 sectionsList.innerHTML = '';
-                
+
                 if (sections.length === 0) {
                     sectionsList.innerHTML = '<div class="no-results">No sections found for this program</div>';
                     return;
                 }
-                
+
                 // Group sections by year level
                 const sectionsByYear = {};
                 sections.forEach(section => {
@@ -435,18 +467,18 @@
                     }
                     sectionsByYear[section.year_level].push(section);
                 });
-                
+
                 // Display sections by year level
                 for (const year in sectionsByYear) {
                     const yearHeader = document.createElement('div');
                     yearHeader.className = 'section-year-header';
                     yearHeader.textContent = `${getOrdinalSuffix(year)} Year Sections`;
                     sectionsList.appendChild(yearHeader);
-                    
+
                     sectionsByYear[year].forEach(section => {
                         const sectionItem = document.createElement('div');
                         sectionItem.className = 'section-item';
-                        
+
                         sectionItem.innerHTML = `
                             <span>${section.section_name}</span>
                             <div class="section-actions">
@@ -454,16 +486,16 @@
                                 <button class="action-btn delete-section-btn" data-id="${section.section_index}">Delete</button>
                             </div>
                         `;
-                        
+
                         sectionsList.appendChild(sectionItem);
                     });
                 }
-                
+
                 // Add event listeners to section action buttons
                 document.querySelectorAll('.edit-section-btn').forEach(btn => {
                     btn.addEventListener('click', () => editSection(btn.dataset.id));
                 });
-                
+
                 document.querySelectorAll('.delete-section-btn').forEach(btn => {
                     btn.addEventListener('click', () => confirmDeleteSection(btn.dataset.id));
                 });
@@ -485,6 +517,7 @@
             }
 
             function displayPrograms(filteredPrograms = null) {
+                const programsPerPage = getProgramsPerPage();
                 let dataToDisplay = filteredPrograms || programs;
 
                 if (currentDeptFilter !== 'all') {
@@ -542,32 +575,37 @@
                     btn.addEventListener('click', () => confirmDeleteProgram(btn.dataset.id));
                 });
 
-                updatePaginationControls(dataToDisplay.length);
+                updatePaginationControls(dataToDisplay.length, programsPerPage);
             }
 
 
-            function updatePaginationControls(totalPrograms) {
-                const totalPages = Math.ceil(totalPrograms / programsPerPage);
-                
+            function updatePaginationControls(totalPrograms, programsPerPage) {
+                const totalPages = Math.ceil(parseInt(totalPrograms) / parseInt(programsPerPage));
+
                 pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
                 prevPageBtn.disabled = currentPage === 1;
                 nextPageBtn.disabled = currentPage === totalPages || totalPages === 0;
             }
 
-            function goToPrevPage() {
-                if (currentPage > 1) {
-                    currentPage--;
-                    displayPrograms();
-                }
-            }
-
             function goToNextPage() {
+                const programsPerPage = getProgramsPerPage();
                 const totalPages = Math.ceil(programs.length / programsPerPage);
                 if (currentPage < totalPages) {
                     currentPage++;
                     displayPrograms();
                 }
             }
+
+            function goToPrevPage() {
+                const programsPerPage = getProgramsPerPage();
+                const totalPages = Math.ceil(programs.length / programsPerPage);
+                if (currentPage > 1) {
+                    currentPage--;
+                    displayPrograms();
+                }
+            }
+
+
 
             function filterPrograms() {
                 const searchTerm = searchInput.value.toLowerCase().trim();
@@ -580,14 +618,14 @@
                 const filtered = programs.filter(program => {
                     const dept = departments.find(d => d.dept_index == program.dept_index) || {};
                     const counselor = counselors.find(c => c.counselor_index == program.counselor_index) || {};
-                    
+
                     // Check all searchable fields
                     return (
                         (program.program_code && program.program_code.toLowerCase().includes(searchTerm)) ||
                         (program.program_name && program.program_name.toLowerCase().includes(searchTerm)) ||
                         (dept.dept_code && dept.dept_code.toLowerCase().includes(searchTerm)) ||
                         (dept.dept_title && dept.dept_title.toLowerCase().includes(searchTerm)) ||
-                        (counselor.first_name && counselor.last_name && 
+                        (counselor.first_name && counselor.last_name &&
                         `${counselor.first_name} ${counselor.last_name}`.toLowerCase().includes(searchTerm))
                     );
                 });
@@ -607,13 +645,13 @@
             function openEditDeptModal(id) {
                 currentAction = 'edit';
                 document.getElementById('dept-modal-title').textContent = 'Edit Department';
-                
+
                 const dept = departments.find(d => d.dept_index == id);
                 if (dept) {
                     document.getElementById('dept-id').value = dept.dept_index;
                     document.getElementById('dept-code').value = dept.dept_code;
                     document.getElementById('dept-title').value = dept.dept_title;
-                    
+
                     deptModal.style.display = 'block';
                 }
             }
@@ -623,7 +661,7 @@
                     alert('Please add at least one department first');
                     return;
                 }
-                
+
                 currentAction = 'add';
                 document.getElementById('program-modal-title').textContent = 'Add New Program';
                 programForm.reset();
@@ -634,7 +672,7 @@
             function openEditProgramModal(id) {
                 currentAction = 'edit';
                 document.getElementById('program-modal-title').textContent = 'Edit Program';
-                
+
                 const program = programs.find(p => p.program_index == id);
                 if (program) {
                     document.getElementById('program-id').value = program.program_index;
@@ -642,7 +680,7 @@
                     document.getElementById('program-name').value = program.program_name;
                     document.getElementById('program-dept').value = program.dept_index;
                     document.getElementById('program-counselor').value = program.counselor_index || '';
-                    
+
                     programModal.style.display = 'block';
                 }
             }
@@ -653,7 +691,7 @@
                 if (program) {
                     const dept = departments.find(d => d.dept_index == program.dept_index) || {};
                     sectionsProgramName.textContent = `${program.program_name} (${program.program_code}) - ${dept.dept_code || ''}`;
-                    
+
                     fetchSections(programId).then(() => {
                         sectionsModal.style.display = 'block';
                     });
@@ -661,41 +699,87 @@
             }
 
             function confirmDeleteProgram(id) {
-                itemToDelete = { type: 'program', id };
-                document.getElementById('confirm-message').textContent = 
+                console.log("confirmDeleteProgram - Received ID:", id);
+                if (!id) {
+                    console.error("Invalid or missing ID");
+                    return;
+                }
+                
+                // Store the ID directly
+                itemToDelete = {
+                    type: 'program',
+                    id: id
+                };
+                
+                document.getElementById('confirm-message').textContent =
                     'Are you sure you want to delete this program? This will also delete all associated sections.';
                 confirmModal.style.display = 'block';
+
+                // Clear previous listeners
+                const confirmOk = document.getElementById('confirm-ok');
+                confirmOk.onclick = null;
                 
+                // Add new listener
+                confirmOk.addEventListener('click', function confirmHandler() {
+                    console.log("Delete confirmed for ID:", itemToDelete.id);
+                    deleteItem(itemToDelete.id, itemToDelete.type);
+                    // Remove this listener after use to prevent duplicates
+                    confirmOk.removeEventListener('click', confirmHandler);
+                    closeModal();
+                });
+
                 document.getElementById('confirm-cancel').onclick = closeModal;
-                document.getElementById('confirm-ok').onclick = deleteItem;
             }
 
             function confirmDeleteSection(id) {
-                itemToDelete = { type: 'section', id };
-                document.getElementById('confirm-message').textContent = 
+                console.log("confirmDeleteSection - Received ID:", id);
+                if (!id) {
+                    console.error("Invalid or missing ID for section deletion");
+                    return;
+                }
+                
+                // Store the ID and type directly
+                itemToDelete = {
+                    type: 'section',
+                    id: id
+                };
+                
+                document.getElementById('confirm-message').textContent =
                     'Are you sure you want to delete this section? All students in this section will be unassigned.';
                 confirmModal.style.display = 'block';
+
+                // Clear previous listeners
+                const confirmOk = document.getElementById('confirm-ok');
+                confirmOk.onclick = null;
                 
+                // Add new listener
+                confirmOk.addEventListener('click', function confirmHandler() {
+                    console.log("Delete confirmed for section ID:", itemToDelete.id);
+                    deleteItem(itemToDelete.id, itemToDelete.type);
+                    // Remove this listener after use to prevent duplicates
+                    confirmOk.removeEventListener('click', confirmHandler);
+                    closeModal();
+                });
+
                 document.getElementById('confirm-cancel').onclick = closeModal;
-                document.getElementById('confirm-ok').onclick = deleteItem;
             }
 
             function handleDeptFormSubmit(e) {
                 e.preventDefault();
-                
+
                 const formData = {
                     dept_code: document.getElementById('dept-code').value.trim(),
                     dept_title: document.getElementById('dept-title').value.trim()
                 };
-                
+
                 if (currentAction === 'edit') {
                     formData.dept_index = document.getElementById('dept-id').value;
                 }
-                
-                const url = currentAction === 'add' 
-                    ? '../../backend/department/add-department.php' 
+
+                const url = currentAction === 'add'
+                    ? '../../backend/department/add-department.php'
                     : `../../backend/department/update-department.php?id=${formData.dept_index}`;
-                
+
                 fetch(url, {
                     method: 'POST',
                     headers: {
@@ -726,22 +810,22 @@
 
             function handleProgramFormSubmit(e) {
                 e.preventDefault();
-                
+
                 const formData = {
                     program_code: document.getElementById('program-code').value.trim(),
                     program_name: document.getElementById('program-name').value.trim(),
                     dept_index: document.getElementById('program-dept').value,
                     counselor_index: document.getElementById('program-counselor').value || null
                 };
-                
+
                 if (currentAction === 'edit') {
                     formData.program_index = document.getElementById('program-id').value;
                 }
-                
-                const url = currentAction === 'add' 
-                    ? '../../backend/program/program.php' 
+
+                const url = currentAction === 'add'
+                    ? '../../backend/program/program.php'
                     : `../../backend/program/program.php?id=${formData.program_index}`;
-                
+
                 fetch(url, {
                     method: 'POST',
                     headers: {
@@ -773,26 +857,31 @@
             function addNewSection() {
                 const yearLevel = document.getElementById('section-year-level').value;
                 const sectionName = document.getElementById('section-name').value.trim();
-                
+
                 if (!sectionName) {
                     alert('Please enter a section name');
                     return;
                 }
-                
-                fetch('../../backend/section/add-section.php', {
+
+                if (!currentProgramId) {
+                    alert('No program selected');
+                    return;
+                }
+
+                fetch('../../backend/section/section.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        program_id: currentProgramId,
+                        program_index: currentProgramId,  // Changed from program_id to program_index
                         year_level: yearLevel,
                         section_name: sectionName
                     })
                 })
                 .then(response => {
                     if (!response.ok) {
-                        return response.json().then(err => { throw new Error(err.message || 'Unknown error'); });
+                        return response.json().then(err => { throw new Error(err.error || 'Unknown error'); });
                     }
                     return response.json();
                 })
@@ -803,7 +892,7 @@
                             fetchPrograms(); // Refresh program list to update section counts
                         });
                     } else {
-                        throw new Error(data.message || 'Operation failed');
+                        throw new Error(data.error || 'Operation failed');
                     }
                 })
                 .catch(error => {
@@ -815,11 +904,11 @@
             function editSection(sectionId) {
                 const section = sections.find(s => s.section_index == sectionId);
                 if (!section) return;
-                
+
                 const newName = prompt('Enter new section name:', section.section_name);
                 if (newName === null || newName.trim() === '') return;
-                
-                fetch(`../../backend/section/update-section.php?id=${sectionId}`, {
+
+                fetch(`../../backend/section/section.php?id=${sectionId}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -847,51 +936,97 @@
                 });
             }
 
-            function deleteItem() {
-                if (!itemToDelete) return;
-                
-                const { type, id } = itemToDelete;
-                let url = '';
-                
-                if (type === 'program') {
-                    url = `../../backend/program/delete-program.php?id=${id}`;
-                } else if (type === 'section') {
-                    url = `../../backend/section/delete-section.php?id=${id}`;
-                } else {
+            function deleteItem(id, type) {
+                if (!id || !type) {
+                    console.error("Missing ID or type for deletion");
+                    alert('Error: No valid item selected for deletion');
+                    closeModal();
                     return;
                 }
-                
-                fetch(url, {
-                    method: 'GET'
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(err => { throw new Error(err.message || 'Unknown error'); });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        if (type === 'program') {
-                            fetchPrograms();
-                        } else if (type === 'section') {
-                            fetchSections(currentProgramId).then(() => {
-                                fetchPrograms(); // Refresh program list to update section counts
+
+                console.log(`Attempting to delete ${type} with ID:`, id);
+
+                if (type === 'program') {
+                    // First delete all sections for this program
+                    fetch(`../../backend/section/section.php?program_id=${id}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.sections && data.sections.length > 0) {
+                                // Delete each section
+                                const deletePromises = data.sections.map(section => 
+                                    fetch(`../../backend/section/section.php?id=${section.section_index}`, {
+                                        method: 'DELETE',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                        }
+                                    })
+                                );
+                                return Promise.all(deletePromises);
+                            }
+                            return Promise.resolve();
+                        })
+                        .then(() => {
+                            // Now delete the program
+                            return fetch(`../../backend/program/program.php?id=${id}`, {
+                                method: 'DELETE',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                }
+                            });
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                return response.json().then(err => { 
+                                    throw new Error(err.message || 'Unknown error'); 
+                                });
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data && data.success) {
+                                fetchPrograms();
+                                closeModal();
+                                alert('Program and all its sections deleted successfully');
+                            } else {
+                                throw new Error(data?.message || 'Operation failed');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error deleting program:', error);
+                            alert('Error: ' + error.message);
+                        });
+                } else {
+                    // Section deletion
+                    fetch(`../../backend/section/section.php?id=${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(err => { 
+                                throw new Error(err.message || 'Unknown error'); 
                             });
                         }
-                        closeModal();
-                        itemToDelete = null;
-                        alert('Item deleted successfully');
-                    } else {
-                        throw new Error(data.message || 'Deletion failed');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error deleting item:', error);
-                    alert('Failed to delete item: ' + error.message);
-                });
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data && data.success) {
+                            fetchSections(currentProgramId).then(fetchPrograms);
+                            closeModal();
+                            alert('Section deleted successfully');
+                        } else {
+                            throw new Error(data?.message || 'Operation failed');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error deleting section:', error);
+                        alert('Error deleting section: ' + error.message);
+                    });
+                }
             }
-            
+
             function closeModal() {
                 deptModal.style.display = 'none';
                 programModal.style.display = 'none';
@@ -900,7 +1035,7 @@
             }
 
             window.addEventListener('click', function(e) {
-                if (e.target === deptModal || e.target === programModal || 
+                if (e.target === deptModal || e.target === programModal ||
                     e.target === sectionsModal || e.target === confirmModal) {
                     closeModal();
                 }
