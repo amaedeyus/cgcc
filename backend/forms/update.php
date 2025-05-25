@@ -1,169 +1,316 @@
 <?php
-header("Access-Control-Allow-Methods: GET, POST, PUT, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type");
+session_start();
+
+// Debugging: Log session data
+file_put_contents('session_debug.log', print_r($_SESSION, true), FILE_APPEND);
+
+
+if (!isset($_SESSION['user_index'])) {
+    http_response_code(401);
+    echo json_encode(['error' => 'Unauthorized']);
+    exit;
+}
+
+$userType = $_SESSION['user_type'];
+
+
+if ($userType !== 'admin') {
+    http_response_code(403);
+    echo json_encode(['error' => 'Access denied']);
+    exit;
+}
+
+// Optional: Log user type
+error_log("User type: " . $userType);
+// update_form.php
+header("Access-Control-Allow-Credentials: true");
+header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Content-Type: application/json");
 
-// CORS Handling
-$allowed_origins = ['http://localhost:3000', 'http://localhost:3001'];
-if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed_origins)) {
-    header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
-}
-
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit;
+    header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
+    header("Access-Control-Allow-Credentials: true");
+    header("Access-Control-Allow-Methods: POST, OPTIONS");
+    header("Access-Control-Allow-Headers: Content-Type");
+    exit(0);
 }
 
-// Include mysqli connection
-require_once '../connect.php';
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-$input = file_get_contents('php://input');
-$data = json_decode($input, true);
-$formId = $_GET['id'] ?? null;
+require_once '../connect3.php'; // Adjust path as needed
 
-error_log("Raw Input: " . $input);
-error_log("Decoded Data: " . print_r($data, true));
+$data = json_decode(file_get_contents('php://input'), true);
 
-// Validate input
-if (!$formId || !$data || !isset($data['title']) || !isset($data['sections'])) {
+if (!isset($data['form_index'])) {
     http_response_code(400);
-    echo json_encode(['error' => 'Missing or invalid form ID, title, or sections']);
+    echo json_encode(['error' => 'Form ID missing']);
     exit;
 }
 
-$title = trim($data['title']);
-$description = $data['description'] ?? null;
-$sections = $data['sections'];
-
-if (empty($title)) {
-    http_response_code(400);
-    echo json_encode(['error' => 'Form title is required']);
-    exit;
-}
-
-if (!is_array($sections) || count($sections) === 0) {
-    http_response_code(400);
-    echo json_encode(['error' => 'At least one section is required']);
-    exit;
-}
-
-// Begin transaction
-$conn->autocommit(FALSE);
+$formId = (int)$data['form_index'];
 
 try {
-    // 1. Check if form exists
-    $stmt = $conn->prepare("SELECT * FROM forms WHERE form_index = ?");
-    $stmt->bind_param("i", $formId);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    // First, create snapshot before making any destructive changes
+    try {
+        // Fetch current form state
+        $stmt = $conn->prepare("
+            SELECT 
+                f.form_index,
+                f.form_name,
+                f.description,
+                fs.section_index,
+                fs.section_title,
+                fs.section_description,
+                fs.section_order,
+                IFNULL(fs.behavior, 'same-page') as behavior,
+                q.main_question_index,
+                q.main_question_text,
+                qt.type_name AS type_name,
+                q.is_required,
+                IFNULL(q.include_other, 0) AS include_other,
+                c.choice_index,
+                c.choice_text,
+                sq.sub_question_index,
+                sq.sub_question_text
+            FROM forms f
+            LEFT JOIN form_sections fs ON f.form_index = fs.form_index
+            LEFT JOIN main_questions q ON fs.section_index = q.section_index
+            LEFT JOIN question_types qt ON q.type_index = qt.type_index
+            LEFT JOIN choices c ON q.main_question_index = c.main_question_index
+            LEFT JOIN sub_questions sq ON q.main_question_index = sq.main_question_index
+            WHERE f.form_index = ?
+            ORDER BY fs.section_order, q.main_question_index, c.choice_index, sq.sub_question_index
+        ");
 
-    if ($result->num_rows === 0) {
-        http_response_code(404);
-        throw new Exception("Form not found");
+        $stmt->bind_param("i", $formId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows === 0) {
+            throw new Exception("No form data found");
+        }
+
+        $form = null;
+        $sections = [];
+        $allQuestions = [];
+
+        $sectionMap = [];
+        $questionMap = [];
+
+        while ($row = $result->fetch_assoc()) {
+            if (!$form) {
+                $form = [
+                    'form_index' => $row['form_index'],
+                    'form_name' => $row['form_name'],
+                    'description' => $row['description']
+                ];
+            }
+
+            $sectionId = $row['section_index'];
+            if (!isset($sectionMap[$sectionId])) {
+                $sectionMap[$sectionId] = [
+                    'id' => (string)$sectionId,
+                    'title' => $row['section_title'],
+                    'description' => $row['section_description'] ?? '',
+                    'order' => $row['section_order'],
+                    'behavior' => $row['behavior'],
+                    'questions' => []
+                ];
+            }
+
+            $questionId = $row['main_question_index'];
+            if ($questionId && !isset($questionMap[$questionId])) {
+                $questionMap[$questionId] = [
+                    'id' => (string)$questionId,
+                    'question' => $row['main_question_text'],
+                    'type' => $row['type_name'],
+                    'required' => (bool)$row['is_required'],
+                    'includeOther' => (bool)$row['include_other'],
+                    'options' => [],
+                    'rows' => [],
+                    'section_index' => $sectionId  // ← Add this
+                ];
+            }
+
+            if ($row['choice_index'] !== null && $row['choice_text'] !== null) {
+                $choiceExists = array_filter($questionMap[$questionId]['options'], function ($opt) use ($row) {
+                    return $opt['choice_index'] == $row['choice_index'];
+                });
+                if (empty($choiceExists)) {
+                    $questionMap[$questionId]['options'][] = [
+                        'choice_index' => $row['choice_index'],
+                        'choice_text' => $row['choice_text']
+                    ];
+                }
+            }
+
+            if ($row['sub_question_index'] !== null && $row['sub_question_text'] !== null) {
+                if (!in_array($row['sub_question_text'], $questionMap[$questionId]['rows'])) {
+                    $questionMap[$questionId]['rows'][] = $row['sub_question_text'];
+                }
+            }
+        }
+
+        // Assign questions to their respective sections and build allQuestions list
+        foreach ($questionMap as $qid => $qdata) {
+            $sectionId = $qdata['section_index'];
+            if (isset($sectionMap[$sectionId])) {
+                $sectionMap[$sectionId]['questions'][] = $qdata;
+                $allQuestions[] = $qdata;
+            }
+        }
+
+        $sections = array_values($sectionMap);
+
+        // If no sections, create a default one
+        if (empty($sections)) {
+            $sections[] = [
+                'id' => '0',
+                'title' => 'Default Section',
+                'description' => '',
+                'order' => 1,
+                'behavior' => 'same-page',
+                'questions' => $allQuestions
+            ];
+        }
+
+        // Final JSON output
+        $snapshotData = json_encode([
+            'form_index' => $form['form_index'],
+            'form_name' => $form['form_name'],
+            'description' => $form['description'],
+            'sections' => $sections,
+            'questions' => $allQuestions,
+            'timestamp' => date('c')
+        ], JSON_NUMERIC_CHECK);
+
+
+        if (!$snapshotData || json_last_error() !== JSON_ERROR_NONE) {
+            throw new Exception("Failed to encode snapshot: " . json_last_error_msg());
+        }
+
+        // Deactivate previous active snapshot
+        $stmtDeactivate = $conn->prepare("UPDATE form_snapshots SET is_active = 0 WHERE form_index = ?");
+        $stmtDeactivate->bind_param("i", $formId);
+        $stmtDeactivate->execute();
+        $stmtDeactivate->close();
+
+        // Insert new snapshot
+        $stmtInsert = $conn->prepare("INSERT INTO form_snapshots (form_index, snapshot_data, is_active) VALUES (?, ?, 1)");
+        $stmtInsert->bind_param("is", $formId, $snapshotData);
+        $stmtInsert->execute();
+        $snapshotId = $conn->insert_id;
+        $stmtInsert->close();
+
+    } catch (Exception $e) {
+        error_log("Snapshot failed: " . $e->getMessage());
+        // Continue even if snapshot fails
     }
 
-    // 2. Update form metadata
-    $stmt = $conn->prepare("UPDATE forms SET form_name = ?, description = ? WHERE form_index = ?");
-    $stmt->bind_param("ssi", $title, $description, $formId);
-    $stmt->execute();
+    // Now proceed with updating the form
+    $conn->begin_transaction();
 
-    // 3. Delete existing structure
-    $stmt = $conn->prepare("DELETE FROM sub_questions WHERE main_question_index IN (SELECT main_question_index FROM main_questions WHERE form_index = ?)");
+    // 1. Update form name and description
+    if (isset($data['form_name']) || isset($data['description'])) {
+        $name = $data['form_name'] ?? '';
+        $desc = $data['description'] ?? '';
+
+        $stmt = $conn->prepare("UPDATE forms SET form_name = ?, description = ? WHERE form_index = ?");
+        $stmt->bind_param("ssi", $name, $desc, $formId);
+        $stmt->execute();
+        $stmt->close();
+    }
+
+    // 2. Delete existing sections and questions
+    $stmt = $conn->prepare("DELETE FROM form_sections WHERE form_index = ?");
     $stmt->bind_param("i", $formId);
     $stmt->execute();
+    $stmt->close();
 
-    $stmt = $conn->prepare("DELETE FROM choices WHERE main_question_index IN (SELECT main_question_index FROM main_questions WHERE form_index = ?)");
+    $stmt = $conn->prepare("DELETE mq FROM main_questions mq INNER JOIN choices c ON mq.main_question_index = c.main_question_index WHERE mq.form_index = ?");
     $stmt->bind_param("i", $formId);
     $stmt->execute();
+    $stmt->close();
+
+    $stmt = $conn->prepare("DELETE mq FROM main_questions mq INNER JOIN sub_questions sq ON mq.main_question_index = sq.main_question_index WHERE mq.form_index = ?");
+    $stmt->bind_param("i", $formId);
+    $stmt->execute();
+    $stmt->close();
 
     $stmt = $conn->prepare("DELETE FROM main_questions WHERE form_index = ?");
     $stmt->bind_param("i", $formId);
     $stmt->execute();
+    $stmt->close();
 
-    $stmt = $conn->prepare("DELETE FROM form_sections WHERE form_index = ?");
-    $stmt->bind_param("i", $formId);
-    $stmt->execute();
+    // 3. Insert updated sections and questions
+    $sectionInsert = $conn->prepare("INSERT INTO form_sections (form_index, section_title, section_description, section_order, behavior) VALUES (?, ?, ?, ?, ?)");
+    $questionInsert = $conn->prepare("INSERT INTO main_questions (form_index, section_index, main_question_text, type_index, is_required, include_other) VALUES (?, ?, ?, (SELECT type_index FROM question_types WHERE type_name = ?), ?, ?)");
 
-    // 4. Re-insert all sections and questions
-    $order = 1;
-    foreach ($sections as $sectionData) {
+    $choiceInsert = $conn->prepare("INSERT INTO choices (main_question_index, choice_text) VALUES (?, ?)");
+    $subQuestionInsert = $conn->prepare("INSERT INTO sub_questions (main_question_index, sub_question_text) VALUES (?, ?)");
+
+    foreach ($data['sections'] as $index => $section) {
+        $title = $section['title'] ?? 'Untitled Section';
+        $description = $section['description'] ?? '';
+        $order = $index + 1;
+        $behavior = $section['behavior'] ?? 'next-page';
+
         // Insert section
-        $stmt = $conn->prepare("INSERT INTO form_sections (form_index, section_title, section_description, section_order) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("issi", $formId, $sectionData['title'], $sectionData['description'], $order);
-        $stmt->execute();
-        $sectionId = $stmt->insert_id;
-        $order++;
+        $sectionInsert->bind_param("issis", $formId, $title, $description, $order, $behavior);
+        $sectionInsert->execute();
+        $sectionIndex = $conn->insert_id;
 
-        foreach ($sectionData['questions'] as $q) {
-            if (!isset($q['question'], $q['type'])) {
-                throw new Exception("Missing question or type");
-            }
+        // Insert questions
+        if (isset($section['questions']) && is_array($section['questions'])) {
+            foreach ($section['questions'] as $question) {
+                $type = $question['type'] ?? 'short';
+                $required = $question['required'] ? 1 : 0;
+                $includeOther = isset($question['includeOther']) ? (int)$question['includeOther'] : 0;
 
-            $questionText = trim($q['question']);
-            $type = $q['type'];
-            $required = $q['required'] ?? false;
+                // Insert question
+                $questionInsert->bind_param(
+                    "iissii",
+                    $formId,
+                    $sectionIndex,
+                    $question['question'],
+                    $type,
+                    $required,
+                    $includeOther
+                );
+                $questionInsert->execute();
+                $questionIndex = $conn->insert_id;
 
-            // Get type_index
-            $stmt = $conn->prepare("SELECT type_index FROM question_types WHERE type_name = ?");
-            $stmt->bind_param("s", $type);
-            $stmt->execute();
-            $result = $stmt->get_result();
-
-            if ($result->num_rows === 0) {
-                throw new Exception("Invalid question type: $type");
-            }
-
-            $typeRow = $result->fetch_assoc();
-            $typeId = $typeRow['type_index'];
-
-            // Insert main question with section reference
-            $stmt = $conn->prepare("INSERT INTO main_questions (form_index, section_index, main_question_text, type_index, is_required) VALUES (?, ?, ?, ?, ?)");
-            $requiredInt = $required ? 1 : 0;
-            $stmt->bind_param("iisii", $formId, $sectionId, $questionText, $typeId, $requiredInt);
-            $stmt->execute();
-            $questionId = $stmt->insert_id;
-
-            // Insert choices (options)
-            if (!empty($q['options']) && is_array($q['options'])) {
-                foreach ($q['options'] as $opt) {
-                    $text = is_string($opt) ? $opt : ($opt['choice_text'] ?? '');
-                    $text = trim($text);
-                    if (!empty($text)) {
-                        $stmt = $conn->prepare("INSERT INTO choices (main_question_index, choice_text) VALUES (?, ?)");
-                        $stmt->bind_param("is", $questionId, $text);
-                        $stmt->execute();
+                // Insert options
+                if (isset($question['options']) && is_array($question['options'])) {
+                    foreach ($question['options'] as $option) {
+                        $choiceInsert->bind_param("is", $questionIndex, $option);
+                        $choiceInsert->execute();
                     }
                 }
-            }
 
-            // Insert subquestions (rows)
-            if (!empty($q['rows']) && is_array($q['rows'])) {
-                foreach ($q['rows'] as $row) {
-                    $text = trim($row);
-                    if (!empty($text)) {
-                        $stmt = $conn->prepare("INSERT INTO sub_questions (main_question_index, sub_question_text) VALUES (?, ?)");
-                        $stmt->bind_param("is", $questionId, $text);
-                        $stmt->execute();
+                // Insert rows (for grid)
+                if (isset($question['rows']) && is_array($question['rows'])) {
+                    foreach ($question['rows'] as $row) {
+                        $subQuestionInsert->bind_param("is", $questionIndex, $row);
+                        $subQuestionInsert->execute();
                     }
                 }
             }
         }
     }
 
+    $sectionInsert->close();
+    $questionInsert->close();
+    $choiceInsert->close();
+    $subQuestionInsert->close();
+
     $conn->commit();
-    echo json_encode([
-        'message' => 'Form updated successfully',
-        'id' => $formId
-    ]);
+    echo json_encode(['success' => true, 'message' => 'Form updated successfully']);
+
 } catch (Exception $e) {
     $conn->rollback();
-    error_log("Error updating form: " . $e->getMessage());
+    error_log("Update failed: " . $e->getMessage());
     http_response_code(500);
-    echo json_encode([
-        'error' => 'Failed to update form',
-        'details' => $e->getMessage()
-    ]);
+    echo json_encode(['error' => 'Failed to update form', 'message' => $e->getMessage()]);
 }
-
-$conn->autocommit(TRUE);
-?>

@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 // Redirect users based on role
                 if ($row['type'] == 'admin') {
-                    header("Location: ../public/admin.html");
+                    header("Location: ../public/admin-manage-forms.html");
                 } else {
                     header("Location: ../public/main.html");
                 }

@@ -1,6 +1,6 @@
 <?php
 $servername = "localhost";
-$database = "form_builder";
+$database = "form_new";
 $username = "root";
 $password = "";
 
