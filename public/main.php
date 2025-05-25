@@ -6,7 +6,7 @@
     <link rel="icon" type="image/png" href="cgcc2.png">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/main-page.css">
+    <link rel="stylesheet" href="css/main-page.css?v=<?= time() ?>">
     <base href="Media/">
     <title>CGCC</title>
 </head>
