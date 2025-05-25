@@ -59,6 +59,7 @@
         
             <div class="schedule">
                 <button class="button-class" onclick="">
+<<<<<<< HEAD
                     Manage Counselors
                 </button>
             </div>
@@ -69,6 +70,20 @@
             </div>
         </div>
     </div>
+=======
+                    Schedule a Counseling Appointment
+                </button>
+            </div>
+            <div class="update">
+                <button class="button-class" onclick="">
+                    Edit Profile Information
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+>>>>>>> f957798264a8c19d14914c8f115e3792b6539854
 <script>
 
 
@@ -95,7 +110,11 @@ function goToPage(){
 }
 
 // 🆕 Fetch and display forms
+<<<<<<< HEAD
 fetch('http://localhost/cgcc-system/backend/forms/form.php')
+=======
+fetch('http://localhost:3001/api/forms')
+>>>>>>> f957798264a8c19d14914c8f115e3792b6539854
   .then(response => response.json())
   .then(data => {
     const container = document.getElementById('form-card-container');
@@ -109,9 +128,15 @@ fetch('http://localhost/cgcc-system/backend/forms/form.php')
       card.classList.add('form-card'); // Add your own styling class
 
       card.innerHTML = `
+<<<<<<< HEAD
         <h3>${form.form_name}</h3>
         <p>${form.description || 'No description'}</p>
         <a href="http://localhost:3000/edit-form/${form.form_index}" target="_blank">Open Form</a>
+=======
+        <h3>${form.Form_Name}</h3>
+        <p>${form.Description || 'No description'}</p>
+        <a href="http://localhost:3000/edit-form/${form.Form_ID}" target="_blank">Open Form</a>
+>>>>>>> f957798264a8c19d14914c8f115e3792b6539854
       `;
 
       container.appendChild(card);

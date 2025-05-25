@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # CGCC-System: Google Login PHP Integration
 
 This project integrates Google OAuth 2.0 Login using PHP, Composer, and the Google API Client. Follow the steps below to set it up properly on your local development machine.
@@ -48,3 +49,21 @@ If Composer is not installed on your machine:
 ### 2 > New Terminal
 ### 3 cd react_form
 ### 4 npm start
+=======
+## Run in terminal
+### `npm install connect-flash dotenv express express-session morgan passport passport-google-oauth20 mysql2`
+### `npm install --save-dev nodemon`
+
+## Run in Terminal
+### `cd react_form`
+### `npm install react react-dom react-router-dom react-bootstrap @hello-pangea/dnd react-icons bootstrap`
+### `npm install express knex body-parser cors dotenv`
+### `npm install --save-dev nodemon`
+
+## Run the application (steps)
+### 1 > New Terminal
+### 2 `node server.js`
+### 3 > New Terminal
+### 4 `cd react_form`
+### 5 `npm start`
+>>>>>>> f957798264a8c19d14914c8f115e3792b6539854
