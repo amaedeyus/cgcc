@@ -334,18 +334,8 @@
                 updatePaginationControls(dataToDisplay.length);
             }
 
-            counselorsTable.addEventListener('click', function(e) {
-                const deleteBtn = e.target.closest('.delete-btn');
-                if (deleteBtn) {
-                    const id = deleteBtn.dataset.id;
-                    if (!id || id === 'undefined') {
-                        console.warn('Invalid ID:', id);
-                        alert('Cannot delete: Invalid counselor ID');
-                        return;
-                    }
-                    confirmDeleteCounselor(id);
-                }
-            });
+            
+            
 
             function updatePaginationControls(totalCounselors) {
                 const totalPages = Math.ceil(totalCounselors / counselorsPerPage);

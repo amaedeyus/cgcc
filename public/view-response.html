@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Form Responses</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px 0;
+        }
+        
+        .response-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        
+        .header-section {
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .form-title {
+            color: #2c3e50;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .student-info {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .section-card {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        
+        .section-header {
+            background-color: #e9f7ef;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .section-title {
+            color: #27ae60;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .section-description {
+            color: #7f8c8d;
+            margin: 10px 0 0 0;
+        }
+        
+        .question-card {
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .question-card:last-child {
+            border-bottom: none;
+        }
+        
+        .question-text {
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .response-text {
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+        
+        .grid-response {
+            margin-top: 15px;
+        }
+        
+        .grid-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .grid-table th {
+            background-color: #e9f7ef;
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #dee2e6;
+        }
+        
+        .grid-table td {
+            padding: 10px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .no-response {
+            color: #95a5a6;
+            font-style: italic;
+        }
+        
+        .back-button {
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .response-container {
+                padding: 15px;
+            }
+            
+            .section-header {
+                padding: 10px 15px;
+            }
+            
+            .question-card {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button id="back-button" class="btn btn-outline-secondary back-button">
+            &larr; Back to Responses
+        </button>
+        
+        <div id="response-container" class="response-container">
+            <div class="text-center mb-4">
+                <h1 id="loading-text">Loading response data...</h1>
+            </div>
+            
+            <div id="response-content" style="display: none;">
+                <div class="header-section">
+                    <h1 id="form-title" class="form-title"></h1>
+                    <div id="student-info" class="student-info">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>Student:</strong> <span id="student-name"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Student Number:</strong> <span id="student-number"></span>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-6">
+                                <strong>Submitted:</strong> <span id="submission-date"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="sections-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get response ID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const responseId = urlParams.get('id');
+            
+            if (!responseId) {
+                document.getElementById('loading-text').textContent = 'Error: No response ID specified';
+                return;
+            }
+            
+            // Set back button URL
+            document.getElementById('back-button').addEventListener('click', function() {
+                // You might want to adjust this to go back to your responses listing page
+                window.location.href = 'responses_list.php';
+            });
+            
+            // Fetch response data
+            fetchResponseData(responseId);
+        });
+        
+        function fetchResponseData(responseId) {
+            fetch(`../backend/forms/view_response.php?response_id=${responseId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        displayResponseData(data.data);
+                    } else {
+                        showError(data.error || 'Failed to load response data');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showError('Failed to load response data. Please try again.');
+                });
+        }
+        
+        function displayResponseData(responseData) {
+            // Show the main content and hide loading text
+            document.getElementById('loading-text').style.display = 'none';
+            document.getElementById('response-content').style.display = 'block';
+            
+            // Set header information
+            document.getElementById('form-title').textContent = responseData.form_name;
+            document.getElementById('student-name').textContent = responseData.student.name;
+            document.getElementById('student-number').textContent = responseData.student.student_number;
+            document.getElementById('submission-date').textContent = formatDate(responseData.student.submitted_at);
+            
+            // Render sections
+            const sectionsContainer = document.getElementById('sections-container');
+            sectionsContainer.innerHTML = '';
+            
+            if (!responseData.sections || responseData.sections.length === 0) {
+                sectionsContainer.innerHTML = '<p>No sections in this form.</p>';
+                return;
+            }
+            
+            responseData.sections.forEach(section => {
+                const sectionCard = document.createElement('div');
+                sectionCard.className = 'section-card';
+                
+                // Section header
+                const sectionHeader = document.createElement('div');
+                sectionHeader.className = 'section-header';
+                
+                const sectionTitle = document.createElement('h3');
+                sectionTitle.className = 'section-title';
+                sectionTitle.textContent = section.title || 'Untitled Section';
+                
+                sectionHeader.appendChild(sectionTitle);
+                
+                if (section.description) {
+                    const sectionDesc = document.createElement('p');
+                    sectionDesc.className = 'section-description';
+                    sectionDesc.textContent = section.description;
+                    sectionHeader.appendChild(sectionDesc);
+                }
+                
+                sectionCard.appendChild(sectionHeader);
+                
+                // Questions
+                if (section.questions && section.questions.length > 0) {
+                    section.questions.forEach(question => {
+                        const questionCard = document.createElement('div');
+                        questionCard.className = 'question-card';
+                        
+                        const questionText = document.createElement('div');
+                        questionText.className = 'question-text';
+                        questionText.textContent = question.question;
+                        questionCard.appendChild(questionText);
+                        
+                        const responseDiv = document.createElement('div');
+                        responseDiv.className = 'response-text';
+                        
+                        if (question.response === null) {
+                            responseDiv.innerHTML = '<span class="no-response">No response provided</span>';
+                        } else {
+                            if (question.type === 'grid') {
+                                responseDiv.appendChild(createGridResponse(question.response));
+                            } else if (Array.isArray(question.response)) {
+                                // Checkbox or other multiple response
+                                if (question.response.length === 0) {
+                                    responseDiv.innerHTML = '<span class="no-response">No response provided</span>';
+                                } else {
+                                    const ul = document.createElement('ul');
+                                    question.response.forEach(item => {
+                                        const li = document.createElement('li');
+                                        li.textContent = item;
+                                        ul.appendChild(li);
+                                    });
+                                    responseDiv.appendChild(ul);
+                                }
+                            } else {
+                                // Single response (text, radio, dropdown, etc.)
+                                responseDiv.textContent = question.response;
+                            }
+                        }
+                        
+                        questionCard.appendChild(responseDiv);
+                        sectionCard.appendChild(questionCard);
+                    });
+                } else {
+                    const noQuestions = document.createElement('div');
+                    noQuestions.className = 'question-card';
+                    noQuestions.innerHTML = '<p class="no-response">No questions in this section</p>';
+                    sectionCard.appendChild(noQuestions);
+                }
+                
+                sectionsContainer.appendChild(sectionCard);
+            });
+        }
+        
+        function createGridResponse(gridData) {
+            if (!gridData || gridData.length === 0) {
+                return document.createTextNode('No responses for this grid');
+            }
+            
+            const container = document.createElement('div');
+            container.className = 'grid-response';
+            
+            // Find all unique rows and choices to build the table
+            const rows = [...new Set(gridData.map(item => item.row))];
+            const choices = [...new Set(gridData.map(item => item.choice))];
+            
+            const table = document.createElement('table');
+            table.className = 'grid-table table table-bordered';
+            
+            // Create header
+            const thead = document.createElement('thead');
+            const headerRow = document.createElement('tr');
+            headerRow.appendChild(document.createElement('th')); // Empty corner cell
+            
+            choices.forEach(choice => {
+                const th = document.createElement('th');
+                th.textContent = choice;
+                headerRow.appendChild(th);
+            });
+            
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+            
+            // Create body
+            const tbody = document.createElement('tbody');
+            
+            rows.forEach(row => {
+                const tr = document.createElement('tr');
+                const rowHeader = document.createElement('th');
+                rowHeader.textContent = row;
+                tr.appendChild(rowHeader);
+                
+                choices.forEach(choice => {
+                    const td = document.createElement('td');
+                    const hasResponse = gridData.some(item => item.row === row && item.choice === choice);
+                    td.innerHTML = hasResponse ? '✓' : '';
+                    td.style.textAlign = 'center';
+                    tr.appendChild(td);
+                });
+                
+                tbody.appendChild(tr);
+            });
+            
+            table.appendChild(tbody);
+            container.appendChild(table);
+            return container;
+        }
+        
+        function formatDate(dateString) {
+            if (!dateString) return 'Unknown date';
+            
+            try {
+                const date = new Date(dateString);
+                return date.toLocaleString();
+            } catch (e) {
+                return dateString;
+            }
+        }
+        
+        function showError(message) {
+            document.getElementById('loading-text').textContent = message;
+        }
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
