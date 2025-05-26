@@ -32,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 if ($row['type'] == 'admin') {
                     header("Location: ../public/admin-manage-forms.html");
                 } else {
-                    header("Location: ../public/main.html");
+                    header("Location: ../public/main.php");
                 }
                 exit();
             } else {
