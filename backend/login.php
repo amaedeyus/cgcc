@@ -3,48 +3,60 @@ session_start();
 include('connect.php'); // Include database connection
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Retrieve email and password from form input
     $email = $_POST['email'] ?? null;
     $password = $_POST['password'] ?? null;
 
     if (!$email || !$password) {
         echo "Please enter both email and password.";
-    } else {
-        // Prepare query to fetch user data
-        $query = "SELECT * FROM users WHERE email = ?";
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
+        exit();
+    }
 
-        if ($result->num_rows > 0) {
-            $row = $result->fetch_assoc();
-            $hashed_password = $row['password'];
+    // Query to get user and student name
+    $query = "
+        SELECT users.*, students.first_name, students.last_name 
+        FROM users 
+        JOIN students ON users.user_index = students.user_index 
+        WHERE users.email = ?
+    ";
 
-            // Verify hashed password
-            if (password_verify($password, $hashed_password)) {
-                // Set session variables
-                $_SESSION['user_index'] = $row['user_index'];
-                $_SESSION['email'] = $row['email'];
-                $_SESSION['user_type'] = $row['type'];
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-                // Redirect users based on role
-                if ($row['type'] == 'admin') {
-                    header("Location: ../public/admin-manage-forms.html");
-                } else {
-                    header("Location: ../public/main.php");
-                }
-                exit();
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $hashed_password = $row['password'];
+
+        if (password_verify($password, $hashed_password)) {
+            // Set session variables
+            $_SESSION['user_index'] = $row['user_index'];
+            $_SESSION['email'] = $row['email'];
+            $_SESSION['user_type'] = $row['type'];
+
+            // Name values
+            $firstName = $row['first_name'] ?? 'User';
+            $lastName = $row['last_name'] ?? '';
+
+            $_SESSION['first_name'] = $firstName;
+            $_SESSION['last_name'] = $lastName;
+            $_SESSION['full_name'] = trim($firstName . ' ' . $lastName);
+
+            // Redirect based on user type
+            if ($row['type'] === 'admin') {
+                header("Location: ../public/admin-manage-forms.html");
             } else {
-                echo "Invalid email or password.";
+                header("Location: ../public/main.php");
             }
+            exit();
         } else {
             echo "Invalid email or password.";
         }
-
-        $stmt->close();
+    } else {
+        echo "Invalid email or password.";
     }
 
+    $stmt->close();
     $conn->close();
 }
 ?>

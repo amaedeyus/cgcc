@@ -1,3 +1,9 @@
+<?php
+session_start();
+$fullName = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Guest';
+$firstName = isset($_SESSION['first_name']) ? $_SESSION['first_name'] : 'Guest';
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,7 +37,7 @@
         <div class="page-left">
             <div class="profile">
                 <div class="profile-picture"></div>
-                <span id="user-name"></span> <!-- papalitan ng id ni user -->
+                <span id="user-name"><?= htmlspecialchars($fullName)?></span> <!-- papalitan ng id ni user -->
                     <div class="edit">
                         <a href="../edit-profile.html">✎Edit Profile</a>
                     </div>
@@ -52,7 +58,7 @@
         <div class="page-right">
             <div class="greetings">
                 <div class="h1">
-                    Hello,<span class="user-name"> </span>! <!-- papalitan ng id ni user --> Welcome to the College Guidance and Counseling Center!
+                    Hello, <span id="user-name"><?= htmlspecialchars($firstName)?></span>! <!-- papalitan ng id ni user --> Welcome to the College Guidance and Counseling Center!
                 </div>
                     <div class="subh1">
                         You Share, We Listen, We Care
@@ -81,15 +87,6 @@
     </div>
 
 <script>
-
-
-const userName = localStorage.getItem('username') || 'Guest';  
-
-document.getElementById('user-name').innerText = userName;
-const greetingElements = document.querySelectorAll('.user-name');
-greetingElements.forEach(element => {
-    element.innerText = userName;
-});
 
 function toggleDropdown(id){
     const content = document.getElementById(id);
