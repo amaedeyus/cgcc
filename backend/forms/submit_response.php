@@ -12,6 +12,9 @@ if (!isset($_SESSION['user_index'])) {
     exit;
 }
 
+file_put_contents('session_debug.log', print_r($_SESSION, true), FILE_APPEND);
+
+
 // Get user type and index
 $userIndex = $_SESSION['user_index'];
 $userType = $_SESSION['user_type'];
@@ -97,15 +100,33 @@ try {
         ");
 
         foreach ($data['answers'] as $answer) {
-            error_log("Answer received: " . json_encode($answer));
             $questionId = (int)$answer['main_question_index'];
             
             // Initialize both fields as null
             $choiceId = null;
             $textAnswer = null;
             
-            // Check if this is a choice-based answer or text answer
-            if (isset($answer['choice_index']) && $answer['choice_index'] !== null) {
+            // Handle different answer types
+            if (isset($answer['is_other']) && $answer['is_other']) {
+                // This is an "other" option with text answer
+                $textAnswer = $answer['text_answer'] ?? '';
+                
+                // Verify the question allows "other" option
+                $checkOther = $conn->prepare("
+                    SELECT include_other FROM main_questions 
+                    WHERE main_question_index = ?
+                ");
+                $checkOther->bind_param("i", $questionId);
+                $checkOther->execute();
+                $checkOther->bind_result($includeOther);
+                $checkOther->fetch();
+                $checkOther->close();
+
+                if (!$includeOther) {
+                    throw new Exception("Question $questionId doesn't allow 'other' option");
+                }
+            } 
+            else if (isset($answer['choice_index']) && $answer['choice_index'] !== null) {
                 // This is a regular choice selection
                 $choiceId = (int)$answer['choice_index'];
 
@@ -121,30 +142,14 @@ try {
                     throw new Exception("Invalid choice_index $choiceId for question $questionId");
                 }
                 $checkChoice->close();
-
-            } else if (isset($answer['text_answer']) && $answer['text_answer'] !== '') {
+            } 
+            else if (isset($answer['text_answer']) && $answer['text_answer'] !== '') {
+                // This is a direct text answer (for text, paragraph, etc.)
                 $textAnswer = $answer['text_answer'];
-
-                if (isset($answer['is_other']) && $answer['is_other']) {
-                    $checkOther = $conn->prepare("
-                        SELECT include_other FROM main_questions 
-                        WHERE main_question_index = ?
-                    ");
-                    $checkOther->bind_param("i", $questionId);
-                    $checkOther->execute();
-                    $checkOther->bind_result($includeOther);
-                    $checkOther->fetch();
-                    $checkOther->close();
-
-                    if (!$includeOther) {
-                        throw new Exception("Question $questionId doesn't allow 'other' option");
-                    }
-                }
-
-            } else {
-                continue; // No valid input
+            } 
+            else {
+                continue; // Skip if no valid answer provided
             }
-
             
             // Insert the answer
             $answerStmt->bind_param("iiis", $responseId, $questionId, $choiceId, $textAnswer);
@@ -152,7 +157,6 @@ try {
                 throw new Exception("Failed to insert answer: " . $answerStmt->error);
             }
         }
-
         $answerStmt->close();
     }
 

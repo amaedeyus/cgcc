@@ -1116,12 +1116,27 @@
                 grid_answers: []
             };
 
-            for (const [questionId, response] of Object.entries(formResponses)) {
-                if (questionId === 'formId') continue; // Skip metadata
-                
-                const main_question_index = parseInt(questionId);
+            // Get all question IDs from the form data to ensure we don't miss any
+            const allQuestionIds = [];
+            sections.forEach(section => {
+                if (section.questions) {
+                    section.questions.forEach(question => {
+                        allQuestionIds.push(question.id);
+                    });
+                }
+            });
 
-                if (response.type === 'grid') {
+            // Process each question
+            allQuestionIds.forEach(questionId => {
+                const response = formResponses[questionId];
+                if (!response) return; // Skip unanswered questions
+
+                const main_question_index = parseInt(questionId);
+                const question = findQuestionById(questionId);
+
+                if (!question) return;
+
+                if (question.type === 'grid') {
                     if (Array.isArray(response.value)) {
                         response.value.forEach(gridResponse => {
                             submissionData.grid_answers.push({
@@ -1131,7 +1146,8 @@
                             });
                         });
                     }
-                } else if (response.type === 'checkbox') {
+                } 
+                else if (question.type === 'checkbox') {
                     if (Array.isArray(response.value)) {
                         response.value.forEach(value => {
                             const isOther = value === 'other';
@@ -1143,15 +1159,18 @@
                             });
                         });
                     }
-                } else if (response.type === 'multiple' || response.type === 'dropdown') {
+                } 
+                else if (question.type === 'multiple' || question.type === 'dropdown') {
                     const isOther = response.value === 'other';
                     submissionData.answers.push({
                         main_question_index,
-                        choice_index: isOther ? null : parseInt(response.choiceIndex),
+                        choice_index: isOther ? null : parseInt(response.value),
                         text_answer: isOther ? (response.otherText || '') : null,
                         is_other: isOther
                     });
-                } else {
+                } 
+                else {
+                    // Handle text, paragraph, date inputs
                     submissionData.answers.push({
                         main_question_index,
                         choice_index: null,
@@ -1159,27 +1178,54 @@
                         is_other: false
                     });
                 }
-            }
+            });
 
             try {
                 const response = await fetch('http://localhost/cgcc-system/backend/forms/submit_response.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(submissionData),
-                    credentials: 'include' // Important for session
+                    credentials: 'include'
                 });
 
-                if (!response.ok) throw new Error('Failed to submit form');
+                const rawResponse = await response.text();
+                console.log('Raw response from server:', rawResponse);
+
+                let responseData;
+                try {
+                    responseData = JSON.parse(rawResponse);
+                } catch (jsonError) {
+                    throw new Error(`Invalid JSON returned from server: ${rawResponse}`);
+                }
+
+                
+                if (!response.ok) {
+                    throw new Error(responseData.error || 'Failed to submit form');
+                }
 
                 localStorage.removeItem('studentFormProgress');
                 alert('Form submitted successfully!');
                 window.location.href = 'submission-success.html';
             } catch (error) {
                 console.error('Error:', error);
-                alert('Failed to submit form. Please try again.');
+                alert(error.message || 'Failed to submit form. Please try again.');
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = 'Submit';
             }
+        }
+
+        // Helper function to find question by ID
+        function findQuestionById(questionId) {
+            for (const section of sections) {
+                if (section.questions) {
+                    for (const question of section.questions) {
+                        if (question.id === questionId) {
+                            return question;
+                        }
+                    }
+                }
+            }
+            return null;
         }
 
 
