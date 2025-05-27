@@ -86,7 +86,7 @@ try {
 
     // 3. Insert updated sections and questions
     $sectionInsert = $conn->prepare("INSERT INTO form_sections (form_index, section_title, section_description, section_order, behavior) VALUES (?, ?, ?, ?, ?)");
-    $questionInsert = $conn->prepare("INSERT INTO main_questions (form_index, section_index, main_question_text, type_index, is_required, include_other) VALUES (?, ?, ?, (SELECT type_index FROM question_types WHERE type_name = ?), ?, ?)");
+    $questionInsert = $conn->prepare("INSERT INTO main_questions (form_index, form_section_index, main_question_text, type_index, is_required, include_other) VALUES (?, ?, ?, (SELECT type_index FROM question_types WHERE type_name = ?), ?, ?)");
     $choiceInsert = $conn->prepare("INSERT INTO choices (main_question_index, choice_text) VALUES (?, ?)");
     $subQuestionInsert = $conn->prepare("INSERT INTO sub_questions (main_question_index, sub_question_text) VALUES (?, ?)");
 
@@ -154,7 +154,7 @@ try {
                 f.form_index,
                 f.form_name,
                 f.description,
-                fs.section_index,
+                fs.form_section_index,
                 fs.section_title,
                 fs.section_description,
                 fs.section_order,
@@ -170,7 +170,7 @@ try {
                 sq.sub_question_text
             FROM forms f
             LEFT JOIN form_sections fs ON f.form_index = fs.form_index
-            LEFT JOIN main_questions q ON fs.section_index = q.section_index
+            LEFT JOIN main_questions q ON fs.form_section_index = q.form_section_index
             LEFT JOIN question_types qt ON q.type_index = qt.type_index
             LEFT JOIN choices c ON q.main_question_index = c.main_question_index
             LEFT JOIN sub_questions sq ON q.main_question_index = sq.main_question_index
@@ -201,7 +201,7 @@ try {
                 ];
             }
 
-            $sectionId = $row['section_index'];
+            $sectionId = $row['form_section_index'];
             if (!isset($sectionMap[$sectionId])) {
                 $sectionMap[$sectionId] = [
                     'id' => (string)$sectionId,
@@ -223,7 +223,7 @@ try {
                     'includeOther' => (bool)$row['include_other'],
                     'options' => [],
                     'rows' => [],
-                    'section_index' => $sectionId
+                    'form_section_index' => $sectionId
                 ];
             }
 
@@ -247,7 +247,7 @@ try {
         }
 
         foreach ($questionMap as $qid => $qdata) {
-            $sectionId = $qdata['section_index'];
+            $sectionId = $qdata['form_section_index'];
             if (isset($sectionMap[$sectionId])) {
                 $sectionMap[$sectionId]['questions'][] = $qdata;
                 $allQuestions[] = $qdata;

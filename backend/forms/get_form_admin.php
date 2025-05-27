@@ -78,7 +78,7 @@ try {
 
     // Fetch sections
     // Fetch sections - corrected column name from section_behavior to behavior
-    $query = "SELECT section_index, section_title, section_description, section_order, 
+    $query = "SELECT form_section_index, section_title, section_description, section_order, 
                     IFNULL(behavior, 'same-page') AS behavior 
             FROM form_sections 
             WHERE form_index = ? 
@@ -103,14 +103,14 @@ try {
                          qt.type_name, IFNULL(mq.include_other, 0) AS include_other
                   FROM main_questions mq
                   JOIN question_types qt ON mq.type_index = qt.type_index 
-                  WHERE mq.section_index = ?
+                  WHERE mq.form_section_index = ?
                   ORDER BY mq.main_question_index";
         $stmt2 = $conn->prepare($query);
         if (!$stmt2) {
             throw new Exception("Prepare failed: " . $conn->error);
         }
         
-        $stmt2->bind_param("i", $section['section_index']);
+        $stmt2->bind_param("i", $section['form_section_index']);
         if (!$stmt2->execute()) {
             throw new Exception("Execute failed: " . $stmt2->error);
         }
@@ -158,7 +158,7 @@ try {
         $stmt2->close();
 
         $sections[] = [
-            'id' => (string)$section['section_index'],
+            'id' => (string)$section['form_section_index'],
             'title' => $section['section_title'],
             'description' => $section['section_description'] ?? '',
             'order' => $section['section_order'],

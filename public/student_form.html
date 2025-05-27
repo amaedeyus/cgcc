@@ -339,7 +339,7 @@
 
         async function fetchFormData(formId) {
             try {
-                const response = await fetch(`http://localhost/cgcc-system/backend/forms/get_form_student.php?id=${formId}`);
+                const response = await fetch(`http://localhost/cgcc/backend/forms/get_form_student.php?id=${formId}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch form data');
                 }
@@ -1181,7 +1181,7 @@
             });
 
             try {
-                const response = await fetch('http://localhost/cgcc-system/backend/forms/submit_response.php', {
+                const response = await fetch('http://localhost/cgcc/backend/forms/submit_response.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(submissionData),

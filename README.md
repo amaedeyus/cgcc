@@ -22,7 +22,7 @@ This project integrates Google OAuth 2.0 Login using PHP, Composer, and the Goog
 >> open in terminal
 >> run this command 
 git clone https://github.com/your-org/cgcc-system.git
-cd cgcc-system
+cd cgcc
 
 ### 2️⃣ Install Composer Dependencies
 
@@ -33,7 +33,7 @@ If Composer is not installed on your machine:
 
 ### 3️⃣ API
 - copy secret.json in the shared google drive
-- paste the contents in the cgcc-system/backend/config/secret.json
+- paste the contents in the cgcc/backend/config/secret.json
 - do not commit the json file 
 
 ## Run in terminal
@@ -45,7 +45,7 @@ If Composer is not installed on your machine:
 ### npm install --save-dev nodemon
 
 ## Run the application (steps)
-### 1 > [localhost/cgcc-system/](http://localhost/cgcc-system/public/front-end.html)
+### 1 > [localhost/cgcc/](http://localhost/cgcc/public/front-end.html)
 ### 2 > New Terminal
 ### 3 cd react_form
 ### 4 npm start

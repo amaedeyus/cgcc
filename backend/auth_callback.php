@@ -2,14 +2,14 @@
 session_start();
 use Google\Service\Oauth2;
 require_once __DIR__ . '/../vendor/autoload.php';
-    require_once __DIR__ . '/connect.php'; // include your DB connection
+    require_once __DIR__ . '/connect3.php'; // include your DB connection
     
 // Initialize Google Client
 $client = new Google_Client();
 $client->setAuthConfig(__DIR__ . '/config/secret.json');
 $client->addScope("email");
 $client->addScope("profile");
-$client->setRedirectUri('http://localhost/cgcc-system/backend/auth_callback.php');
+$client->setRedirectUri('http://localhost/cgcc/backend/auth_callback.php');
 
 if (!isset($_GET['code'])) {
     $authUrl = $client->createAuthUrl();
@@ -39,14 +39,21 @@ if (!isset($_GET['code'])) {
             $_SESSION['email'] = $row['email'];
             $_SESSION['user_type'] = $row['type'];
 
+            // Name values
+            $firstName = $row['first_name'] ?? 'User';
+            $lastName = $row['last_name'] ?? '';
+
+            $_SESSION['first_name'] = $firstName;
+            $_SESSION['last_name'] = $lastName;
+            $_SESSION['full_name'] = trim($firstName . ' ' . $lastName);
+
             // Redirect based on user type
             if ($row['type'] === 'admin') {
-                header("Location: ../public/admin-manage-forms.html");
+                header("Location: ../public/admin/admin-manage-forms.html");
             } else if ($row['type'] === 'counselor'){
-                header("Location: ../public/student-record.php");
+                header("Location: ../public/counselor/student-record.php");
             } else {
-                echo $row['user_type'];
-                header("Location: ../public/main.html");
+                header("Location: ../public/main.php");
             }
         } else {
             // Optional: redirect or show error if user not found in DB

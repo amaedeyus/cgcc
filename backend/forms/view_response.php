@@ -37,7 +37,7 @@
             JOIN form_snapshots s ON r.snapshot_index = s.snapshot_index
             JOIN forms f ON r.form_index = f.form_index
             JOIN students st ON r.student_index = st.student_index
-            LEFT JOIN sections sec ON st.section_index = sec.section_index
+            LEFT JOIN sections sec ON st.form_section_index = sec.form_section_index
             LEFT JOIN programs p ON sec.program_index = p.program_index
             LEFT JOIN departments d ON p.dept_index = d.dept_index
             WHERE r.response_index = ?

@@ -1,5 +1,6 @@
 <?php
 session_start();
+ob_start();
 include('connect.php'); // Include database connection
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -12,6 +13,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Query to get user and student name
+  // Modify your query to left join:
     $query = "
         SELECT users.*, students.first_name, students.last_name 
         FROM users 
@@ -29,6 +31,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $hashed_password = $row['password'];
 
         if (password_verify($password, $hashed_password)) {
+
+            // Temporarily add this debug code:
+            echo "Stored hash: ".$hashed_password."<br>";
+            echo "Input password: ".$password."<br>";
+            echo "Verification: ".(password_verify($password, $hashed_password) ? 'true' : 'false');
             // Set session variables
             $_SESSION['user_index'] = $row['user_index'];
             $_SESSION['email'] = $row['email'];

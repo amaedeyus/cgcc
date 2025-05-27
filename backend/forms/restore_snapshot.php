@@ -86,7 +86,7 @@ try {
     ");
     
     $questionInsert = $conn->prepare("
-        INSERT INTO main_questions (form_index, section_index, main_question_text, type_index, is_required, include_other) 
+        INSERT INTO main_questions (form_index, form_section_index, main_question_text, type_index, is_required, include_other) 
         VALUES (?, ?, ?, (SELECT type_index FROM question_types WHERE type_name = ?), ?, ?)
     ");
     

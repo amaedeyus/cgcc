@@ -7,16 +7,6 @@ if (!isset($_SESSION['user_index'])) {
     exit;
 }
 
-$userType = $_SESSION['user_type'];
-
-if ($userType !== 'admin' && $userType !== 'staff') {
-    http_response_code(403);
-    echo json_encode(['error' => 'Access denied']);
-    exit;
-}
-
-// Optional: Log user type
-error_log("User type: " . $userType);
 
 header("Access-Control-Allow-Origin: http://localhost:3000");
 header("Access-Control-Allow-Origin: http://localhost:3001");
