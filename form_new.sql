@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 27, 2025 at 07:50 AM
+-- Generation Time: May 27, 2025 at 04:36 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -233,7 +233,7 @@ INSERT INTO `choices` (`choice_index`, `main_question_index`, `choice_text`) VAL
 
 CREATE TABLE `counselors` (
   `counselor_index` int(11) NOT NULL,
-  `user_index` int(11) NOT NULL,
+  `user_index` int(11) DEFAULT NULL,
   `counselor_number` varchar(255) DEFAULT NULL,
   `last_name` varchar(50) NOT NULL,
   `first_name` varchar(50) NOT NULL,
@@ -246,15 +246,15 @@ CREATE TABLE `counselors` (
 --
 
 INSERT INTO `counselors` (`counselor_index`, `user_index`, `counselor_number`, `last_name`, `first_name`, `calendar_link`, `status`) VALUES
-(1, 120, 'CG0120', 'Balion', 'Angel Amaya', 'https://calendar.app.google/DVooLDaj5wBZ9Jnj7', 'active'),
-(10, 121, '1001', 'cruz', 'juan', 'https://calendly.com/juan-dela-cruz', 'active'),
-(11, 122, '1002', 'santos', 'maria', 'https://calendly.com/maria-santos', 'active'),
-(12, 123, '1003', 'lim', 'antonio', 'https://calendly.com/antonio-lim', 'active'),
-(13, 124, '1004', 'reyes', 'sofia', 'https://calendly.com/sofia-reyes', 'active'),
-(14, 125, '1005', 'gonzales', 'carlos', 'https://calendly.com/carlos-gonzales', 'active'),
-(15, 126, '1006', 'ramirez', 'lucia', 'https://calendly.com/lucia-ramirez', 'active'),
-(16, 127, '1007', 'tan', 'fernando', 'https://calendly.com/fernando-tan', 'active'),
-(17, 128, '1008', 'garcia', 'isabela', 'https://calendly.com/isabela-garcia', 'active');
+(1, 40, 'CG0001', 'Balion', 'Angel Amaya', 'https://calendar.app.google/DVooLDaj5wBZ9Jnj7', 'active'),
+(2, 41, 'CG0002', 'cruz', 'juan', 'https://calendly.com/juan-dela-cruz', 'active'),
+(3, 42, 'CG0003', 'santos', 'maria', 'https://calendly.com/maria-santos', 'active'),
+(4, 43, 'CG0004', 'lim', 'antonio', 'https://calendly.com/antonio-lim', 'active'),
+(5, 44, 'CG0005', 'reyes', 'sofia', 'https://calendly.com/sofia-reyes', 'active'),
+(6, 45, 'CG0006', 'gonzales', 'carlos', 'https://calendly.com/carlos-gonzales', 'active'),
+(7, 46, 'CG0007', 'ramirez', 'lucia', 'https://calendly.com/lucia-ramirez', 'active'),
+(8, 47, 'CG0008', 'tan', 'fernando', 'https://calendly.com/fernando-tan', 'active'),
+(9, 48, 'CG0009', 'garcia', 'isabela', 'https://calendly.com/isabela-garcia', 'active');
 
 -- --------------------------------------------------------
 
@@ -291,16 +291,16 @@ CREATE TABLE `forms` (
   `form_name` varchar(255) DEFAULT NULL,
   `description` text DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
-  `status` enum('active','inactive') NOT NULL DEFAULT 'inactive'
+  `is_active` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `forms`
 --
 
-INSERT INTO `forms` (`form_index`, `form_name`, `description`, `created_at`, `status`) VALUES
-(1, 'STUDENT INDIVIDUAL INVENTORY (SII) & CLIENT CONSENT FORM AY 2024-2025', 'This form would only take 15- 20 minutes of your time.\n\nEvery person\'s life is a developing story. The person you are today is a result of your upbringing and experiences, joys and sorrows, desires, and dreams. While we know that it\'s tempting to rush at times, please take some time to reflect on your life.', '2025-04-30 05:28:30', 'inactive'),
-(2, 'fsdfsdfs', 'fsdfsdfsdf', '2025-04-30 12:25:24', 'inactive');
+INSERT INTO `forms` (`form_index`, `form_name`, `description`, `created_at`, `is_active`) VALUES
+(1, 'STUDENT INDIVIDUAL INVENTORY (SII) & CLIENT CONSENT FORM AY 2024-2025', 'This form would only take 15- 20 minutes of your time.\n\nEvery person\'s life is a developing story. The person you are today is a result of your upbringing and experiences, joys and sorrows, desires, and dreams. While we know that it\'s tempting to rush at times, please take some time to reflect on your life.', '2025-04-30 05:28:30', 1),
+(2, 'fsdfsdfs', 'fsdfsdfsdf', '2025-04-30 12:25:24', 0);
 
 -- --------------------------------------------------------
 
@@ -1360,7 +1360,7 @@ INSERT INTO `sub_questions` (`sub_question_index`, `main_question_index`, `sub_q
 CREATE TABLE `users` (
   `user_index` int(11) NOT NULL,
   `email` varchar(255) NOT NULL,
-  `password` varchar(100) NOT NULL,
+  `password` varchar(255) NOT NULL,
   `type` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -1409,15 +1409,21 @@ INSERT INTO `users` (`user_index`, `email`, `password`, `type`, `created_at`) VA
 (37, 'xyrelle_dominique_talens@dlsl.edu.ph', '$2y$10$L11qAVZF9fFA7pIn70AYrOj9.Xp7ZNonVt5FftsmskB4QmBCV0mOy', 'student', '2025-05-21 14:08:04'),
 (38, 'jhon_paulo_tenorio@dlsl.edu.ph', '$2y$10$Z.j6Uin5x8.g7TOweygODuaWKw1CYgWUn/Wk/wfK9eVsv/U/H9fs.', 'student', '2025-05-21 14:08:04'),
 (39, 'kyan_prince_torres@dlsl.edu.ph', '$2y$10$Plkf7Flr.mkg/Gv5KLVygOO4BW7e25deeuLpff00dc5PoVpwQsH0W', 'student', '2025-05-21 14:08:04'),
-(120, 'angel_amaya_balion@dlsl.edu.ph', '$2y$10$oruFH6IQ9LvWbRCTFDG3ouK3VTo3t3efKj9mkhBpZP11xrPFt1Tmm', 'counselor', '2025-05-27 05:02:54'),
-(121, 'juan.dela.cruz@dlsl.edu.ph', '$2y$10$oruFH6IQ9LvWbRCTFDG3ouK3VTo3t3efKj9mkhBpZP11xrPFt1Tmm', 'counselor', '2025-05-27 05:25:25'),
-(122, 'maria.santos@dlsl.edu.ph', '$2y$10$oruFH6IQ9LvWbRCTFDG3ouK3VTo3t3efKj9mkhBpZP11xrPFt1Tmm', 'counselor', '2025-05-27 05:25:25'),
-(123, 'antonio.lim@dlsl.edu.ph', '$2y$10$oruFH6IQ9LvWbRCTFDG3ouK3VTo3t3efKj9mkhBpZP11xrPFt1Tmm', 'counselor', '2025-05-27 05:25:25'),
-(124, 'sofia.reyes@dlsl.edu.ph', '$2y$10$oruFH6IQ9LvWbRCTFDG3ouK3VTo3t3efKj9mkhBpZP11xrPFt1Tmm', 'counselor', '2025-05-27 05:25:25'),
-(125, 'carlos.gonzales@dlsl.edu.ph', '$2y$10$oruFH6IQ9LvWbRCTFDG3ouK3VTo3t3efKj9mkhBpZP11xrPFt1Tmm', 'counselor', '2025-05-27 05:25:25'),
-(126, 'lucia.ramirez@dlsl.edu.ph', '$2y$10$oruFH6IQ9LvWbRCTFDG3ouK3VTo3t3efKj9mkhBpZP11xrPFt1Tmm', 'counselor', '2025-05-27 05:25:25'),
-(127, 'fernando.tan@dlsl.edu.ph', '$2y$10$oruFH6IQ9LvWbRCTFDG3ouK3VTo3t3efKj9mkhBpZP11xrPFt1Tmm', 'counselor', '2025-05-27 05:25:25'),
-(128, 'isabela.garcia@dlsl.edu.ph', '$2y$10$oruFH6IQ9LvWbRCTFDG3ouK3VTo3t3efKj9mkhBpZP11xrPFt1Tmm', 'counselor', '2025-05-27 05:25:25');
+(40, 'angel_amaya_balion@dlsl.edu.ph', '$2y$10$oruFH6IQ9LvWbRCTFDG3ouK3VTo3t3efKj9mkhBpZP11xrPFt1Tmm', 'counselor', '2025-05-27 05:02:54'),
+(41, 'juan.dela.cruz@dlsl.edu.ph', '$2y$10$oruFH6IQ9LvWbRCTFDG3ouK3VTo3t3efKj9mkhBpZP11xrPFt1Tmm', 'counselor', '2025-05-27 05:25:25'),
+(42, 'maria.santos@dlsl.edu.ph', '$2y$10$oruFH6IQ9LvWbRCTFDG3ouK3VTo3t3efKj9mkhBpZP11xrPFt1Tmm', 'counselor', '2025-05-27 05:25:25'),
+(43, 'antonio.lim@dlsl.edu.ph', '$2y$10$oruFH6IQ9LvWbRCTFDG3ouK3VTo3t3efKj9mkhBpZP11xrPFt1Tmm', 'counselor', '2025-05-27 05:25:25'),
+(44, 'sofia.reyes@dlsl.edu.ph', '$2y$10$oruFH6IQ9LvWbRCTFDG3ouK3VTo3t3efKj9mkhBpZP11xrPFt1Tmm', 'counselor', '2025-05-27 05:25:25'),
+(45, 'carlos.gonzales@dlsl.edu.ph', '$2y$10$oruFH6IQ9LvWbRCTFDG3ouK3VTo3t3efKj9mkhBpZP11xrPFt1Tmm', 'counselor', '2025-05-27 05:25:25'),
+(46, 'lucia.ramirez@dlsl.edu.ph', '$2y$10$oruFH6IQ9LvWbRCTFDG3ouK3VTo3t3efKj9mkhBpZP11xrPFt1Tmm', 'counselor', '2025-05-27 05:25:25'),
+(47, 'fernando.tan@dlsl.edu.ph', '$2y$10$oruFH6IQ9LvWbRCTFDG3ouK3VTo3t3efKj9mkhBpZP11xrPFt1Tmm', 'counselor', '2025-05-27 05:25:25'),
+(48, 'isabela.garcia@dlsl.edu.ph', '$2y$10$oruFH6IQ9LvWbRCTFDG3ouK3VTo3t3efKj9mkhBpZP11xrPFt1Tmm', 'counselor', '2025-05-27 05:25:25'),
+(49, 'renz.andrei.delrosario@dlsl.edu.ph', '$2y$10$E5bQo2ZVNbL.G85IBAURmu32J9vv6JTrnr/9FjMPggHtldOid1HkW', 'admin', '2025-05-27 12:20:42'),
+(50, 'xyrelle.dominique.talens@dlsl.edu.ph', '$2y$10$E5bQo2ZVNbL.G85IBAURmu32J9vv6JTrnr/9FjMPggHtldOid1HkW', 'admin', '2025-05-27 12:48:40'),
+(51, 'lyrus.lei.doctolero@dlsl.edu.ph', '$2y$10$E5bQo2ZVNbL.G85IBAURmu32J9vv6JTrnr/9FjMPggHtldOid1HkW', 'admin', '2025-05-27 12:52:59'),
+(52, 'lyrusdoc2@gmail.com', '$2y$10$E5bQo2ZVNbL.G85IBAURmu32J9vv6JTrnr/9FjMPggHtldOid1HkW', 'admin', '2025-05-27 12:54:21'),
+(53, 'renzandreidelrosario@gmail.com', '$2y$10$E5bQo2ZVNbL.G85IBAURmu32J9vv6JTrnr/9FjMPggHtldOid1HkW', 'admin', '2025-05-27 12:54:21'),
+(54, 'deleonfuego@gmail.com', '$2y$10$E5bQo2ZVNbL.G85IBAURmu32J9vv6JTrnr/9FjMPggHtldOid1HkW', 'admin', '2025-05-27 12:54:21');
 
 --
 -- Indexes for dumped tables
@@ -1442,7 +1448,7 @@ ALTER TABLE `choices`
 --
 ALTER TABLE `counselors`
   ADD PRIMARY KEY (`counselor_index`),
-  ADD KEY `fk2` (`user_index`);
+  ADD KEY `fk_counselors_users` (`user_index`);
 
 --
 -- Indexes for table `departments`
@@ -1527,9 +1533,9 @@ ALTER TABLE `sections`
 --
 ALTER TABLE `students`
   ADD PRIMARY KEY (`student_index`),
-  ADD KEY `fk1` (`user_index`),
   ADD KEY `fk_student_program` (`section_index`),
-  ADD KEY `fk_student_guardian` (`guardian_index`);
+  ADD KEY `fk_student_guardian` (`guardian_index`),
+  ADD KEY `fk_students_users` (`user_index`);
 
 --
 -- Indexes for table `sub_questions`
@@ -1649,7 +1655,7 @@ ALTER TABLE `sub_questions`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=137;
+  MODIFY `user_index` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=144;
 
 --
 -- Constraints for dumped tables
@@ -1671,7 +1677,7 @@ ALTER TABLE `choices`
 -- Constraints for table `counselors`
 --
 ALTER TABLE `counselors`
-  ADD CONSTRAINT `fk2` FOREIGN KEY (`user_index`) REFERENCES `users` (`user_index`) ON DELETE CASCADE;
+  ADD CONSTRAINT `fk_counselors_users` FOREIGN KEY (`user_index`) REFERENCES `users` (`user_index`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `form_sections`
@@ -1724,9 +1730,9 @@ ALTER TABLE `sections`
 -- Constraints for table `students`
 --
 ALTER TABLE `students`
-  ADD CONSTRAINT `fk1` FOREIGN KEY (`user_index`) REFERENCES `users` (`user_index`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_student_guardian` FOREIGN KEY (`guardian_index`) REFERENCES `guardians` (`guardian_index`) ON DELETE CASCADE,
-  ADD CONSTRAINT `fk_student_section` FOREIGN KEY (`section_index`) REFERENCES `sections` (`section_index`) ON DELETE CASCADE;
+  ADD CONSTRAINT `fk_student_section` FOREIGN KEY (`section_index`) REFERENCES `sections` (`section_index`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_students_users` FOREIGN KEY (`user_index`) REFERENCES `users` (`user_index`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `sub_questions`

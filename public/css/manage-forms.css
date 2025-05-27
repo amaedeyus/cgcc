@@ -185,7 +185,7 @@ header {
 .cards-grid {
     display: flex;
     flex-wrap: wrap; /* Allow wrapping */
-    gap: 20px; /* Spacing between cards */
+    gap: 40px; /* Spacing between cards */
     padding: 10px 0;
 }
 
@@ -213,13 +213,14 @@ header {
 }
 
 .form-card {
+    position: relative; /* Add this */
     background-color: rgb(237, 253, 243);
     border-radius: 15px;
-    padding: 20px;
+    padding: 40px;
     box-shadow: 0 3px 10px rgba(2, 61, 2, 0.2);
     transition: all 0.3s ease;
-    flex: 1 1 calc(33.333% - 14px); /* 3 cards per row by default */
-    min-width: 280px; /* Prevent cards from getting too small */
+    flex: 1 1 calc(33.333% - 14px);
+    min-width: 280px;
     max-width: 380px;
     display: flex;
     flex-direction: column;
@@ -344,6 +345,174 @@ header {
     align-items: center;
     justify-content: center;
 }
+
+/* Three-dot menu styles */
+.form-card-menu {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    cursor: pointer;
+    font-size: 1.8vh;
+    color: rgb(2, 55, 2);
+    padding: 5px;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+.form-card-menu:hover {
+    background-color: rgba(79, 189, 156, 0.2);
+    color: rgb(36, 154, 118);
+}
+
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1001;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: rgb(243, 255, 243);
+    margin: 5% auto;
+    padding: 25px;
+    border-radius: 15px;
+    width: 50%;
+    max-width: 500px;
+    box-shadow: 0 5px 15px rgba(2, 61, 2, 0.3);
+    position: relative;
+}
+
+.close-modal {
+    position: absolute;
+    top: 15px;
+    right: 25px;
+    color: rgb(2, 55, 2);
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-modal:hover {
+    color: rgb(36, 154, 118);
+}
+
+.modal-body {
+    margin-top: 20px;
+}
+
+/* Form Settings Styles */
+.form-setting {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #4CAF50;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.status-text {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.active-status {
+    color: #4CAF50;
+}
+
+.inactive-status {
+    color: #f44336;
+}
+
+.save-btn {
+    padding: 8px 16px;
+    background-color: rgb(79, 189, 156);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.save-btn:hover {
+    background-color: rgb(36, 154, 118);
+}
+
+.delete-btn {
+    padding: 8px 16px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-left: 10px;
+}
+
+.delete-btn:hover {
+    background-color: #d32f2f;
+}
+
+@media (max-width: 768px) {
+    .modal-content {
+        width: 80%;
+        margin: 15% auto;
+    }
+}
+
+
 
 /* Responsive Styles */
 @media (max-width: 1024px) {
