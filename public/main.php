@@ -54,7 +54,7 @@ $firstName = isset($_SESSION['first_name']) ? $_SESSION['first_name'] : 'Guest';
             </div>
 
             <div class="logout-wrapper">
-                <form method="POST" action="../backend/logout.php">
+                <form method="POST" action="../../backend/logout.php">
                     <button type="submit" class="logout-btn">Log Out</button>
                 </form>
             </div>

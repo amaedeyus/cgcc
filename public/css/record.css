@@ -9,7 +9,6 @@
 
 .page right{
     display:flex;
-    align-items: center;
     justify-content: flex-start;
 }
 
@@ -328,6 +327,3 @@ select:disabled{
     cursor: not-allowed;
     box-shadow: none;
 }
-
-
-
