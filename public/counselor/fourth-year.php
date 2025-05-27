@@ -30,6 +30,13 @@
             <a href="third-year.php">➤ Third Year</a>
             <a href="fourth-year.php" class="active">➤ Fourth Year</a>
         </div>
+
+        <div class="logout-wrapper">
+            <form method="POST" action="../backend/logout.php">
+                <button type="submit" class="logout-btn">Log Out</button>
+            </form>
+        </div>
+
 </div>
 
 <div class="page-right">
