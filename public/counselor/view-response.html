@@ -189,7 +189,7 @@
         });
         
         function fetchResponseData(responseId) {
-            fetch(`../backend/forms/view_response.php?response_id=${responseId}`)
+            fetch(`../../backend/forms/view_response.php?response_id=${responseId}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');

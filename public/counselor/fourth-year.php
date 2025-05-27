@@ -1,17 +1,17 @@
-<?php require("../backend/connect2.php"); ?>
+<?php require("../../backend/connect2.php"); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/record.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/record.css?v=<?= time() ?>">
     <title>Student Records</title>
 </head>
 <body>
 <header>
     <div class="logo">
-        <img src="Media/cgcc.png" alt="cgcc-logo" class="logo-img">
+        <img src="../Media/cgcc.png" alt="cgcc-logo" class="logo-img">
         College Guidance and Counseling Center
     </div>
 </header>
@@ -154,7 +154,6 @@
             }
         } else {
             echo "<tr><td colspan='6' style='text-align: center; color: #bdc3c7;'>No records found</td></tr>";
-
         }
         ?>
 
