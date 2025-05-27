@@ -39,13 +39,20 @@ if (!isset($_GET['code'])) {
             $_SESSION['email'] = $row['email'];
             $_SESSION['user_type'] = $row['type'];
 
+            // Name values
+            $firstName = $row['first_name'] ?? 'User';
+            $lastName = $row['last_name'] ?? '';
+
+            $_SESSION['first_name'] = $firstName;
+            $_SESSION['last_name'] = $lastName;
+            $_SESSION['full_name'] = trim($firstName . ' ' . $lastName);
+
             // Redirect based on user type
             if ($row['type'] === 'admin') {
-                header("Location: ../public/admin-manage-forms.html");
+                header("Location: ../public/admin/admin-manage-forms.html");
             } else if ($row['type'] === 'counselor'){
-                header("Location: ../public/student-record.php");
+                header("Location: ../public/counselor/student-record.php");
             } else {
-                echo $row['user_type'];
                 header("Location: ../public/main.html");
             }
         } else {
