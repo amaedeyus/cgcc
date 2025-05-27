@@ -13,14 +13,13 @@ $firstName = isset($_SESSION['first_name']) ? $_SESSION['first_name'] : 'Guest';
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/main-page.css?v=<?= time() ?>">
-    <base href="Media/">
     <title>CGCC</title>
 </head>
 <body>
 
     <header>
         <div class="logo">
-            <img src="cgcc.png" alt="cgcc-logo" class="logo-img">
+            <img src="Media/cgcc.png" alt="cgcc-logo" class="logo-img">
             College Guidance and Counseling Center
         </div>
         <nav class="navigation">
@@ -53,6 +52,13 @@ $firstName = isset($_SESSION['first_name']) ? $_SESSION['first_name'] : 'Guest';
                         <a href="#">Exit Interview</a>
                     </div>
             </div>
+
+            <div class="logout-wrapper">
+                <form method="POST" action="../backend/logout.php">
+                    <button type="submit" class="logout-btn">Log Out</button>
+                </form>
+            </div>
+            
         </div>
 
         <div class="page-right">
