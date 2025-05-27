@@ -65,9 +65,15 @@
         </div>
 
     <div class="search-box">
-        <input type="text" placeholder="Search programs..." id="searchInput">
-        <button class="search-btn">🔍</button>
+        <form method="GET" id="searchForm">
+            <input type="text" name="search" placeholder="Search student..." value="<?= isset($_GET['search']) ? htmlspecialchars($_GET['search']) : '' ?>">
+            <input type="hidden" name="department" value="<?= htmlspecialchars($_GET['department'] ?? '') ?>">
+            <input type="hidden" name="program" value="<?= htmlspecialchars($_GET['program'] ?? '') ?>">
+            <input type="hidden" name="section" value="<?= htmlspecialchars($_GET['section'] ?? '') ?>">
+            <button type="submit" class="search-btn">🔍</button>
+        </form>
     </div>
+
 
     </div>
 
@@ -92,6 +98,17 @@
 
 
         $where = "WHERE s.year_level = 1";
+
+        $search = $conn->real_escape_string($_GET['search'] ?? '');
+
+        if (!empty($search)) {
+            $where .= " AND (
+                s.student_number LIKE '%$search%' OR
+                s.last_name LIKE '%$search%' OR
+                s.first_name LIKE '%$search%' OR
+                sec.section_name LIKE '%$search%'
+            )";
+        }
 
 
         if (!empty($_GET['department'])) {
@@ -191,70 +208,80 @@
 </body>
 
 <script>
-    function loadPrograms(deptCode) {
-        const programSelect = document.getElementById("program");
-        const sectionSelect = document.getElementById("section");
+function loadPrograms(deptCode) {
+    const programSelect = document.getElementById("program");
+    const sectionSelect = document.getElementById("section");
 
-        programSelect.innerHTML = '<option value="">Select a department first</option>';
-        sectionSelect.innerHTML = '<option value="">-- Select Section --</option>';
+    programSelect.innerHTML = '<option value="">Select a department first</option>';
+    sectionSelect.innerHTML = '<option value="">-- Select Section --</option>';
 
-        programSelect.disabled = true;
+    programSelect.disabled = true;
+    sectionSelect.disabled = true;
+
+    if (!deptCode) return;
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", "get_programs.php?dept_code=" + deptCode, true);
+    xhr.onload = function () {
+        if (this.status === 200) {
+            programSelect.innerHTML = this.responseText;
+            programSelect.disabled = false;
+        }
+    };
+    xhr.send();
+}
+
+function getYearLevelFromURL() {
+    const pageUrl = window.location.href;
+
+    if (pageUrl.includes("second-year")) return 2;
+    if (pageUrl.includes("third-year")) return 3;
+    if (pageUrl.includes("fourth-year")) return 4;
+    return 1;
+}
+
+document.getElementById('program').addEventListener('change', function () {
+    const programCode = this.value;
+    const sectionSelect = document.getElementById('section');
+
+    if (!programCode) {
+        sectionSelect.innerHTML = '<option value="">Select Section</option>';
         sectionSelect.disabled = true;
+        return;
+    }
 
-        if (!deptCode) return;
+    const yearLevel = getYearLevelFromURL();
 
-            const xhr = new XMLHttpRequest();
-            xhr.open("GET", "get_programs.php?dept_code=" + deptCode, true);
-            xhr.onload = function () {
-                if (this.status === 200) {
-                programSelect.innerHTML = this.responseText;
-                programSelect.disabled = false;
-                }
-            };
-        xhr.send();
-        }
-
-        document.getElementById('program').addEventListener('change', function () {
-        const programCode = this.value;
-        const sectionSelect = document.getElementById('section');
-
-        if (!programCode) {
+    fetch(`get_sections.php?program_code=${programCode}&year_level=${yearLevel}`)
+        .then(response => response.json())
+        .then(data => {
             sectionSelect.innerHTML = '<option value="">Select Section</option>';
-            sectionSelect.disabled = true;
-            return;
-        }
-
-        fetch('get_sections.php?program_code=' + programCode)
-            .then(response => response.json())
-            .then(data => {
-            sectionSelect.innerHTML = '<option value="">Select Section</option>'; // <-- This line sets default visible option
             data.forEach(section => {
                 sectionSelect.innerHTML += `<option value="${section.section_index}">${section.section_name}</option>`;
             });
             sectionSelect.disabled = false;
-            })
-            .catch(error => {
+        })
+        .catch(error => {
             console.error('Error fetching sections:', error);
             sectionSelect.disabled = true;
-            });
         });
+});
 
-
-    function updateFilters() {
-        const dept = document.getElementById("department").value;
-        const prog = document.getElementById("program").value;
-        const sec = document.getElementById("section").value;
+function updateFilters() {
+    const dept = document.getElementById("department").value;
+    const prog = document.getElementById("program").value;
+    const sec = document.getElementById("section").value;
 
     const url = new URL(window.location.href);
     url.searchParams.set('department', dept);
     url.searchParams.set('program', prog);
     url.searchParams.set('section', sec);
-    url.searchParams.set('page', 1); // Reset pagination
+    url.searchParams.set('page', 1);
 
     window.location.href = url;
-    }
+}
 
-    document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     const deptSelect = document.getElementById("department");
     const progSelect = document.getElementById("program");
     const secSelect = document.getElementById("section");
@@ -268,34 +295,35 @@
 
         const interval = setInterval(() => {
             if (!progSelect.disabled) {
+                clearInterval(interval);
                 if (selectedProg) {
                     progSelect.value = selectedProg;
 
-            fetch('get_sections.php?program_code=' + selectedProg)
-            .then(response => response.json())
-            .then(data => {
-                secSelect.innerHTML = '<option value="">-- Select Section --</option>';
-                data.forEach(section => {
-                secSelect.innerHTML += `<option value="${section.section_index}">${section.section_name}</option>`;
-            });
-            secSelect.disabled = false;
+                    const yearLevel = getYearLevelFromURL();
 
-            if (selectedSec) {
-                secSelect.value = selectedSec;
+                    fetch(`get_sections.php?program_code=${selectedProg}&year_level=${yearLevel}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            secSelect.innerHTML = '<option value="">-- Select Section --</option>';
+                            data.forEach(section => {
+                                secSelect.innerHTML += `<option value="${section.section_index}">${section.section_name}</option>`;
+                            });
+                            secSelect.disabled = false;
+
+                            if (selectedSec) {
+                                secSelect.value = selectedSec;
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error fetching sections:', error);
+                            secSelect.disabled = true;
+                        });
+                }
             }
-            })
-            .catch(error => {
-                console.error('Error fetching sections:', error);
-                secSelect.disabled = true;
-            });
-        }
-        clearInterval(interval);
-        }
-    }, 100);
+        }, 100);
     }
 });
-
-
 </script>
+
 
 </html>
