@@ -2,14 +2,14 @@
 session_start();
 use Google\Service\Oauth2;
 require_once __DIR__ . '/../vendor/autoload.php';
-    require_once __DIR__ . '/connect.php'; // include your DB connection
+    require_once __DIR__ . '/connect3.php'; // include your DB connection
     
 // Initialize Google Client
 $client = new Google_Client();
 $client->setAuthConfig(__DIR__ . '/config/secret.json');
 $client->addScope("email");
 $client->addScope("profile");
-$client->setRedirectUri('http://localhost/cgcc-system/backend/auth_callback.php');
+$client->setRedirectUri('http://localhost/cgcc/backend/auth_callback.php');
 
 if (!isset($_GET['code'])) {
     $authUrl = $client->createAuthUrl();
@@ -53,7 +53,7 @@ if (!isset($_GET['code'])) {
             } else if ($row['type'] === 'counselor'){
                 header("Location: ../public/counselor/student-record.php");
             } else {
-                header("Location: ../public/main.html");
+                header("Location: ../public/main.php");
             }
         } else {
             // Optional: redirect or show error if user not found in DB

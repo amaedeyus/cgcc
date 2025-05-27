@@ -1714,7 +1714,7 @@
 
             // Function to load a form for editing
             function loadForm(formId) {
-                const API_BASE_URL = 'http://localhost/cgcc-system/backend/forms';
+                const API_BASE_URL = 'http://localhost/cgcc/backend/forms';
 
                 $.ajax({
                     url: `${API_BASE_URL}/get_form_admin.php?id=${formId}`,
@@ -1987,8 +1987,8 @@
 
                 const method = formId ? 'PUT' : 'POST';
                 const endpoint = formId
-                    ? `http://localhost/cgcc-system/backend/forms/update.php?id=${formId}`
-                    : `http://localhost/cgcc-system/backend/forms/create.php`;
+                    ? `http://localhost/cgcc/backend/forms/update.php?id=${formId}`
+                    : `http://localhost/cgcc/backend/forms/create.php`;
 
                 const formData = {
                     form_index: formId ? parseInt(formId) : null,
