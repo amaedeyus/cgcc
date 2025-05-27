@@ -15,7 +15,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $query = "
         SELECT users.*, students.first_name, students.last_name 
         FROM users 
-        JOIN students ON users.user_index = students.user_index 
+        LEFT JOIN students ON users.user_index = students.user_index 
         WHERE users.email = ?
     ";
 
