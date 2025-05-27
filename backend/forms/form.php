@@ -7,8 +7,6 @@ if (!isset($_SESSION['user_index'])) {
     exit;
 }
 
-// Optional: Log user type
-error_log("User type: " . $userType);
 
 header("Access-Control-Allow-Origin: http://localhost:3000");
 header("Access-Control-Allow-Origin: http://localhost:3001");
