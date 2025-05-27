@@ -6,22 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="cgcc2.png">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/manage-forms.css">
-    <base href="Media/">
-
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/manage-forms.css">
     <title>CGCC</title>
 </head>
 
 <body>
-
     <header>
         <div class="logo">
             <img src="cgcc.png" alt="cgcc-logo" class="logo-img">
             College Guidance and Counseling Center
         </div>
         <nav class="navigation">
-            <a href="../admin-manage-forms.html">Home</a>
+            <a href="admin-manage-forms.html">Home</a>
             <a href="#">Contact</a>
             <a href="#">About Mental Health</a>
             <a href="#">FAQ</a>
@@ -39,9 +36,9 @@
                     </div>
                 </div>
                 <div class="sidebar-nav">
-                    <a href="../admin-manage-forms.html" class="nav-link active">Manage Forms</a>
-                    <a href="../admin-manage-counselor.html" class="nav-link">Manage Counselors</a>
-                    <a href="../admin-manage-program.html" class="nav-link">Manage Programs</a>
+                    <a href="admin-manage-forms.html" class="nav-link active">Manage Forms</a>
+                    <a href="admin-manage-counselor.html" class="nav-link">Manage Counselors</a>
+                    <a href="admin-manage-program.html" class="nav-link">Manage Programs</a>
                 </div>
             </div>  
 
@@ -63,7 +60,7 @@
                 </div>
             </div>
             <!-- Floating Create Form Button -->
-            <button class="floating-btn" onclick="location.href='../formbuilder.html';" title="Create New Form">
+            <button class="floating-btn" onclick="location.href='formbuilder.html';" title="Create New Form">
                 + Create Form
             </button>
 
@@ -84,14 +81,15 @@
         }
 
         function goToPage() {
+            // talens
             // Example condition — adjust based on actual use case
             window.location.href = "../schedule-forms-uncompleted.html";
         }
 
-        // 🆕 Fetch and display forms
+        // Fetch and display forms
         async function loadForms() {
             try {
-                const response = await fetch('http://localhost/cgcc-system/backend/forms/form.php');
+                const response = await fetch('http://localhost/cgcc/backend/forms/form.php');
                 if (!response.ok) throw new Error("Failed to fetch form data");
 
                 const data = await response.json();
@@ -120,7 +118,7 @@
                     card.innerHTML = `
                     <h3>${form.form_name}</h3>
                     <p class="form-description">${truncatedDescription.replace(/\n/g, ' ')}</p>
-                    <a href="http://localhost/cgcc-system/public/formbuilder.html?id=${form.form_index}" target="_blank">Open Form</a>
+                    <a href="http://localhost/cgcc/public/admin/formbuilder.html?id=${form.form_index}" target="_blank">Open Form</a>
                 `;
 
                     container.appendChild(card);

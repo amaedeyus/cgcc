@@ -44,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             // Redirect based on user type
             if ($row['type'] === 'admin') {
-                header("Location: ../public/admin-manage-forms.html");
+                header("Location: ../public/admin/admin-manage-forms.html");
             } else {
                 header("Location: ../public/main.php");
             }
