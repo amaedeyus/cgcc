@@ -232,3 +232,48 @@ Array
     [last_name] => 
     [full_name] => User
 )
+Array
+(
+    [user_index] => 1
+    [email] => amybalion533@gmail.com
+    [user_type] => admin
+    [first_name] => User
+    [last_name] => 
+    [full_name] => User
+)
+Array
+(
+    [user_index] => 1
+    [email] => amybalion533@gmail.com
+    [user_type] => admin
+    [first_name] => User
+    [last_name] => 
+    [full_name] => User
+)
+Array
+(
+    [user_index] => 6
+    [email] => balionamaya01@gmail.com
+    [user_type] => student
+    [first_name] => User
+    [last_name] => 
+    [full_name] => User
+)
+Array
+(
+    [user_index] => 1
+    [email] => amybalion533@gmail.com
+    [user_type] => admin
+    [first_name] => User
+    [last_name] => 
+    [full_name] => User
+)
+Array
+(
+    [user_index] => 1
+    [email] => amybalion533@gmail.com
+    [user_type] => admin
+    [first_name] => User
+    [last_name] => 
+    [full_name] => User
+)

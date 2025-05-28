@@ -100,11 +100,11 @@ try {
     while ($section = $sectionsResult->fetch_assoc()) {
         // Fetch questions for this section
         $query = "SELECT mq.main_question_index, mq.main_question_text, mq.is_required,
-                         qt.type_name, IFNULL(mq.include_other, 0) AS include_other
-                  FROM main_questions mq
-                  JOIN question_types qt ON mq.type_index = qt.type_index 
-                  WHERE mq.form_section_index = ?
-                  ORDER BY mq.main_question_index";
+                        qt.type_name
+                FROM main_questions mq
+                JOIN question_types qt ON mq.type_index = qt.type_index 
+                WHERE mq.form_section_index = ?
+                ORDER BY mq.main_question_index";
         $stmt2 = $conn->prepare($query);
         if (!$stmt2) {
             throw new Exception("Prepare failed: " . $conn->error);
@@ -150,7 +150,6 @@ try {
                 'question' => $q['main_question_text'],
                 'type' => $q['type_name'],
                 'required' => (bool)$q['is_required'],
-                'includeOther' => (bool)$q['include_other'],
                 'options' => $options,
                 'rows' => $rows
             ];

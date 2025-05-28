@@ -1005,7 +1005,6 @@
                             text: $(this).find('.question-text').val(),
                             type: $(this).find('.question-type').val(),
                             required: $(this).find('.required-switch').is(':checked'),
-                            includeOther: $(this).find('.include-other').is(':checked'),
                             options: [],
                             rows: []
                         };
@@ -1206,12 +1205,6 @@
                                     <i class="fas fa-plus me-1"></i>
                                     Add Option
                                 </button>
-                                <div class="form-check mt-3">
-                                    <input class="form-check-input include-other" type="checkbox" id="include-other-${questionId}" ${questionData.includeOther ? 'checked' : ''}>
-                                    <label class="form-check-label" for="include-other-${questionId}">
-                                        Include "Other" option with text input
-                                    </label>
-                                </div>
                             `);
                         }
 
@@ -1292,11 +1285,6 @@
                     updateQuestionType(questionCard);
                     saveState();
                 });
-
-                questionCard.find('.required-switch, .include-other').on('change', function () {
-                    saveState();
-                });
-
                 questionCard.find('.toggle-preview').on('click', function (e) {
                     e.stopPropagation();
                     togglePreviewMode(questionCard);
@@ -1519,9 +1507,6 @@
                         saveState();
                     });
 
-                    questionCard.find('.required-switch, .include-other').on('change', function () {
-                        saveState();
-                    });
 
                     questionCard.find('.toggle-preview').on('click', function (e) {
                         e.stopPropagation();
@@ -1664,12 +1649,6 @@
                                 <i class="fas fa-plus me-1"></i>
                                 Add Option
                             </button>
-                            <div class="form-check mt-3">
-                                <input class="form-check-input include-other" type="checkbox" id="include-other-${questionCard.data('question-id')}">
-                                <label class="form-check-label" for="include-other-${questionCard.data('question-id')}">
-                                    Include "Other" option with text input
-                                </label>
-                            </div>
                         `);
                         break;
                     case 'grid':
@@ -1945,12 +1924,6 @@
                             <i class="fas fa-plus me-1"></i>
                             Add Option
                         </button>
-                        <div class="form-check mt-3">
-                            <input class="form-check-input include-other" type="checkbox" id="include-other-${questionId}" ${questionData.includeOther ? 'checked' : ''}>
-                            <label class="form-check-label" for="include-other-${questionId}">
-                                Include "Other" option with text input
-                            </label>
-                        </div>
                     `);
                 }
 
@@ -2024,7 +1997,6 @@
                             question: $question.find('.question-text').val().trim(),
                             type: type,
                             required: $question.find('.required-switch').is(':checked'),
-                            includeOther: $question.find('.include-other').is(':checked'),
                             options: [],
                             rows: []
                         };
@@ -2422,11 +2394,6 @@
                     return;
                 }
                 $(this).closest('.grid-row').remove();
-                saveState();
-            });
-
-            // Include other checkbox change
-            $(document).on('change', '.include-other', function () {
                 saveState();
             });
 

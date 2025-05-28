@@ -134,67 +134,40 @@ try {
         $stmt->close();
     }
 
-    // 3. Process regular answers (non-grid questions)
-    // 3. Process regular answers (non-grid questions)
+    // 3. Process regular answers (choice-based only)
     if (isset($data['answers']) && is_array($data['answers'])) {
         $answerStmt = $conn->prepare("
             INSERT INTO answers 
-            (response_index, main_question_index, choice_index, text_answer) 
-            VALUES (?, ?, ?, ?)
+            (response_index, main_question_index, choice_index) 
+            VALUES (?, ?, ?)
         ");
 
         foreach ($data['answers'] as $answer) {
             error_log("Answer received: " . json_encode($answer));
-            $questionId = (int)$answer['main_question_index'];
             
-            // Initialize both fields as null
-            $choiceId = null;
-            $textAnswer = null;
-            
-            // Check if this is a choice-based answer or text answer
-            if (isset($answer['choice_index']) && $answer['choice_index'] !== null) {
-                // This is a regular choice selection
-                $choiceId = (int)$answer['choice_index'];
-
-                $checkChoice = $conn->prepare("
-                    SELECT 1 FROM choices 
-                    WHERE choice_index = ? AND main_question_index = ?
-                ");
-                $checkChoice->bind_param("ii", $choiceId, $questionId);
-                $checkChoice->execute();
-                $checkChoice->store_result();
-
-                if ($checkChoice->num_rows === 0) {
-                    throw new Exception("Invalid choice_index $choiceId for question $questionId");
-                }
-                $checkChoice->close();
-
-            } else if (isset($answer['text_answer']) && $answer['text_answer'] !== '') {
-                $textAnswer = $answer['text_answer'];
-
-                if (isset($answer['is_other']) && $answer['is_other']) {
-                    $checkOther = $conn->prepare("
-                        SELECT include_other FROM main_questions 
-                        WHERE main_question_index = ?
-                    ");
-                    $checkOther->bind_param("i", $questionId);
-                    $checkOther->execute();
-                    $checkOther->bind_result($includeOther);
-                    $checkOther->fetch();
-                    $checkOther->close();
-
-                    if (!$includeOther) {
-                        throw new Exception("Question $questionId doesn't allow 'other' option");
-                    }
-                }
-
-            } else {
-                continue; // No valid input
+            if (!isset($answer['main_question_index']) || !isset($answer['choice_index'])) {
+                continue; // Skip invalid answers
             }
 
+            $questionId = (int)$answer['main_question_index'];
+            $choiceId = (int)$answer['choice_index'];
+
+            // Verify the choice exists for this question
+            $checkChoice = $conn->prepare("
+                SELECT 1 FROM choices 
+                WHERE choice_index = ? AND main_question_index = ?
+            ");
+            $checkChoice->bind_param("ii", $choiceId, $questionId);
+            $checkChoice->execute();
+            $checkChoice->store_result();
+
+            if ($checkChoice->num_rows === 0) {
+                throw new Exception("Invalid choice_index $choiceId for question $questionId");
+            }
+            $checkChoice->close();
             
             // Insert the answer
-            $answerStmt->bind_param("iiis", $responseId, $questionId, $choiceId, $textAnswer);
+            $answerStmt->bind_param("iii", $responseId, $questionId, $choiceId);
             if (!$answerStmt->execute()) {
                 throw new Exception("Failed to insert answer: " . $answerStmt->error);
             }

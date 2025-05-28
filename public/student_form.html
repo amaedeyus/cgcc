@@ -1,1169 +1,766 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Submission</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Student Form Response</title>
     <link rel="stylesheet" href="css/student-form.css">
-    <style>
-        .question-card {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
 
-        .required-label:after {
-            content: " *";
-            color: red;
-        }
-
-        .progress-container {
-            margin: 30px 0;
-        }
-
-        .section-navigation {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 30px;
-        }
-
-        .grid-table th {
-            text-align: center;
-            background-color: #f8f9fa;
-        }
-
-        .grid-table td {
-            vertical-align: middle;
-        }
-
-        #form-container {
-            background-color: white;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-        }
-    </style>
 </head>
-
 <body>
-    <div class="container py-5">
-        <div id="form-container">
-            <div class="text-center mb-4">
-                <h1 id="form-title">Loading form...</h1>
-                <p id="form-description" class="lead"></p>
-            </div>
-
-            <div id="sections-container"></div>
-
-            <div class="progress-container">
-                <div class="progress">
-                    <div id="progress-bar" class="progress-bar" role="progressbar" style="width: 0%"></div>
-                </div>
-                <span id="progress-text">0/0 pages</span>
-            </div>
-
-            <div class="section-navigation">
-                <button id="prev-section-btn" class="btn btn-outline-primary" disabled>Previous</button>
-                <div>
-                    <button id="clear-section-btn" class="btn btn-outline-danger me-2">Clear Section</button>
-                    <button id="next-section-btn" class="btn btn-primary">Next Section</button>
-                </div>
-            </div>
+    <div class="form-container">
+        <div class="form-header">
+            <h1 class="form-title" id="formTitle">Loading Form...</h1>
+            <p class="form-description" id="formDescription"></p>
         </div>
+        
+        <div id="formSections"></div>
+        
+        <div class="action-buttons">
+            <button id="saveDraftBtn" class="save-btn">Save Draft</button>
+            <button id="submitFormBtn" class="submit-btn">Submit Form</button>
+        </div>
+        <div id="autosaveStatus" class="autosave-status"></div>
     </div>
 
     <script>
-        let currentSectionIndex = 0;
+        // Global variables
         let formData = null;
-        let sections = [];
-        let formResponses = {};
-        let autoSaveInterval;
-
-
-        let isDirty = false;
-        let autoSaveTimer;
-
-        // Initialize the autosave functionality
-        function initAutoSave() {
-            // Mark as dirty and schedule autosave when inputs change
-            document.addEventListener('input', function (e) {
-                const questionInput = e.target.closest('.form-section .form-control, .form-section select, .form-section input[type="radio"], .form-section input[type="checkbox"]');
-                if (questionInput) {
-                    markAsDirty();
-                    scheduleAutoSave();
-                }
-            });
-
-            // Also handle change events for radios/checkboxes
-            document.addEventListener('change', function (e) {
-                const questionInput = e.target.closest('.form-section input[type="checkbox"], .form-section input[type="radio"]');
-                if (questionInput) {
-                    markAsDirty();
-                    scheduleAutoSave();
-                }
-            });
-        }
-
-        function markAsDirty() {
-            isDirty = true;
-            console.log("Changes detected, will autosave...");
-        }
-
-        function scheduleAutoSave() {
-            // Clear any pending autosave
-            clearTimeout(autoSaveTimer);
-            
-            // Schedule new autosave
-            autoSaveTimer = setTimeout(() => {
-                if (isDirty) {
-                    saveCurrentSectionResponses(); // Save to local storage first
-                    autoSaveForm();              // Then send to server
-                    isDirty = false;
-                }
-            }, 1000); // 1 second debounce
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            initAutoSave();
+        let formId = null;
+        let savedResponse = null;
+        let autosaveInterval = null;
+        let autosaveTimeout = null;
+        let hasChanges = false;
+        
+        // DOM elements
+        const formTitleEl = document.getElementById('formTitle');
+        const formDescriptionEl = document.getElementById('formDescription');
+        const formSectionsEl = document.getElementById('formSections');
+        const saveDraftBtn = document.getElementById('saveDraftBtn');
+        const submitFormBtn = document.getElementById('submitFormBtn');
+        const autosaveStatusEl = document.getElementById('autosaveStatus');
+        
+        // Initialize the form
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Get form ID from URL
             const urlParams = new URLSearchParams(window.location.search);
-            const formId = urlParams.get('id');
+            formId = urlParams.get('id');
+            
             if (!formId) {
                 alert('No form ID specified in URL');
                 return;
             }
-
-            const savedData = localStorage.getItem('studentFormProgress');
-            if (savedData) {
-                try {
-                    const parsedData = JSON.parse(savedData);
-                    if (parsedData.formId !== formId) {
-                        localStorage.removeItem('studentFormProgress');
+            
+            try {
+                // Load form structure
+                await loadFormData();
+                
+                // Load any saved response
+                await loadSavedResponse();
+                
+                // Render the form
+                renderForm();
+                
+                // Set up change detection
+                setupChangeDetection();
+                
+                // Start autosave timer (every 30 seconds as fallback)
+                autosaveInterval = setInterval(() => {
+                    if (hasChanges) {
+                        saveDraft();
                     }
-                } catch (e) {
-                    localStorage.removeItem('studentFormProgress');
-                }
+                }, 30000);
+                
+            } catch (error) {
+                console.error('Error initializing form:', error);
+                alert('Failed to load form. Please try again.');
             }
-            fetchFormData(formId);
-
-            // Event listeners
-            document.getElementById('prev-section-btn').addEventListener('click', showPreviousSection);
-            document.getElementById('clear-section-btn').addEventListener('click', clearCurrentSection);
-            document.getElementById('next-section-btn').addEventListener('click', handleNextAction);
-
-            // Optionally add a "change" event for checkboxes/radios that may not trigger "input"
-            document.addEventListener('change', function (e) {
-                const questionInput = e.target.closest('.form-section input[type="checkbox"], .form-section input[type="radio"]');
-                if (questionInput) {
-                    saveCurrentSectionResponses();
-                    markAsDirty();
+        });
+        
+        // Set up event listeners to detect form changes
+        function setupChangeDetection() {
+            // Listen for all input changes
+            formSectionsEl.addEventListener('change', function(e) {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                    triggerAutosave();
                 }
             });
-        });
-
-
-        async function fetchSavedServerResponse(formId) {
+            
+            // Listen for text input (for textareas and text inputs)
+            formSectionsEl.addEventListener('input', function(e) {
+                if (e.target.tagName === 'TEXTAREA' || 
+                    (e.target.tagName === 'INPUT' && e.target.type === 'text')) {
+                    triggerAutosave();
+                }
+            });
+        }
+        
+        // Trigger autosave with debounce
+        function triggerAutosave() {
+            hasChanges = true;
+            
+            // Clear any pending timeout
+            if (autosaveTimeout) {
+                clearTimeout(autosaveTimeout);
+            }
+            
+            // Set new timeout (debounce 1.5 seconds)
+            autosaveTimeout = setTimeout(() => {
+                if (hasChanges) {
+                    saveDraft();
+                }
+            }, 1500);
+        }
+        
+        // Load form structure from server
+        async function loadFormData() {
+            const response = await fetch(`../backend/forms/get_form_student.php?id=${formId}`);
+            if (!response.ok) {
+                throw new Error('Failed to load form data');
+            }
+            formData = await response.json();
+            
+            // Update header
+            formTitleEl.textContent = formData.form_name;
+            formDescriptionEl.textContent = formData.description || '';
+        }
+        
+        // Load saved response if exists
+        async function loadSavedResponse() {
             try {
-                const response = await fetch(`../backend/forms/get_saved_response.php?formId=${formId}`, {
-                    method: 'GET',
-                    credentials: 'include'
-                });
-
+                const response = await fetch(`../backend/forms/get_saved_response.php?formId=${formId}`);
                 if (!response.ok) {
-                    console.warn("No saved response found on server");
-                    return null;
+                    throw new Error('Failed to check for saved response');
                 }
-
-                const data = await response.json();
-                console.log("Fetched saved response from server:", data);
-
-                if (data && data.formId === formId) {
-                    return data;
-                }
-
-                return null;
+                savedResponse = await response.json();
             } catch (error) {
-                console.error("Error fetching saved response from server:", error);
-                return null;
+                console.error('Error loading saved response:', error);
             }
         }
-
-        function loadSavedResponse(questionId, inputElement) {
-            if (!questionId || !inputElement || !formResponses[questionId]) return;
-
-            const response = formResponses[questionId];
-            console.log(`Loading response for ${questionId}:`, response);
-
-            if (response.type === 'checkbox') {
-                if (!response.value || !Array.isArray(response.value) || response.value.length === 0) {
-                    return; // Skip if empty or not an array
-                }
-                const checkboxes = inputElement.querySelectorAll(`input[type="checkbox"]`);
-                checkboxes.forEach(checkbox => {
-                    if (response.value && Array.isArray(response.value) && response.value.includes(checkbox.value)) {
-                        checkbox.checked = true;
-                    }
-                });
-
-                if (response.value && Array.isArray(response.value)) {
-                    if (response.value.includes('other') && inputElement.querySelector('input[data-other-for]')) {
-                        const otherInput = inputElement.querySelector('input[data-other-for]');
-                        otherInput.value = response.otherText || '';
-                        otherInput.disabled = false;
-                        const otherCheckbox = inputElement.querySelector(`input[type="checkbox"][value="other"]`);
-                        if (otherCheckbox) otherCheckbox.checked = true;
-                    }
-                }
-            }
-            else if (response.type === 'multiple') {
-                const radios = inputElement.querySelectorAll(`input[type="radio"]`);
-                radios.forEach(radio => {
-                    if (radio.value === response.value) {
-                        radio.checked = true;
-                    }
-                });
-
-                if (response.value === 'other' && inputElement.querySelector('input[data-other-for]')) {
-                    const otherInput = inputElement.querySelector('input[data-other-for]');
-                    otherInput.value = response.otherText || '';
-                    otherInput.disabled = false;
-                }
-            }
-            else if (response.type === 'dropdown' && inputElement.tagName === 'SELECT') {
-                inputElement.value = response.value || '';
-            }
-            else if (response.type === 'grid') {
-                if (response.value && Array.isArray(response.value)) {
-                    response.value.forEach(gridResponse => {
-                        const radio = inputElement.querySelector(
-                            `input[type="radio"][name="question_${questionId}_row_${gridResponse.rowIndex}"][value="${gridResponse.optionIndex}"]`
-                        );
-                        if (radio) radio.checked = true;
-                    });
-                }
-            }
-            else if (inputElement.value !== undefined) {  // For text inputs, textareas, etc.
-                inputElement.value = response.value || '';
-            }
-        }
-
-        async function fetchFormData(formId) {
-            try {
-                const response = await fetch(`../backend/forms/get_form_student.php?id=${formId}`);
-                if (!response.ok) throw new Error('Failed to fetch form data');
-
-                formData = await response.json();
-                sections = formData.sections || [];
-
-                // ✅ Initialize formResponses with current form ID
-                formResponses = {};;
-
-                // ✅ Load saved responses from localStorage
-                let serverData = null;
-                try {
-                    serverData = await fetchSavedServerResponse(formId);
-                } catch (e) {
-                    console.error("Failed to fetch server-side response:", e);
-                }
-
-                if (serverData) {
-                    // Use server data as primary source
-                    for (const key in serverData) {
-                        if (key !== 'formId' && serverData[key]?.value) {
-                            formResponses[key] = serverData[key];
-                        }
-                    }
-
-                    // Update localStorage to match server state
-                    localStorage.setItem('studentFormProgress', JSON.stringify(formResponses));
-                } else {
-                    // Fall back to localStorage
-                    const savedData = localStorage.getItem('studentFormProgress');
-                    if (savedData) {
-                        try {
-                            const parsedData = JSON.parse(savedData);
-                            if (parsedData.formId === formId) {
-                                for (const key in parsedData) {
-                                    if (key !== 'formId' && parsedData[key]?.value) {
-                                        formResponses[key] = parsedData[key];
-                                    }
-                                }
-                            }
-                        } catch (e) {
-                            console.warn("Invalid saved progress", e);
-                        }
-                    }
-                }
-                formResponses.formId = formId;
-
-                // ✅ Finish initialization
-                initializeForm();
-                checkLocalStorage()
-                renderSectionsStartingAt(currentSectionIndex);
-
-            } catch (error) {
-                console.error('Error fetching form data:', error);
-                alert('Failed to load form. Please try again later.');
-            }
-        }
-
-
-        function initializeForm() {
-            if (!formData) return;
-
-            document.getElementById('form-title').textContent = formData.form_name || 'Untitled Form';
-            document.getElementById('form-description').textContent = formData.description || '';
-
-            updateProgress();
-            renderSectionsStartingAt(currentSectionIndex);
-            // Save initial state
-            saveCurrentSectionResponses();
-        }
-
-        function renderSectionsStartingAt(startIndex) {
-            const sectionsContainer = document.getElementById('sections-container');
-            sectionsContainer.innerHTML = '';
-
-            if (!sections || sections.length === 0) {
-                sectionsContainer.innerHTML = '<p>No sections available in this form.</p>';
+        
+        // Render the form sections and questions
+        function renderForm() {
+            formSectionsEl.innerHTML = '';
+            
+            if (!formData || !formData.sections) {
+                formSectionsEl.innerHTML = '<p>No form sections found.</p>';
                 return;
             }
-
-            let index = startIndex;
-            while (index < sections.length && (index === startIndex || sections[index].behavior === 'same-page')) {
-                const section = sections[index];
-                const sectionElement = document.createElement('div');
-                sectionElement.className = 'form-section';
-                sectionElement.dataset.sectionIndex = index;
-
-                if (section.title) {
-                    const sectionTitle = document.createElement('h2');
-                    sectionTitle.textContent = section.title;
-                    sectionElement.appendChild(sectionTitle);
-                }
-                if (section.description) {
-                    const sectionDesc = document.createElement('p');
-                    sectionDesc.className = 'text-muted';
-                    sectionDesc.textContent = section.description;
-                    sectionElement.appendChild(sectionDesc);
-                }
-
+            
+            // Sort sections by order
+            const sortedSections = [...formData.sections].sort((a, b) => a.order - b.order);
+            
+            sortedSections.forEach(section => {
+                const sectionEl = document.createElement('div');
+                sectionEl.className = 'section';
+                sectionEl.dataset.sectionId = section.id;
+                
+                // Section header
+                const sectionHeader = document.createElement('div');
+                sectionHeader.className = 'section-header';
+                
+                const sectionTitle = document.createElement('h2');
+                sectionTitle.className = 'section-title';
+                sectionTitle.textContent = section.title;
+                
+                const sectionDesc = document.createElement('p');
+                sectionDesc.className = 'section-description';
+                sectionDesc.textContent = section.description || '';
+                
+                sectionHeader.appendChild(sectionTitle);
+                sectionHeader.appendChild(sectionDesc);
+                sectionEl.appendChild(sectionHeader);
+                
+                // Questions
                 if (section.questions && section.questions.length > 0) {
                     section.questions.forEach(question => {
-                        console.log("Rendering question:", question);
-                        const questionCard = document.createElement('div');
-                        questionCard.className = 'question-card';
-
-                        const questionLabel = document.createElement('label');
-                        questionLabel.className = 'form-label mb-3';
-                        if (question.required) questionLabel.classList.add('required-label');
-                        questionLabel.textContent = question.question;
-                        questionCard.appendChild(questionLabel);
-
-                        const inputElement = createInputElement(question);
-                        questionCard.appendChild(inputElement);
-                        
-                        loadSavedResponse(question.id, inputElement);
-
-                        sectionElement.appendChild(questionCard);
+                        sectionEl.appendChild(createQuestionElement(question));
                     });
                 } else {
-                    sectionElement.innerHTML += '<p>No questions in this section.</p>';
+                    const noQuestions = document.createElement('p');
+                    sectionEl.appendChild(noQuestions);
                 }
+                
+                formSectionsEl.appendChild(sectionEl);
+            });
+            
+            // Apply saved responses if they exist
+            if (savedResponse) {
+                applySavedResponses();
+            }
+        }
+        
+        // Create a question element based on its type
+        function createQuestionElement(question) {
+            const questionEl = document.createElement('div');
+            questionEl.className = 'question';
+            questionEl.dataset.questionId = question.id;
+            questionEl.dataset.questionType = question.type;
 
-                sectionsContainer.appendChild(sectionElement);
-                index++;
+            // Question text
+            const questionText = document.createElement('div');
+            questionText.className = 'question-text';
+            questionText.textContent = question.question;
+
+            if (question.required) {
+                const requiredStar = document.createElement('span');
+                requiredStar.className = 'required-star';
+                requiredStar.textContent = ' *';
+                questionText.appendChild(requiredStar);
             }
 
-            currentSectionIndex = index - 1; // Set to last rendered section index
-            updateNavigationButtons();
-            updateProgress();
-        }
+            questionEl.appendChild(questionText);
 
-        // Input Creation Functions
-        function createInputElement(question) {
-            if (!question) return document.createTextNode('Invalid question');
+            // Error message placeholder
+            const errorEl = document.createElement('div');
+            errorEl.className = 'error-message hidden';
+            questionEl.appendChild(errorEl);
 
+            // Create input based on question type
             switch (question.type) {
-                case 'short':
-                    return createShortAnswerInput(question);
-                case 'paragraph':
-                    return createParagraphInput(question);
-                case 'multiple':
-                    return createMultipleChoiceInput(question);
+                case 'multiple': // radio buttons
+                    createRadioInput(questionEl, question);
+                    break;
                 case 'checkbox':
-                    return createCheckboxInput(question);
-                case 'dropdown':
-                    return createDropdownInput(question);
+                    createCheckboxInput(questionEl, question);
+                    break;
+                case 'short': // text input
+                    createTextInput(questionEl, question);
+                    break;
+                case 'paragraph': // textarea
+                    createTextareaInput(questionEl, question);
+                    break;
                 case 'grid':
-                    return createGridInput(question);
+                    createGridInput(questionEl, question);
+                    break;
+                case 'dropdown':
+                    createDropdownInput(questionEl, question);
+                    break;
                 case 'date':
-                    return createDateInput(question);
+                    createDateInput(questionEl, question);
+                    break;
+                case 'display':
+                    // No input needed for display questions
+                    const displayNote = document.createElement('p');
+                    displayNote.className = 'display-note';
+                    questionEl.appendChild(displayNote);
+                    break;
                 default:
-                    return document.createTextNode('Unsupported question type');
+                    questionEl.innerHTML += `<p>Unsupported question type: ${question.type}</p>`;
             }
+
+            return questionEl;
         }
 
-        function createShortAnswerInput(question) {
+        // Create radio input (for multiple choice questions)
+        function createRadioInput(container, question) {
+            const optionsContainer = document.createElement('div');
+            optionsContainer.className = 'options-container';
+
+            question.options.forEach((option, index) => {
+                const optionId = `${question.id}_${option.choice_index}`;
+
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+
+                const input = document.createElement('input');
+                input.type = 'radio';
+                input.name = question.id;
+                input.value = option.choice_index;
+                input.id = optionId;
+
+                const label = document.createElement('label');
+                label.htmlFor = optionId;
+                label.textContent = option.choice_text;
+
+                optionDiv.appendChild(input);
+                optionDiv.appendChild(label);
+                optionsContainer.appendChild(optionDiv);
+            });
+
+            container.appendChild(optionsContainer);
+        }
+
+        // Create checkbox input
+        function createCheckboxInput(container, question) {
+            const optionsContainer = document.createElement('div');
+            optionsContainer.className = 'options-container';
+
+            question.options.forEach((option, index) => {
+                const optionId = `${question.id}_${option.choice_index}`;
+
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+
+                const input = document.createElement('input');
+                input.type = 'checkbox';
+                input.name = question.id;
+                input.value = option.choice_index;
+                input.id = optionId;
+
+                const label = document.createElement('label');
+                label.htmlFor = optionId;
+                label.textContent = option.choice_text;
+
+                optionDiv.appendChild(input);
+                optionDiv.appendChild(label);
+                optionsContainer.appendChild(optionDiv);
+            });
+
+            container.appendChild(optionsContainer);
+        }
+
+        // Create text input (for short answer questions)
+        function createTextInput(container, question) {
             const input = document.createElement('input');
             input.type = 'text';
-            input.className = 'form-control';
-            input.dataset.questionId = question.id;
-            input.dataset.questionType = question.type;
-            input.required = question.required || false;
-            return input;
+            input.name = question.id;
+            input.id = question.id;
+            input.className = 'text-input';
+            container.appendChild(input);
         }
 
-        function createParagraphInput(question) {
+        // Create textarea input (for paragraph answers)
+        function createTextareaInput(container, question) {
             const textarea = document.createElement('textarea');
-            textarea.className = 'form-control';
-            textarea.rows = 4;
-            textarea.dataset.questionId = question.id;
-            textarea.dataset.questionType = question.type;
-            textarea.required = question.required || false;
-            return textarea;
+            textarea.name = question.id;
+            textarea.id = question.id;
+            container.appendChild(textarea);
         }
 
-        function createMultipleChoiceInput(question) {
-            const container = document.createElement('div');
-
-            if (question.options && question.options.length > 0) {
-                question.options.forEach((option, index) => {
-                    const div = document.createElement('div');
-                    div.className = 'form-check';
-
-                    const inputId = `question_${question.id}_option_${index}`;
-                    const input = document.createElement('input');
-                    input.className = 'form-check-input';
-                    input.type = 'radio';
-                    input.name = `question_${question.id}`;
-                    input.id = inputId;
-                    input.value = option.choice_index;
-                    input.dataset.questionId = question.id;
-                    input.dataset.questionType = question.type;
-                    input.required = question.required || false;
-
-                    const label = document.createElement('label');
-                    label.className = 'form-check-label';
-                    label.htmlFor = inputId;
-                    label.textContent = option.choice_text;
-                    label.style.cursor = 'pointer';
-
-                    div.appendChild(input);
-                    div.appendChild(label);
-                    container.appendChild(div);
-                });
-            }
-
-            if (question.includeOther) {
-                const div = document.createElement('div');
-                div.className = 'form-check';
-
-                const inputId = `question_${question.id}_option_other`;
-                const input = document.createElement('input');
-                input.className = 'form-check-input';
-                input.type = 'radio';
-                input.name = `question_${question.id}`;
-                input.id = inputId;
-                input.value = 'other';
-                input.dataset.questionId = question.id;
-                input.dataset.questionType = question.type;
-
-                const label = document.createElement('label');
-                label.className = 'form-check-label';
-                label.htmlFor = inputId;
-                label.textContent = 'Other:';
-                label.style.cursor = 'pointer';
-
-                const otherInput = document.createElement('input');
-                otherInput.type = 'text';
-                otherInput.className = 'form-control mt-2';
-                otherInput.style.marginLeft = '2em';
-                otherInput.style.width = 'calc(100% - 2em)';
-                otherInput.dataset.otherFor = question.id;
-                otherInput.disabled = true;
-
-                input.addEventListener('change', function () {
-                    otherInput.disabled = this.value !== 'other';
-                    if (this.value === 'other') otherInput.focus();
-                });
-
-                div.appendChild(input);
-                div.appendChild(label);
-                div.appendChild(otherInput);
-                container.appendChild(div);
-            }
-
-            return container;
-        }
-
-        function createCheckboxInput(question) {
-            const container = document.createElement('div');
-
-            if (question.options && question.options.length > 0) {
-                question.options.forEach((option, index) => {
-                    const div = document.createElement('div');
-                    div.className = 'form-check';
-
-                    const inputId = `question_${question.id}_option_${index}`;
-                    const input = document.createElement('input');
-                    input.className = 'form-check-input';
-                    input.type = 'checkbox';
-                    input.name = `question_${question.id}_${index}`;
-                    input.id = inputId;
-                    input.value = option.choice_index;
-                    input.dataset.questionId = question.id;
-                    input.dataset.questionType = question.type;
-
-                    const label = document.createElement('label');
-                    label.className = 'form-check-label';
-                    label.htmlFor = inputId;
-                    label.textContent = option.choice_text;
-                    label.style.cursor = 'pointer';
-
-                    div.appendChild(input);
-                    div.appendChild(label);
-                    container.appendChild(div);
-                });
-            }
-
-            if (question.includeOther) {
-                const div = document.createElement('div');
-                div.className = 'form-check';
-
-                const inputId = `question_${question.id}_option_other`;
-                const input = document.createElement('input');
-                input.className = 'form-check-input';
-                input.type = 'checkbox';
-                input.name = `question_${question.id}_other`;
-                input.id = inputId;
-                input.value = 'other';
-                input.dataset.questionId = question.id;
-                input.dataset.questionType = question.type;
-
-                const label = document.createElement('label');
-                label.className = 'form-check-label';
-                label.htmlFor = inputId;
-                label.textContent = 'Other:';
-                label.style.cursor = 'pointer';
-
-                const otherInput = document.createElement('input');
-                otherInput.type = 'text';
-                otherInput.className = 'form-control mt-2';
-                otherInput.style.marginLeft = '2em';
-                otherInput.style.width = 'calc(100% - 2em)';
-                otherInput.dataset.otherFor = question.id;
-                otherInput.disabled = true;
-
-                input.addEventListener('change', function () {
-                    otherInput.disabled = !this.checked;
-                    if (this.checked) otherInput.focus();
-                });
-
-                div.appendChild(input);
-                div.appendChild(label);
-                div.appendChild(otherInput);
-                container.appendChild(div);
-            }
-
-            return container;
-        }
-
-        function createDropdownInput(question) {
+        // Create dropdown (select) input
+        function createDropdownInput(container, question) {
             const select = document.createElement('select');
-            select.className = 'form-select';
-            select.dataset.questionId = question.id;
-            select.dataset.questionType = question.type;
-            select.required = question.required || false;
+            select.name = question.id;
+            select.id = question.id;
+            select.className = 'dropdown-input';
 
+            // Add default empty option
             const defaultOption = document.createElement('option');
             defaultOption.value = '';
             defaultOption.textContent = '-- Select an option --';
-            defaultOption.selected = true;
             defaultOption.disabled = true;
+            defaultOption.selected = true;
             select.appendChild(defaultOption);
 
-            if (question.options && question.options.length > 0) {
-                question.options.forEach((option) => {
-                    const opt = document.createElement('option');
-                    opt.value = option.choice_index;
-                    opt.textContent = option.choice_text;
-                    select.appendChild(opt);
-                });
-            }
+            // Add options
+            question.options.forEach(option => {
+                const optionEl = document.createElement('option');
+                optionEl.value = option.choice_index;
+                optionEl.textContent = option.choice_text;
+                select.appendChild(optionEl);
+            });
 
-            return select;
+            container.appendChild(select);
         }
 
-        function createGridInput(question) {
-            const table = document.createElement('table');
-            table.className = 'grid-table table table-bordered';
-
-            // Create table header
-            const thead = document.createElement('thead');
-            const headerRow = document.createElement('tr');
-            headerRow.appendChild(document.createElement('th')); // Empty top-left cell
-
-            if (question.options && question.options.length > 0) {
-                question.options.forEach(option => {
-                    const th = document.createElement('th');
-                    th.textContent = option.choice_text;
-                    headerRow.appendChild(th);
-                });
-            }
-
-            thead.appendChild(headerRow);
-            table.appendChild(thead);
-
-            // Create table body
-            const tbody = document.createElement('tbody');
-
-            if (question.rows && question.rows.length > 0) {
-                question.rows.forEach((row, rowIndex) => {
-                    const tr = document.createElement('tr');
-                    const labelCell = document.createElement('td');
-                    labelCell.textContent = row;
-                    tr.appendChild(labelCell);
-
-                    if (question.options && question.options.length > 0) {
-                        question.options.forEach((option, optionIndex) => {
-                            const cell = document.createElement('td');
-                            cell.className = 'text-center';
-
-                            const input = document.createElement('input');
-                            input.type = 'radio';
-                            input.name = `question_${question.id}_row_${rowIndex}`;
-                            input.value = option.choice_index;
-                            input.dataset.questionId = question.id;
-                            input.dataset.rowIndex = rowIndex;
-                            input.dataset.questionType = question.type;
-                            if (question.required) input.dataset.required = 'true';
-
-                            cell.appendChild(input);
-                            tr.appendChild(cell);
-                        });
-                    }
-
-                    tbody.appendChild(tr);
-                });
-            }
-
-            table.appendChild(tbody);
-            return table;
-        }
-
-        function createDateInput(question) {
+        // Create date input
+        function createDateInput(container, question) {
             const input = document.createElement('input');
             input.type = 'date';
-            input.className = 'form-control';
-            input.dataset.questionId = question.id;
-            input.dataset.questionType = question.type;
-            input.required = question.required || false;
-            return input;
+            input.name = question.id;
+            input.id = question.id;
+            input.className = 'date-input';
+            container.appendChild(input);
         }
 
-        function handleNextAction() {
-            if (!validateCurrentSection()) {
-                alert('Please complete all required fields');
-                return;
-            }
+        // Create grid (matrix) input
+        function createGridInput(container, question) {
+            const gridDiv = document.createElement('div');
+            gridDiv.className = 'grid-question';
 
-            saveCurrentSectionResponses();
+            const table = document.createElement('table');
+            table.className = 'grid-table';
 
-            const isLastPage = currentSectionIndex >= sections.length - 1 ||
-                (currentSectionIndex === sections.length - 2 &&
-                    sections[sections.length - 1].behavior === 'same-page');
+            // Create header row with options
+            const headerRow = document.createElement('tr');
+            const emptyHeader = document.createElement('th');
+            headerRow.appendChild(emptyHeader);
 
-            if (isLastPage) {
-                submitForm();
-            } else {
-                const nextIndex = findNextLogicalPage(currentSectionIndex);
-                currentSectionIndex = nextIndex;
-                renderSectionsStartingAt(currentSectionIndex);
-            }
+            question.options.forEach(option => {
+                const th = document.createElement('th');
+                th.textContent = option.choice_text;
+                headerRow.appendChild(th);
+            });
+
+            table.appendChild(headerRow);
+
+            // Create rows with radio buttons
+            question.rows.forEach((rowText, rowIndex) => {
+                const row = document.createElement('tr');
+
+                const rowHeader = document.createElement('td');
+                rowHeader.textContent = rowText;
+                row.appendChild(rowHeader);
+
+                question.options.forEach(option => {
+                    const td = document.createElement('td');
+
+                    const radio = document.createElement('input');
+                    radio.type = 'radio';
+                    radio.name = `${question.id}_${rowIndex}`;
+                    radio.value = option.choice_index;
+                    radio.dataset.questionId = question.id;
+                    radio.dataset.rowIndex = rowIndex;
+
+                    td.appendChild(radio);
+                    row.appendChild(td);
+                });
+
+                table.appendChild(row);
+            });
+
+            gridDiv.appendChild(table);
+            container.appendChild(gridDiv);
         }
-
-        function findNextLogicalPage(index) {
-            if (index >= sections.length - 1) {
-                return index;
+        
+        
+        // Apply saved responses to the form
+        function applySavedResponses() {
+            if (!savedResponse || !savedResponse.formId) return;
+            
+            // Loop through all questions in the saved response
+            for (const [questionId, responseData] of Object.entries(savedResponse)) {
+                if (questionId === 'formId') continue;
+                
+                const questionEl = document.querySelector(`[data-question-id="${questionId}"]`);
+                if (!questionEl) continue;
+                
+                const questionType = questionEl.dataset.questionType;
+                
+                if (questionType === 'grid') {
+                    // Handle grid answers
+                    if (Array.isArray(responseData.value)) {
+                        responseData.value.forEach(gridAnswer => {
+                            const radio = document.querySelector(
+                                `input[name="${questionId}_${gridAnswer.rowIndex}"][value="${gridAnswer.optionIndex}"]`
+                            );
+                            if (radio) {
+                                radio.checked = true;
+                            }
+                        });
+                    }
+                } else if (questionType === 'checkbox') {
+                    // Handle checkbox answers (multiple possible)
+                    if (Array.isArray(responseData.value)) {
+                        responseData.value.forEach(value => {
+                            const input = document.querySelector(
+                                `input[name="${questionId}"][value="${value}"]`
+                            );
+                            if (input) {
+                                input.checked = true;
+                            }
+                        });
+                    }
+                } else if (questionType === 'radio') {
+                    // Handle radio answers (single selection)
+                    if (responseData.value && responseData.value.length > 0) {
+                        const input = document.querySelector(
+                            `input[name="${questionId}"][value="${responseData.value[0]}"]`
+                        );
+                        if (input) {
+                            input.checked = true;
+                        }
+                    }
+                } else if (questionType === 'text' || questionType === 'textarea') {
+                    // Handle text inputs
+                    const input = document.querySelector(
+                        `input[name="${questionId}"], textarea[name="${questionId}"]`
+                    );
+                    if (input && responseData.value) {
+                        input.value = responseData.value;
+                    }
+                }
             }
-
-            let nextIndex = index + 1;
-            while (nextIndex < sections.length && sections[nextIndex].behavior === 'same-page') {
-                nextIndex++;
-            }
-
-            return Math.min(nextIndex, sections.length - 1);
+            
+            showAutosaveStatus('Previously saved answers loaded', false);
         }
-
-        function showPreviousSection() {
-            saveCurrentSectionResponses();
-            let prevIndex = findPreviousLogicalPage(currentSectionIndex);
-            if (prevIndex >= 0) {
-                currentSectionIndex = prevIndex;
-                renderSectionsStartingAt(currentSectionIndex);
-            }
-        }
-
-        function findPreviousLogicalPage(index) {
-            let prevIndex = index - 1;
-            while (prevIndex > 0 && sections[prevIndex].behavior === 'same-page') {
-                prevIndex--;
-            }
-            return prevIndex;
-        }
-
-        function validateCurrentSection() {
+        
+        // Validate the form before submission
+        function validateForm(isAutosave = false) {
             let isValid = true;
-
-            for (let i = currentSectionIndex; i >= 0 && (i === currentSectionIndex || sections[i].behavior === 'same-page'); i--) {
-                const section = sections[i];
-                const sectionElement = document.querySelector(`.form-section[data-section-index="${i}"]`);
-
-                if (!section || !sectionElement || !section.questions) continue;
-
+            const requiredQuestions = [];
+            
+            // Clear previous error messages
+            document.querySelectorAll('.error-message').forEach(el => {
+                el.classList.add('hidden');
+                el.textContent = '';
+            });
+            
+            // Check all required questions
+            formData.sections.forEach(section => {
                 section.questions.forEach(question => {
-                    if (!question.required) return;
-
-                    const questionId = question.id;
-                    const questionType = question.type;
-                    const questionElement = sectionElement.querySelector(`[data-question-id="${questionId}"]`);
-
-                    if (!questionElement) return;
-
-                    if (questionType === 'checkbox') {
-                        const checkboxes = sectionElement.querySelectorAll(
-                            `input[type="checkbox"][name^="question_${questionId}_"]:checked`
-                        );
-                        if (checkboxes.length === 0) {
-                            isValid = false;
-                            highlightRequired(sectionElement.querySelector(`input[type="checkbox"]`));
-                        }
-                    } else if (questionType === 'multiple') {
-                        const radio = sectionElement.querySelector(
-                            `input[type="radio"][name="question_${questionId}"]:checked`
-                        );
-                        if (!radio) {
-                            isValid = false;
-                            highlightRequired(sectionElement.querySelector(`input[type="radio"]`));
-                        }
-                    } else if (questionType === 'dropdown') {
-                        const select = sectionElement.querySelector(
-                            `select[data-question-id="${questionId}"]`
-                        );
-                        if (!select || !select.value) {
-                            isValid = false;
-                            highlightRequired(select);
-                        }
-                    } else if (questionType === 'grid') {
-                        if (question.rows) {
-                            question.rows.forEach((row, rowIndex) => {
-                                const radioGroup = sectionElement.querySelectorAll(
-                                    `input[type="radio"][name="question_${questionId}_row_${rowIndex}"]`
-                                );
-                                const isChecked = Array.from(radioGroup).some(radio => radio.checked);
-                                if (!isChecked) {
-                                    isValid = false;
-                                    const rowElement = radioGroup[0]?.closest('tr');
-                                    if (rowElement) {
-                                        rowElement.style.backgroundColor = 'rgba(255, 0, 0, 0.1)';
-                                        setTimeout(() => {
-                                            rowElement.style.backgroundColor = '';
-                                        }, 2000);
+                    if (question.type === 'display') return;
+                    if (question.required && !isAutosave) {
+                        const questionEl = document.querySelector(`[data-question-id="${question.id}"]`);
+                        const errorEl = questionEl.querySelector('.error-message');
+                        
+                        let isAnswered = false;
+                        
+                        switch (question.type) {
+                            case 'multiple':
+                                const checkedRadio = questionEl.querySelector(`input[name="${question.id}"]:checked`);
+                                isAnswered = checkedRadio !== null;
+                                break;
+                            case 'checkbox':
+                                const checkedCheckboxes = questionEl.querySelectorAll(`input[name="${question.id}"]:checked`);
+                                isAnswered = checkedCheckboxes.length > 0;
+                                break;
+                            case 'short':
+                                const textInput = questionEl.querySelector(`input[name="${question.id}"]`);
+                                isAnswered = textInput && textInput.value.trim() !== '';
+                                break;
+                            case 'paragraph':
+                                const textareaInput = questionEl.querySelector(`textarea[name="${question.id}"]`);
+                                isAnswered = textareaInput && textareaInput.value.trim() !== '';
+                                break;
+                            case 'dropdown':
+                                const selectInput = questionEl.querySelector(`select[name="${question.id}"]`);
+                                isAnswered = selectInput && selectInput.value !== '';
+                                break;
+                            case 'date':
+                                const dateInput = questionEl.querySelector(`input[type="date"][name="${question.id}"]`);
+                                isAnswered = dateInput && dateInput.value !== '';
+                                break;
+                            case 'grid':
+                                // For grids, we need at least one radio selected per row
+                                const gridRows = question.rows.length;
+                                let answeredRows = 0;
+                                
+                                for (let i = 0; i < gridRows; i++) {
+                                    if (document.querySelector(`input[name="${question.id}_${i}"]:checked`)) {
+                                        answeredRows++;
                                     }
                                 }
-                            });
+                                
+                                isAnswered = answeredRows === gridRows;
+                                break;
                         }
-                    } else {
-                        const input = sectionElement.querySelector(
-                            `[data-question-id="${questionId}"]`
-                        );
-                        if (!input || !input.value.trim()) {
+                        
+                        if (!isAnswered) {
                             isValid = false;
-                            highlightRequired(input);
+                            errorEl.textContent = 'This question is required';
+                            errorEl.classList.remove('hidden');
+                            requiredQuestions.push(question.id);
+                            
+                            // Scroll to first error
+                            if (requiredQuestions.length === 1) {
+                                questionEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }
                         }
                     }
                 });
-            }
-
+            });
+            
             return isValid;
         }
-
-        function updateNavigationButtons() {
-            const prevBtn = document.getElementById('prev-section-btn');
-            const nextBtn = document.getElementById('next-section-btn');
-
-            prevBtn.disabled = currentSectionIndex <= 0;
-
-            const isLastPage = currentSectionIndex >= sections.length - 1 ||
-                (currentSectionIndex === sections.length - 2 &&
-                    sections[sections.length - 1].behavior === 'same-page');
-
-            if (isLastPage) {
-                nextBtn.textContent = 'Submit';
-                nextBtn.classList.remove('btn-primary');
-                nextBtn.classList.add('btn-success');
-            } else {
-                nextBtn.textContent = 'Next Section';
-                nextBtn.classList.remove('btn-success');
-                nextBtn.classList.add('btn-primary');
-            }
-        }
-
-        function updateProgress() {
-            const progressContainer = document.querySelector('.progress-container');
-            const progressBar = document.getElementById('progress-bar');
-            const progressText = document.getElementById('progress-text');
-
-            if (!sections || sections.length === 0) {
-                progressContainer.style.display = 'none';
-                return;
-            }
-
-            let totalPages = 1;
-            let prevBehavior = sections[0]?.behavior;
-
-            for (let i = 1; i < sections.length; i++) {
-                const currBehavior = sections[i].behavior || 'next-page';
-                if (currBehavior !== 'same-page' || prevBehavior === 'next-page') {
-                    totalPages++;
-                }
-                prevBehavior = currBehavior;
-            }
-
-            let currentPage = 1;
-            prevBehavior = sections[0]?.behavior;
-
-            for (let i = 1; i <= currentSectionIndex; i++) {
-                const currBehavior = sections[i].behavior || 'next-page';
-                if (currBehavior !== 'same-page' || prevBehavior === 'next-page') {
-                    currentPage++;
-                }
-                prevBehavior = currBehavior;
-            }
-
-            if (totalPages <= 1) {
-                progressContainer.style.display = 'none';
-            } else {
-                progressContainer.style.display = 'block';
-            }
-
-            const progress = (currentPage / totalPages) * 100;
-            progressBar.style.width = `${progress}%`;
-            progressText.textContent = `${currentPage}/${totalPages} ${totalPages > 1 ? 'pages' : 'page'}`;
-        }
-
-        function clearCurrentSection() {
-            if (confirm('Are you sure you want to clear all responses in this section?')) {
-                for (let i = currentSectionIndex; i >= 0 && (i === currentSectionIndex || sections[i].behavior === 'same-page'); i--) {
-                    const section = sections[i];
-                    const sectionElement = document.querySelector(`.form-section[data-section-index="${i}"]`);
-
-                    if (!section || !sectionElement || !section.questions) continue;
-
-                    section.questions.forEach(question => {
-                        const questionId = question.id;
-                        delete formResponses[questionId];
-
-                        if (question.type === 'checkbox') {
-                            sectionElement.querySelectorAll(
-                                `input[type="checkbox"][name^="question_${question.id}_"]`
-                            ).forEach(checkbox => checkbox.checked = false);
-                            const otherInput = sectionElement.querySelector(`input[data-other-for="${question.id}"]`);
-                            if (otherInput) {
-                                otherInput.value = '';
-                                otherInput.disabled = true;
-                            }
-                        } else if (question.type === 'multiple') {
-                            sectionElement.querySelectorAll(
-                                `input[type="radio"][name="question_${question.id}"]`
-                            ).forEach(radio => radio.checked = false);
-                            const otherInput = sectionElement.querySelector(`input[data-other-for="${question.id}"]`);
-                            if (otherInput) {
-                                otherInput.value = '';
-                                otherInput.disabled = true;
-                            }
-                        } else if (question.type === 'dropdown') {
-                            const select = sectionElement.querySelector(`select[data-question-id="${question.id}"]`);
-                            if (select) select.selectedIndex = 0;
-                        } else if (question.type === 'grid') {
-                            sectionElement.querySelectorAll(
-                                `input[type="radio"][name^="question_${question.id}_row_"]`
-                            ).forEach(radio => radio.checked = false);
-                        } else {
-                            const input = sectionElement.querySelector(`[data-question-id="${question.id}"]`);
-                            if (input) input.value = '';
-                        }
-                    });
-                }
-
-                localStorage.setItem('studentFormProgress', JSON.stringify(formResponses));
-                checkLocalStorage();
-            }
-        }
-
-        function saveCurrentSectionResponses() {
-            if (!formData) {
-                setTimeout(saveCurrentSectionResponses, 500); // retry after 0.5s
-                return;
-            }
-
-            formResponses.formId = formData.form_index;
-
-            for (let i = currentSectionIndex; i >= 0 && (i === currentSectionIndex || sections[i].behavior === 'same-page'); i--) {
-                const section = sections[i];
-                const sectionElement = document.querySelector(`.form-section[data-section-index="${i}"]`);
-
-                if (!section || !sectionElement || !section.questions) continue;
-
-                section.questions.forEach(question => {
-                    const questionId = question.id;
-                    const questionType = question.type;
-                    let value = null;
-                    let otherText = null;
-
-                    if (questionType === 'checkbox') {
-                        const checkboxes = sectionElement.querySelectorAll(
-                            `input[type="checkbox"][name^="question_${question.id}_"]:checked`
-                        );
-                        value = Array.from(checkboxes).map(cb => cb.value);
-                        const otherCheckbox = sectionElement.querySelector(
-                            `input[type="checkbox"][name^="question_${question.id}_"][value="other"]:checked`
-                        );
-                        if (otherCheckbox) {
-                            const otherInput = sectionElement.querySelector(`input[data-other-for="${question.id}"]`);
-                            if (otherInput && otherInput.value) {
-                                value.push('other');
-                                otherText = otherInput.value;
-                            }
-                        }
-                    } else if (questionType === 'multiple') {
-                        const radio = sectionElement.querySelector(
-                            `input[type="radio"][name="question_${question.id}"]:checked`
-                        );
-                        value = radio ? radio.value : null;
-                        if (value === 'other') {
-                            const otherInput = sectionElement.querySelector(`input[data-other-for="${question.id}"]`);
-                            if (otherInput) otherText = otherInput.value;
-                        }
-                    } else if (questionType === 'dropdown') {
-                        const select = sectionElement.querySelector(
-                            `select[data-question-id="${question.id}"]`
-                        );
-                        value = select ? select.value : null;
-                    } else if (questionType === 'grid') {
-                        const selectedRadios = sectionElement.querySelectorAll(
-                            `input[type="radio"][name^="question_${question.id}_row_"]:checked`
-                        );
-                        value = Array.from(selectedRadios).map(radio => ({
-                            rowIndex: radio.dataset.rowIndex,
-                            optionIndex: radio.value
-                        }));
-                    } else {
-                        const input = sectionElement.querySelector(
-                            `[data-question-id="${question.id}"]`
-                        );
-                        value = input ? input.value : null;
-                    }
-
-                    if (value !== null) {
-                        formResponses[questionId] = { type: questionType, value };
-                        if (otherText !== null) formResponses[questionId].otherText = otherText;
-                    }
-
-                });
-            }
-
-            try {
-                localStorage.setItem('studentFormProgress', JSON.stringify(formResponses));
-                checkLocalStorage();
-            } catch (e) {
-                console.error("Failed to save to localStorage:", e);
-            }
-        }
-
-        async function autoSaveForm() {
-            if (!formData || Object.keys(formResponses).length <= 1) return; // Only formId is present
-
-            saveCurrentSectionResponses();
-
-            const submissionData = prepareSubmissionData(true);
-            console.log("Auto-saving payload:", submissionData) // <-- Add this line
-            try {
-                const response = await fetch('../backend/forms/submit_response.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(submissionData),
-                    credentials: 'include'
-                });
-
-                const responseData = await response.json();
-
-                if (!response.ok) {
-                    console.error('Auto-save failed:', responseData.error || 'Unknown error');
-                    return;
-                }
-
-                console.log('Form auto-saved successfully');
-            } catch (error) {
-                console.error('Auto-save error:', error);
-            }
-        }
-
-        async function submitForm() {
-            checkLocalStorage();
-            const submitBtn = document.getElementById('next-section-btn');
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...';
-
-            saveCurrentSectionResponses();
-
-            const submissionData = prepareSubmissionData(false);
-
-            try {
-                const response = await fetch('..//backend/forms/submit_response.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(submissionData),
-                    credentials: 'include'
-                });
-
-                const responseData = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(responseData.error || 'Failed to submit form');
-                }
-
-                // Clear auto-save interval and local storage
-                clearInterval(autoSaveInterval);
-                localStorage.removeItem('studentFormProgress');
-
-                alert('Form submitted successfully!');
-                window.location.href = 'submission-success.html';
-            } catch (error) {
-                console.error('Error:', error);
-                alert(error.message || 'Failed to submit form. Please try again.');
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = 'Submit';
-            }
-        }
-
-        function checkLocalStorage() {
-            const content = localStorage.getItem('studentFormProgress');
-            console.log("Current localStorage content:", content);
-            if (!content) {
-                console.warn("No data found in localStorage");
-            } else {
-                try {
-                    console.log("Parsed localStorage:", JSON.parse(content));
-                } catch (e) {
-                    console.error("localStorage contains invalid JSON");
-                }
-            }
-        }
-
-        function prepareSubmissionData(isAutoSave) {
-            const submissionData = {
-                form_index: formData.form_index,
+        
+        // Collect form data for submission
+        function collectFormData(isAutosave = false) {
+            const formDataToSubmit = {
+                form_index: parseInt(formId),
                 answers: [],
                 grid_answers: [],
-                is_autosave: isAutoSave
+                is_autosave: isAutosave
             };
-
-            const allQuestionIds = [];
-            sections.forEach(section => {
-                if (section.questions) {
-                    section.questions.forEach(question => {
-                        allQuestionIds.push(question.id);
-                    });
-                }
-            });
-
-            allQuestionIds.forEach(questionId => {
-                const response = formResponses[questionId];
-                if (!response) return;
-
-                const main_question_index = parseInt(questionId);
-                const question = findQuestionById(questionId);
-
-                if (!question) return;
-
-                if (question.type === 'grid') {
-                    if (Array.isArray(response.value)) {
-                        response.value.forEach(gridResponse => {
-                            submissionData.grid_answers.push({
-                                main_question_index,
-                                sub_question_index: parseInt(gridResponse.rowIndex),
-                                choice_index: parseInt(gridResponse.optionIndex)
+            
+            // Process all questions
+            formData.sections.forEach(section => {
+                section.questions.forEach(question => {
+                    if (question.type === 'display') return;
+                    switch (question.type) {
+                        case 'multiple':
+                            const checkedRadio = document.querySelector(
+                                `[data-question-id="${question.id}"] input[name="${question.id}"]:checked`
+                            );
+                            
+                            if (checkedRadio) {
+                                formDataToSubmit.answers.push({
+                                    main_question_index: parseInt(question.id),
+                                    choice_index: parseInt(checkedRadio.value)
+                                });
+                            }
+                            break;
+                            
+                        case 'checkbox':
+                            const checkedCheckboxes = document.querySelectorAll(
+                                `[data-question-id="${question.id}"] input[name="${question.id}"]:checked`
+                            );
+                            
+                            checkedCheckboxes.forEach(input => {
+                                formDataToSubmit.answers.push({
+                                    main_question_index: parseInt(question.id),
+                                    choice_index: parseInt(input.value)
+                                });
                             });
-                        });
-                    }
-                }
-                else if (question.type === 'checkbox') {
-                    if (Array.isArray(response.value)) {
-                        response.value.forEach(value => {
-                            const isOther = value === 'other';
-                            submissionData.answers.push({
-                                main_question_index,
-                                choice_index: isOther ? null : parseInt(value),
-                                text_answer: isOther ? (response.otherText || '') : null,
-                                is_other: isOther
+                            break;
+                            
+                        case 'short':
+                        case 'paragraph':
+                            const textInput = document.querySelector(
+                                `[data-question-id="${question.id}"] input[name="${question.id}"], 
+                                [data-question-id="${question.id}"] textarea[name="${question.id}"]`
+                            );
+                            
+                            if (textInput && textInput.value.trim() !== '') {
+                                formDataToSubmit.answers.push({
+                                    main_question_index: parseInt(question.id),
+                                    choice_index: null,
+                                    text_answer: textInput.value.trim()
+                                });
+                            }
+                            break;
+                            
+                        case 'dropdown':
+                            const selectInput = document.querySelector(
+                                `[data-question-id="${question.id}"] select[name="${question.id}"]`
+                            );
+                            
+                            if (selectInput && selectInput.value !== '') {
+                                formDataToSubmit.answers.push({
+                                    main_question_index: parseInt(question.id),
+                                    choice_index: parseInt(selectInput.value)
+                                });
+                            }
+                            break;
+                            
+                        case 'date':
+                            const dateInput = document.querySelector(
+                                `[data-question-id="${question.id}"] input[type="date"][name="${question.id}"]`
+                            );
+                            
+                            if (dateInput && dateInput.value !== '') {
+                                formDataToSubmit.answers.push({
+                                    main_question_index: parseInt(question.id),
+                                    choice_index: null,
+                                    text_answer: dateInput.value
+                                });
+                            }
+                            break;
+                            
+                        case 'grid':
+                            question.rows.forEach((row, rowIndex) => {
+                                const checkedRadio = document.querySelector(
+                                    `input[name="${question.id}_${rowIndex}"]:checked`
+                                );
+                                
+                                if (checkedRadio) {
+                                    formDataToSubmit.grid_answers.push({
+                                        main_question_index: parseInt(question.id),
+                                        sub_question_index: parseInt(rowIndex),
+                                        choice_index: parseInt(checkedRadio.value)
+                                    });
+                                }
                             });
-                        });
+                            break;
                     }
-                }
-                else if (question.type === 'multiple' || question.type === 'dropdown') {
-                    const isOther = response.value === 'other';
-                    submissionData.answers.push({
-                        main_question_index,
-                        choice_index: isOther ? null : parseInt(response.value),
-                        text_answer: isOther ? (response.otherText || '') : null,
-                        is_other: isOther
-                    });
-                }
-                else {
-                    submissionData.answers.push({
-                        main_question_index,
-                        choice_index: null,
-                        text_answer: response.value || '',
-                        is_other: false
-                    });
-                }
+                });
             });
-
-            return submissionData;
+            
+            return formDataToSubmit;
         }
-
-        function findQuestionById(questionId) {
-            for (const section of sections) {
-                if (section.questions) {
-                    for (const question of section.questions) {
-                        if (question.id === questionId) {
-                            return question;
-                        }
-                    }
+        
+        // Save draft (autosave)
+        async function saveDraft() {
+            if (!hasChanges) return;
+            
+            try {
+                // Don't validate for autosave
+                const formDataToSubmit = collectFormData(true);
+                
+                const response = await fetch('../backend/forms/submit_response.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formDataToSubmit)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAutosaveStatus('Draft saved automatically', true);
+                    hasChanges = false;
+                } else {
+                    showAutosaveStatus('Failed to save draft', false);
                 }
+            } catch (error) {
+                console.error('Error saving draft:', error);
+                showAutosaveStatus('Error saving draft', false);
             }
-            return null;
         }
-
-        function highlightRequired(element) {
-            if (!element) return;
-
-            element.style.borderColor = 'red';
+        
+        // Submit the form
+        async function submitForm() {
+            if (!validateForm()) {
+                return;
+            }
+            
+            try {
+                submitFormBtn.disabled = true;
+                submitFormBtn.textContent = 'Submitting...';
+                
+                const formDataToSubmit = collectFormData(false);
+                
+                const response = await fetch('../backend/forms/submit_response.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formDataToSubmit)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Stop autosave
+                    if (autosaveInterval) {
+                        clearInterval(autosaveInterval);
+                    }
+                    
+                    // Show success message
+                    alert('Form submitted successfully!');
+                    window.location.href = 'submission_confirmation.html'; // Redirect to confirmation page
+                } else {
+                    alert('Failed to submit form. Please try again.');
+                    submitFormBtn.disabled = false;
+                    submitFormBtn.textContent = 'Submit Form';
+                }
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                alert('An error occurred while submitting the form.');
+                submitFormBtn.disabled = false;
+                submitFormBtn.textContent = 'Submit Form';
+            }
+        }
+        
+        // Show autosave status message
+        function showAutosaveStatus(message, isSuccess) {
+            autosaveStatusEl.textContent = message;
+            autosaveStatusEl.style.color = isSuccess ? '#27ae60' : '#e74c3c';
+            
+            // Hide after 3 seconds
             setTimeout(() => {
-                element.style.borderColor = '';
-            }, 2000);
-
-            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                if (autosaveStatusEl.textContent === message) {
+                    autosaveStatusEl.textContent = '';
+                }
+            }, 3000);
         }
-
+        
+        // Event listeners
+        saveDraftBtn.addEventListener('click', async () => {
+            saveDraftBtn.disabled = true;
+            saveDraftBtn.textContent = 'Saving...';
+            
+            await saveDraft();
+            
+            saveDraftBtn.disabled = false;
+            saveDraftBtn.textContent = 'Save Draft';
+        });
+        
+        submitFormBtn.addEventListener('click', submitForm);
+    
     </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>
