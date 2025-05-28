@@ -1,5 +1,3 @@
-/* manage-counselors.css */
-
 /* Inherit base styles */
 .grid-body {
     display: grid;
@@ -9,23 +7,22 @@
     grid-row-gap: 0px;
 }
 
-.page-left {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: 0.5fr 1fr 0.5fr repeat(3, 1fr);
-    grid-column-gap: 0px;
-    grid-row-gap: 0px;
-    position: relative;
+.page-left{
     grid-column: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
     z-index: 0;
     height: 100vh;
     font-family: 'Poppins', sans-serif;
     color: rgb(2, 55, 2);
     box-shadow: 10px -15px 15px -10px rgba(2, 55, 2, 0.313);
     user-select: none;
+    padding: 2rem 1rem;
+    justify-content: flex-start;
 }
 
-.page-left::before {
+.page-left::before{
     content: "";
     background-image: url("../Media/lasalle.png");
     background-size: cover;
@@ -35,23 +32,44 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: 100vh;
+    height: 100%;
     z-index: -1;
 }
 
-.profile {
+
+.logout-wrapper {
+    display:flex;
+    justify-content: center;
+    margin-top: 300px;
+    padding-top: 1rem;
+}
+
+.logout-btn {
+    width: 100%;
+    background-color: #4fbd9c;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s;
+}
+
+.logout-btn:hover {
+    background-color: rgb(36, 154, 118);
+}
+
+.profile{
     display: flex;
     align-items: center;
     flex-direction: column;
-    grid-column: 2;
-    grid-row: 2;
     font-size: 2vh;
-    opacity: 100%;
     color: rgb(2, 55, 2);
     gap: 5px;
 }
 
-.profile-picture {
+.profile-picture{
     background-image: url("../Media/user.jpg");
     background-size: cover;
     background-position: center;
@@ -75,43 +93,43 @@
     color: rgb(36, 154, 118);
 }
 
-.sidebar-nav {
+.sidebar-nav{
     display: flex;
     flex-direction: column;
     margin-left: 25px;
-    grid-column: 1/3;
-    grid-row: 4/6;
     gap: 25px;
+    margin-top: 2rem;
 }
 
-.sidebar-nav a {
+.sidebar-nav a{
     text-decoration: none;
     color: rgb(2, 55, 2);
 }
 
-.sidebar-nav a:hover {
-    color: rgb(36, 154, 118);
+.sidebar-nav a.active{
+    font-weight: bold;
+    color: rgb(36, 154, 118); 
 }
 
-.sidebar-nav .active {
+
+.sidebar-nav a:hover{
+    color: rgb(36, 154, 118);
+    cursor: pointer;
+}
+
+.sidebar-nav .nav-link.active{
     font-weight: bold;
     color: rgb(36, 154, 118);
 }
 
-.page-right {
-    display: flex;
+
+.page-right{
+    padding: 70px;
+    display:flex;
     flex-direction: column;
-    gap: 15px;
-    position: relative;
-    grid-column: 2;
-    height: 95vh;
-    z-index: 2;
-    user-select: none;
-    padding: 20px;
-    padding-right: 50px;
-    background-color: rgb(243, 255, 243);
-    margin-left: 50px;
+    justify-content: flex-start;
 }
+
 
 /* Main content */
 .header-section {
@@ -432,12 +450,14 @@ td {
 }
 
 .program-select-container {
-    max-height: 200px;
-    overflow-y: auto;
-    border: 1px solid #c0e8db;
-    border-radius: 4px;
-    padding: 10px;
-    background-color: #edfdf3;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(2, 61, 2, 0.2);
+    overflow: hidden;
+    position: relative;
+    height: calc(100% - 150px); /* Adjust based on your header height */
+    display: flex;
+    flex-direction: column;
 }
 
 .program-label {

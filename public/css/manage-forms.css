@@ -1,56 +1,3 @@
-/* manage-forms.css */
-
-/* Base Layout */
-body {
-    font-family: 'Poppins', sans-serif;
-    margin: 0;
-    padding: 0;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    background-color: rgb(243, 255, 243);
-}
-
-/* Header */
-header {
-    background-color: rgb(225, 245, 233);
-    color: rgb(16, 71, 51);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 45px;
-    box-shadow: 0px 0px 10px 1px rgba(2, 55, 2, 0.502), 
-                inset 5px -10px 35px 10px rgba(43, 135, 69, 0.322);
-}
-
-.logo {
-    font-size: 2.3vh;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.logo-img {
-    height: 60px;
-    width: auto;
-}
-
-.navigation {
-    display: flex;
-    gap: 45px;
-}
-
-.navigation a {
-    color: rgb(2, 55, 2);
-    text-decoration: none;
-    font-size: 1.5vh;
-}
-
-.navigation a:hover {
-    font-weight: bolder;
-}
-
 /* Inherit base styles */
 .grid-body {
     display: grid;
@@ -60,23 +7,22 @@ header {
     grid-row-gap: 0px;
 }
 
-.page-left {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: 0.5fr 1fr 0.5fr repeat(3, 1fr);
-    grid-column-gap: 0px;
-    grid-row-gap: 0px;
-    position: relative;
+.page-left{
     grid-column: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
     z-index: 0;
     height: 100vh;
     font-family: 'Poppins', sans-serif;
     color: rgb(2, 55, 2);
     box-shadow: 10px -15px 15px -10px rgba(2, 55, 2, 0.313);
     user-select: none;
+    padding: 2rem 1rem;
+    justify-content: flex-start;
 }
 
-.page-left::before {
+.page-left::before{
     content: "";
     background-image: url("../Media/lasalle.png");
     background-size: cover;
@@ -86,23 +32,44 @@ header {
     top: 0;
     left: 0;
     width: 100%;
-    height: 100vh;
+    height: 100%;
     z-index: -1;
 }
 
-.profile {
+
+.logout-wrapper {
+    display:flex;
+    justify-content: center;
+    margin-top: 300px;
+    padding-top: 1rem;
+}
+
+.logout-btn {
+    width: 100%;
+    background-color: #4fbd9c;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s;
+}
+
+.logout-btn:hover {
+    background-color: rgb(36, 154, 118);
+}
+
+.profile{
     display: flex;
     align-items: center;
     flex-direction: column;
-    grid-column: 2;
-    grid-row: 2;
     font-size: 2vh;
-    opacity: 100%;
     color: rgb(2, 55, 2);
     gap: 5px;
 }
 
-.profile-picture {
+.profile-picture{
     background-image: url("../Media/user.jpg");
     background-size: cover;
     background-position: center;
@@ -126,48 +93,83 @@ header {
     color: rgb(36, 154, 118);
 }
 
-.sidebar-nav {
+.sidebar-nav{
     display: flex;
     flex-direction: column;
     margin-left: 25px;
-    grid-column: 1/3;
-    grid-row: 4/6;
     gap: 25px;
+    margin-top: 2rem;
 }
 
-.sidebar-nav a {
+.sidebar-nav a{
     text-decoration: none;
     color: rgb(2, 55, 2);
 }
 
-.sidebar-nav a:hover {
-    color: rgb(36, 154, 118);
+.sidebar-nav a.active{
+    font-weight: bold;
+    color: rgb(36, 154, 118); 
 }
 
-.sidebar-nav .active {
+
+.sidebar-nav a:hover{
+    color: rgb(36, 154, 118);
+    cursor: pointer;
+}
+
+.sidebar-nav .nav-link.active{
     font-weight: bold;
     color: rgb(36, 154, 118);
 }
 
-/* Right Content Area */
-.page-right {
-    display: flex;
-    flex-direction: column; /* Stack elements vertically */
-    gap: 15px; /* Add spacing between elements */
-    position: relative;
-    grid-column: 2;
-    height: 95vh;
-    z-index: 2;
-    user-select: none;
-    padding: 20px;
-    background-color: rgb(243, 255, 243);
-    margin-left: 50px;
+.autosave-status {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px 15px;
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 1000;
+}
+.autosave-status.show {
+    opacity: 1;
+}
+.autosave-status.saving {
+    background-color: #fff3cd;
+    color: #856404;
+}
+.autosave-status.saved {
+    background-color: #d4edda;
+    color: #155724;
+}
+.autosave-status.error {
+    background-color: #f8d7da;
+    color: #721c24;
 }
 
-/* Greetings Section */
-.greetings {
-    margin-top: 20px;
-    margin-bottom: 20px;
+
+.page-right{
+    padding: 70px;
+    display:flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.header-section {
+    margin-bottom: 30px;
+}
+
+.header-section h1 {
+    color: rgb(2, 55, 2);
+    margin: 0;
+    font-size: 1.8rem;
+}
+
+.header-section p {
+    color: #023702;
+    margin: 5px 0 0;
+    font-size: 0.95rem;
 }
 
 .h1 {
@@ -185,7 +187,7 @@ header {
 .cards-grid {
     display: flex;
     flex-wrap: wrap; /* Allow wrapping */
-    gap: 20px; /* Spacing between cards */
+    gap: 40px; /* Spacing between cards */
     padding: 10px 0;
 }
 
@@ -213,13 +215,14 @@ header {
 }
 
 .form-card {
+    position: relative; /* Add this */
     background-color: rgb(237, 253, 243);
     border-radius: 15px;
-    padding: 20px;
+    padding: 40px;
     box-shadow: 0 3px 10px rgba(2, 61, 2, 0.2);
     transition: all 0.3s ease;
-    flex: 1 1 calc(33.333% - 14px); /* 3 cards per row by default */
-    min-width: 280px; /* Prevent cards from getting too small */
+    flex: 1 1 calc(33.333% - 14px);
+    min-width: 280px;
     max-width: 380px;
     display: flex;
     flex-direction: column;
@@ -344,6 +347,174 @@ header {
     align-items: center;
     justify-content: center;
 }
+
+/* Three-dot menu styles */
+.form-card-menu {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    cursor: pointer;
+    font-size: 1.8vh;
+    color: rgb(2, 55, 2);
+    padding: 5px;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+.form-card-menu:hover {
+    background-color: rgba(79, 189, 156, 0.2);
+    color: rgb(36, 154, 118);
+}
+
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1001;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: rgb(243, 255, 243);
+    margin: 5% auto;
+    padding: 25px;
+    border-radius: 15px;
+    width: 50%;
+    max-width: 500px;
+    box-shadow: 0 5px 15px rgba(2, 61, 2, 0.3);
+    position: relative;
+}
+
+.close-modal {
+    position: absolute;
+    top: 15px;
+    right: 25px;
+    color: rgb(2, 55, 2);
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-modal:hover {
+    color: rgb(36, 154, 118);
+}
+
+.modal-body {
+    margin-top: 20px;
+}
+
+/* Form Settings Styles */
+.form-setting {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #4CAF50;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.status-text {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.active-status {
+    color: #4CAF50;
+}
+
+.inactive-status {
+    color: #f44336;
+}
+
+.save-btn {
+    padding: 8px 16px;
+    background-color: rgb(79, 189, 156);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.save-btn:hover {
+    background-color: rgb(36, 154, 118);
+}
+
+.delete-btn {
+    padding: 8px 16px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-left: 10px;
+}
+
+.delete-btn:hover {
+    background-color: #d32f2f;
+}
+
+@media (max-width: 768px) {
+    .modal-content {
+        width: 80%;
+        margin: 15% auto;
+    }
+}
+
+
 
 /* Responsive Styles */
 @media (max-width: 1024px) {

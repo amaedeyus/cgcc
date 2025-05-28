@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 27, 2025 at 03:16 PM
+-- Generation Time: May 27, 2025 at 04:36 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -291,16 +291,16 @@ CREATE TABLE `forms` (
   `form_name` varchar(255) DEFAULT NULL,
   `description` text DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
-  `status` enum('active','inactive') NOT NULL DEFAULT 'inactive'
+  `is_active` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `forms`
 --
 
-INSERT INTO `forms` (`form_index`, `form_name`, `description`, `created_at`, `status`) VALUES
-(1, 'STUDENT INDIVIDUAL INVENTORY (SII) & CLIENT CONSENT FORM AY 2024-2025', 'This form would only take 15- 20 minutes of your time.\n\nEvery person\'s life is a developing story. The person you are today is a result of your upbringing and experiences, joys and sorrows, desires, and dreams. While we know that it\'s tempting to rush at times, please take some time to reflect on your life.', '2025-04-30 05:28:30', 'inactive'),
-(2, 'fsdfsdfs', 'fsdfsdfsdf', '2025-04-30 12:25:24', 'inactive');
+INSERT INTO `forms` (`form_index`, `form_name`, `description`, `created_at`, `is_active`) VALUES
+(1, 'STUDENT INDIVIDUAL INVENTORY (SII) & CLIENT CONSENT FORM AY 2024-2025', 'This form would only take 15- 20 minutes of your time.\n\nEvery person\'s life is a developing story. The person you are today is a result of your upbringing and experiences, joys and sorrows, desires, and dreams. While we know that it\'s tempting to rush at times, please take some time to reflect on your life.', '2025-04-30 05:28:30', 1),
+(2, 'fsdfsdfs', 'fsdfsdfsdf', '2025-04-30 12:25:24', 0);
 
 -- --------------------------------------------------------
 

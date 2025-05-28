@@ -948,6 +948,17 @@
                 updateUndoRedoButtons();
             }
 
+            $('body').on('click', '.delete-option', function (e) {
+                e.stopPropagation();
+                if ($(this).closest('.options-container').find('.option-row').length > 1) {
+                    $(this).closest('.option-row').remove();
+                    saveState();
+                } else {
+                    alert('You must have at least one option');
+                }
+            });
+
+
             function trackWordInputAndSaveState(selector) {
                 let lastValue = '';
 
@@ -2357,7 +2368,7 @@
                             <input class="form-check-input" type="${questionType === 'multiple' ? 'radio' : 'checkbox'}" disabled>
                         </div>
                         <input type="text" class="form-control option-input" placeholder="Option ${optionCount + 1}">
-                        <button type="button" class="btn btn-sm btn-outline-danger ms-2 delete-option">
+                        <button type="button" class="btn btn-sm btn-outline-danger ms-2 remove-option">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>`;

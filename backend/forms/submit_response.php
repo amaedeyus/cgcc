@@ -12,9 +12,6 @@ if (!isset($_SESSION['user_index'])) {
     exit;
 }
 
-file_put_contents('session_debug.log', print_r($_SESSION, true), FILE_APPEND);
-
-
 // Get user type and index
 $userIndex = $_SESSION['user_index'];
 $userType = $_SESSION['user_type'];
@@ -55,11 +52,12 @@ if (!$data || !isset($data['form_index'])) {
 }
 
 $formId = (int)$data['form_index'];
+$isAutoSave = isset($data['is_autosave']) ? (bool)$data['is_autosave'] : false;
 
 try {
     $conn->begin_transaction();
 
-    // 1. Get active snapshot for this form (to maintain form state at time of submission)
+    // 1. Get active snapshot for this form
     $snapshotIndex = null;
     $snapshotStmt = $conn->prepare("
         SELECT snapshot_index 
@@ -78,19 +76,65 @@ try {
     }
     $snapshotStmt->close();
 
-    // 2. Create the main response record
-    $stmt = $conn->prepare("
-        INSERT INTO responses (form_index, student_index, created_at, snapshot_index) 
-        VALUES (?, ?, NOW(), ?)
-    ");
-    $stmt->bind_param("iii", $formId, $studentId, $snapshotIndex);
-    
-    if (!$stmt->execute()) {
-        throw new Exception("Failed to create response: " . $stmt->error);
+    // 2. Handle auto-save updates or create new response
+    $responseId = null;
+    if ($isAutoSave) {
+        // Check for existing auto-save response
+        $checkStmt = $conn->prepare("
+            SELECT response_index FROM responses 
+            WHERE form_index = ? AND student_index = ? AND is_autosave = 1
+            ORDER BY created_at DESC 
+            LIMIT 1
+        ");
+        $checkStmt->bind_param("ii", $formId, $studentId);
+        $checkStmt->execute();
+        $checkResult = $checkStmt->get_result();
+        
+        if ($checkResult->num_rows > 0) {
+            $responseRow = $checkResult->fetch_assoc();
+            $responseId = $responseRow['response_index'];
+            
+            // Update existing auto-save response
+            $updateStmt = $conn->prepare("
+                UPDATE responses 
+                SET snapshot_index = ?, updated_at = NOW()
+                WHERE response_index = ?
+            ");
+            $updateStmt->bind_param("ii", $snapshotIndex, $responseId);
+            $updateStmt->execute();
+            $updateStmt->close();
+            
+            // Delete previous answers to replace them
+            $deleteAnswers = $conn->prepare("DELETE FROM answers WHERE response_index = ?");
+            $deleteAnswers->bind_param("i", $responseId);
+            $deleteAnswers->execute();
+            $deleteAnswers->close();
+            
+            $deleteGridAnswers = $conn->prepare("DELETE FROM grid_answers WHERE response_index = ?");
+            $deleteGridAnswers->bind_param("i", $responseId);
+            $deleteGridAnswers->execute();
+            $deleteGridAnswers->close();
+        }
     }
-    $responseId = $conn->insert_id;
-    $stmt->close();
 
+    // If not updating an auto-save, create new response record
+    if (!$responseId) {
+        $stmt = $conn->prepare("
+            INSERT INTO responses 
+            (form_index, student_index, created_at, snapshot_index, is_autosave) 
+            VALUES (?, ?, NOW(), ?, ?)
+        ");
+        $isAutoSaveInt = $isAutoSave ? 1 : 0;
+        $stmt->bind_param("iiii", $formId, $studentId, $snapshotIndex, $isAutoSaveInt);
+        
+        if (!$stmt->execute()) {
+            throw new Exception("Failed to create response: " . $stmt->error);
+        }
+        $responseId = $conn->insert_id;
+        $stmt->close();
+    }
+
+    // 3. Process regular answers (non-grid questions)
     // 3. Process regular answers (non-grid questions)
     if (isset($data['answers']) && is_array($data['answers'])) {
         $answerStmt = $conn->prepare("
@@ -100,33 +144,15 @@ try {
         ");
 
         foreach ($data['answers'] as $answer) {
+            error_log("Answer received: " . json_encode($answer));
             $questionId = (int)$answer['main_question_index'];
             
             // Initialize both fields as null
             $choiceId = null;
             $textAnswer = null;
             
-            // Handle different answer types
-            if (isset($answer['is_other']) && $answer['is_other']) {
-                // This is an "other" option with text answer
-                $textAnswer = $answer['text_answer'] ?? '';
-                
-                // Verify the question allows "other" option
-                $checkOther = $conn->prepare("
-                    SELECT include_other FROM main_questions 
-                    WHERE main_question_index = ?
-                ");
-                $checkOther->bind_param("i", $questionId);
-                $checkOther->execute();
-                $checkOther->bind_result($includeOther);
-                $checkOther->fetch();
-                $checkOther->close();
-
-                if (!$includeOther) {
-                    throw new Exception("Question $questionId doesn't allow 'other' option");
-                }
-            } 
-            else if (isset($answer['choice_index']) && $answer['choice_index'] !== null) {
+            // Check if this is a choice-based answer or text answer
+            if (isset($answer['choice_index']) && $answer['choice_index'] !== null) {
                 // This is a regular choice selection
                 $choiceId = (int)$answer['choice_index'];
 
@@ -142,14 +168,30 @@ try {
                     throw new Exception("Invalid choice_index $choiceId for question $questionId");
                 }
                 $checkChoice->close();
-            } 
-            else if (isset($answer['text_answer']) && $answer['text_answer'] !== '') {
-                // This is a direct text answer (for text, paragraph, etc.)
+
+            } else if (isset($answer['text_answer']) && $answer['text_answer'] !== '') {
                 $textAnswer = $answer['text_answer'];
-            } 
-            else {
-                continue; // Skip if no valid answer provided
+
+                if (isset($answer['is_other']) && $answer['is_other']) {
+                    $checkOther = $conn->prepare("
+                        SELECT include_other FROM main_questions 
+                        WHERE main_question_index = ?
+                    ");
+                    $checkOther->bind_param("i", $questionId);
+                    $checkOther->execute();
+                    $checkOther->bind_result($includeOther);
+                    $checkOther->fetch();
+                    $checkOther->close();
+
+                    if (!$includeOther) {
+                        throw new Exception("Question $questionId doesn't allow 'other' option");
+                    }
+                }
+
+            } else {
+                continue; // No valid input
             }
+
             
             // Insert the answer
             $answerStmt->bind_param("iiis", $responseId, $questionId, $choiceId, $textAnswer);
@@ -157,6 +199,7 @@ try {
                 throw new Exception("Failed to insert answer: " . $answerStmt->error);
             }
         }
+
         $answerStmt->close();
     }
 
@@ -169,6 +212,12 @@ try {
         ");
 
         foreach ($data['grid_answers'] as $gridAnswer) {
+            if (!isset($gridAnswer['main_question_index']) || 
+                !isset($gridAnswer['sub_question_index']) || 
+                !isset($gridAnswer['choice_index'])) {
+                continue; // Skip invalid grid answers
+            }
+
             $questionId = (int)$gridAnswer['main_question_index'];
             $subQuestionId = (int)$gridAnswer['sub_question_index'];
             $choiceId = (int)$gridAnswer['choice_index'];
@@ -207,7 +256,6 @@ try {
                 throw new Exception("Failed to insert grid answer: " . $gridStmt->error);
             }
         }
-
         $gridStmt->close();
     }
 
@@ -216,21 +264,21 @@ try {
     // Successful response
     echo json_encode([
         'success' => true,
-        'message' => 'Response submitted successfully',
+        'message' => $isAutoSave ? 'Response auto-saved successfully' : 'Response submitted successfully',
         'response_index' => $responseId,
-        'snapshot_index' => $snapshotIndex
+        'snapshot_index' => $snapshotIndex,
+        'is_autosave' => $isAutoSave
     ]);
 
 } catch (Exception $e) {
     $conn->rollback();
     http_response_code(500);
     echo json_encode([
-        'error' => 'Failed to submit response',
+        'error' => $isAutoSave ? 'Auto-save failed' : 'Failed to submit response',
         'message' => $e->getMessage(),
-        'trace' => $e->getTrace() // Only for debugging, remove in production
+        'is_autosave' => $isAutoSave
     ]);
 }
 
-// Close connection
 $conn->close();
 ?>

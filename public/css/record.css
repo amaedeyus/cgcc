@@ -9,7 +9,6 @@
 
 .page right{
     display:flex;
-    align-items: center;
     justify-content: flex-start;
 }
 
@@ -20,7 +19,7 @@
     color: #023802;
 }
 
-    h2{
+h2{
     margin-bottom: 5px;
     font-size: 28px;
 }
@@ -32,7 +31,7 @@
 
 
 .top-container{
-        display: flex;
+    display: flex;
     justify-content: space-between;
     align-items: flex-start;
     flex-wrap: wrap;
@@ -328,6 +327,3 @@ select:disabled{
     cursor: not-allowed;
     box-shadow: none;
 }
-
-
-

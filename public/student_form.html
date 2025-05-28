@@ -1,290 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Form Submission</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/student-form.css">
     <style>
-        /* Main background and typography */
-        body {
-            background-color: #e8f6e9; /* Light gray background */
-            color: #212529;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            min-height: 100vh;
-            padding: 20px 0;
-        }
-
-        /* Form container */
-        #form-container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: #ffffff; /* White container */
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        /* Form sections */
-        .form-section {
-            background-color: #ffffff; /* White sections */
-            border-radius: 10px;
-            padding: 25px;
-            margin-bottom: 25px;
-            border: 1px solid #e0e0e0; /* Light gray border */
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        /* Section titles */
-        .section-title {
-            color: #1B5E20; /* Dark green */
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #C8E6C9; /* Light green accent */
-            padding-bottom: 8px;
-        }
-
-        /* Section descriptions */
-        .section-description {
-            color: #2E7D32; /* Medium green */
-            margin-bottom: 20px;
-            font-size: 1.1rem;
-        }
-
-        /* Question cards - now with stronger visual focus */
         .question-card {
-            background-color: #ffffff; /* White cards */
+            background-color: #f8f9fa;
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 20px;
-            border-left: 4px solid #4fbc9c; /* Green accent border */
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
 
-        .question-card:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            transform: translateY(-2px);
-        }
-
-        /* Question text - more prominent */
-        .question-card .form-label {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-            display: block;
-            color: #1B5E20; /* Dark green */
-        }
-
-        .required-label::after {
+        .required-label:after {
             content: " *";
-            color: #d32f2f;
-            font-weight: bold;
+            color: red;
         }
 
-        /* Form elements */
-        .form-check {
-            padding: 8px 0;
-            padding-left: 2.2em;
-            margin-bottom: 10px;
-            background-color: #f8f9fa; /* Light gray background for options */
-            border-radius: 4px;
-            transition: background-color 0.2s;
+        .progress-container {
+            margin: 30px 0;
         }
 
-        .form-check:hover {
-            background-color: #e8f5e9; /* Light green on hover */
-        }
-
-        .form-check-input {
-            width: 1.3em;
-            height: 1.3em;
-            margin-top: 0.15em;
-            margin-left: -1.8em;
-            border: 1px solid #81C784;
-        }
-
-        .form-check-label {
-            font-size: 1rem;
-            padding-left: 0.5em;
-            vertical-align: middle;
-            cursor: pointer;
-            display: inline-block;
-            width: calc(100% - 2em);
-            color: #2E7D32; /* Medium green */
-        }
-
-        /* Grid table */
-        .grid-table {
-            width: 100%;
-            margin: 15px 0;
-            border-collapse: separate;
-            border-spacing: 0;
+        .section-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
         }
 
         .grid-table th {
             text-align: center;
-            background-color: #E8F5E9; /* Lighter green header */
-            color: #1B5E20;
-            padding: 12px;
-            border: 1px solid #C8E6C9;
-            font-weight: 600;
+            background-color: #f8f9fa;
         }
 
         .grid-table td {
-            padding: 12px;
-            border: 1px solid #e0e0e0;
-            background-color: #ffffff;
+            vertical-align: middle;
         }
 
-        /* Buttons */
-        .btn-outline-primary {
-            border-color: #4fbc9c;
-            color: #4fbc9c;
-            padding: 8px 20px;
-            font-weight: 500;
-        }
-
-        .btn-outline-primary:hover {
-            background-color:#4fbc9c;
-            color: #ffffff;
-        }
-
-        .btn-outline-danger {
-            border-color: #d32f2f;
-            color: #d32f2f;
-            padding: 8px 20px;
-            font-weight: 500;
-        }
-
-        .btn-outline-danger:hover {
-            background-color: #d32f2f;
-            color: #ffffff;
-        }
-
-        .btn-primary {
-            background-color: #4fbc9c;
-            border-color: #4fbc9c;
-            padding: 8px 20px;
-            font-weight: 500;
-        }
-
-        .btn-primary:hover {
-            background-color: #3d8b40;
-            border-color: #3d8b40;
-        }
-
-        /* Focus states */
-        .form-control:focus, 
-        .form-select:focus, 
-        textarea.form-control:focus {
-            border-color: #81C784;
-            box-shadow: 0 0 0 0.25rem rgba(76, 175, 80, 0.25);
-            outline: none;
-        }
-
-        .form-check-input:focus {
-            box-shadow: 0 0 0 0.25rem rgba(76, 175, 80, 0.25);
-        }
-
-        /* Progress bar */
-        .progress-bar {
-            background-color: #4fbc9c;
-        }
-
-        /* Interactive elements */
-        .form-check-label:hover,
-        .grid-table label:hover {
-            background-color: rgba(0,0,0,0.03);
-        }
-
-        .grid-table label {
-            display: block;
-            width: 100%;
-            height: 100%;
-            margin: -12px;
-            padding: 12px;
-        }
-
-        .form-check-input:checked {
-            background-color: #4fbc9c;
-            border-color: #4fbc9c;
-        }
-
-        /* Layout */
-        .section-navigation {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 25px;
-            padding-top: 20px;
-            border-top: 1px solid #e0e0e0;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .progress-container {
-            margin-bottom: 20px;
-        }
-
-        .progress {
-            background-color: #E9ECEF;
-            height: 10px;
-            border-radius: 5px;
-        }
-
-        #progress-text {
-            margin-top: 6px;
-            display: block;
-            text-align: right;
-            font-size: 14px;
-            color: #6c757d;
-        }
-
-        /* Feedback message */
-        .save-feedback {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
-            padding: 12px 20px;
-            background-color: #4fbc9c;
-            color: white;
-            border-radius: 6px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            animation: fadeInOut 3s ease-in-out;
-            opacity: 0;
-        }
-
-        @keyframes fadeInOut {
-            0% { opacity: 0; transform: translateY(20px); }
-            20% { opacity: 1; transform: translateY(0); }
-            80% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(20px); }
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            #form-container {
-                padding: 15px;
-            }
-            
-            .form-section {
-                padding: 15px;
-            }
-            
-            .question-card {
-                padding: 15px;
-            }
-            
-            .question-card .form-label {
-                font-size: 1.1rem;
-            }
+        #form-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
+
 <body>
     <div class="container py-5">
         <div id="form-container">
@@ -292,7 +56,7 @@
                 <h1 id="form-title">Loading form...</h1>
                 <p id="form-description" class="lead"></p>
             </div>
-            
+
             <div id="sections-container"></div>
 
             <div class="progress-container">
@@ -301,7 +65,7 @@
                 </div>
                 <span id="progress-text">0/0 pages</span>
             </div>
-            
+
             <div class="section-navigation">
                 <button id="prev-section-btn" class="btn btn-outline-primary" disabled>Previous</button>
                 <div>
@@ -312,74 +76,251 @@
         </div>
     </div>
 
-    <div id="save-feedback" class="save-feedback alert alert-success" style="display: none;">
-        Responses saved successfully
-    </div>
     <script>
-        // Global variables
         let currentSectionIndex = 0;
         let formData = null;
         let sections = [];
         let formResponses = {};
+        let autoSaveInterval;
+
+
+        let isDirty = false;
+        let autoSaveTimer;
+
+        // Initialize the autosave functionality
+        function initAutoSave() {
+            // Mark as dirty and schedule autosave when inputs change
+            document.addEventListener('input', function (e) {
+                const questionInput = e.target.closest('.form-section .form-control, .form-section select, .form-section input[type="radio"], .form-section input[type="checkbox"]');
+                if (questionInput) {
+                    markAsDirty();
+                    scheduleAutoSave();
+                }
+            });
+
+            // Also handle change events for radios/checkboxes
+            document.addEventListener('change', function (e) {
+                const questionInput = e.target.closest('.form-section input[type="checkbox"], .form-section input[type="radio"]');
+                if (questionInput) {
+                    markAsDirty();
+                    scheduleAutoSave();
+                }
+            });
+        }
+
+        function markAsDirty() {
+            isDirty = true;
+            console.log("Changes detected, will autosave...");
+        }
+
+        function scheduleAutoSave() {
+            // Clear any pending autosave
+            clearTimeout(autoSaveTimer);
+            
+            // Schedule new autosave
+            autoSaveTimer = setTimeout(() => {
+                if (isDirty) {
+                    saveCurrentSectionResponses(); // Save to local storage first
+                    autoSaveForm();              // Then send to server
+                    isDirty = false;
+                }
+            }, 1000); // 1 second debounce
+        }
 
         document.addEventListener('DOMContentLoaded', function () {
+            initAutoSave();
             const urlParams = new URLSearchParams(window.location.search);
             const formId = urlParams.get('id');
             if (!formId) {
                 alert('No form ID specified in URL');
                 return;
             }
+
+            const savedData = localStorage.getItem('studentFormProgress');
+            if (savedData) {
+                try {
+                    const parsedData = JSON.parse(savedData);
+                    if (parsedData.formId !== formId) {
+                        localStorage.removeItem('studentFormProgress');
+                    }
+                } catch (e) {
+                    localStorage.removeItem('studentFormProgress');
+                }
+            }
             fetchFormData(formId);
-            
+
             // Event listeners
             document.getElementById('prev-section-btn').addEventListener('click', showPreviousSection);
             document.getElementById('clear-section-btn').addEventListener('click', clearCurrentSection);
             document.getElementById('next-section-btn').addEventListener('click', handleNextAction);
+
+            // Optionally add a "change" event for checkboxes/radios that may not trigger "input"
+            document.addEventListener('change', function (e) {
+                const questionInput = e.target.closest('.form-section input[type="checkbox"], .form-section input[type="radio"]');
+                if (questionInput) {
+                    saveCurrentSectionResponses();
+                    markAsDirty();
+                }
+            });
         });
+
+
+        async function fetchSavedServerResponse(formId) {
+            try {
+                const response = await fetch(`../backend/forms/get_saved_response.php?formId=${formId}`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    console.warn("No saved response found on server");
+                    return null;
+                }
+
+                const data = await response.json();
+                console.log("Fetched saved response from server:", data);
+
+                if (data && data.formId === formId) {
+                    return data;
+                }
+
+                return null;
+            } catch (error) {
+                console.error("Error fetching saved response from server:", error);
+                return null;
+            }
+        }
+
+        function loadSavedResponse(questionId, inputElement) {
+            if (!questionId || !inputElement || !formResponses[questionId]) return;
+
+            const response = formResponses[questionId];
+            console.log(`Loading response for ${questionId}:`, response);
+
+            if (response.type === 'checkbox') {
+                if (!response.value || !Array.isArray(response.value) || response.value.length === 0) {
+                    return; // Skip if empty or not an array
+                }
+                const checkboxes = inputElement.querySelectorAll(`input[type="checkbox"]`);
+                checkboxes.forEach(checkbox => {
+                    if (response.value && Array.isArray(response.value) && response.value.includes(checkbox.value)) {
+                        checkbox.checked = true;
+                    }
+                });
+
+                if (response.value && Array.isArray(response.value)) {
+                    if (response.value.includes('other') && inputElement.querySelector('input[data-other-for]')) {
+                        const otherInput = inputElement.querySelector('input[data-other-for]');
+                        otherInput.value = response.otherText || '';
+                        otherInput.disabled = false;
+                        const otherCheckbox = inputElement.querySelector(`input[type="checkbox"][value="other"]`);
+                        if (otherCheckbox) otherCheckbox.checked = true;
+                    }
+                }
+            }
+            else if (response.type === 'multiple') {
+                const radios = inputElement.querySelectorAll(`input[type="radio"]`);
+                radios.forEach(radio => {
+                    if (radio.value === response.value) {
+                        radio.checked = true;
+                    }
+                });
+
+                if (response.value === 'other' && inputElement.querySelector('input[data-other-for]')) {
+                    const otherInput = inputElement.querySelector('input[data-other-for]');
+                    otherInput.value = response.otherText || '';
+                    otherInput.disabled = false;
+                }
+            }
+            else if (response.type === 'dropdown' && inputElement.tagName === 'SELECT') {
+                inputElement.value = response.value || '';
+            }
+            else if (response.type === 'grid') {
+                if (response.value && Array.isArray(response.value)) {
+                    response.value.forEach(gridResponse => {
+                        const radio = inputElement.querySelector(
+                            `input[type="radio"][name="question_${questionId}_row_${gridResponse.rowIndex}"][value="${gridResponse.optionIndex}"]`
+                        );
+                        if (radio) radio.checked = true;
+                    });
+                }
+            }
+            else if (inputElement.value !== undefined) {  // For text inputs, textareas, etc.
+                inputElement.value = response.value || '';
+            }
+        }
 
         async function fetchFormData(formId) {
             try {
-                const response = await fetch(`http://localhost/cgcc/backend/forms/get_form_student.php?id=${formId}`);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch form data');
-                }
+                const response = await fetch(`../backend/forms/get_form_student.php?id=${formId}`);
+                if (!response.ok) throw new Error('Failed to fetch form data');
+
                 formData = await response.json();
                 sections = formData.sections || [];
-                
-                // Restore formResponses from localStorage AFTER form data is loaded
-                const savedData = localStorage.getItem('studentFormProgress');
-                if (savedData) {
-                    try {
-                        formResponses = JSON.parse(savedData);
-                        // Verify the saved data matches the current form
-                        if (formResponses.formId !== formId) {
-                            formResponses = {}; // Reset if form ID doesn't match
-                        }
-                    } catch (e) {
-                        console.warn("Invalid saved progress");
-                        formResponses = {};
-                    }
-                } else {
-                    formResponses = {};
+
+                // ✅ Initialize formResponses with current form ID
+                formResponses = {};;
+
+                // ✅ Load saved responses from localStorage
+                let serverData = null;
+                try {
+                    serverData = await fetchSavedServerResponse(formId);
+                } catch (e) {
+                    console.error("Failed to fetch server-side response:", e);
                 }
-                
+
+                if (serverData) {
+                    // Use server data as primary source
+                    for (const key in serverData) {
+                        if (key !== 'formId' && serverData[key]?.value) {
+                            formResponses[key] = serverData[key];
+                        }
+                    }
+
+                    // Update localStorage to match server state
+                    localStorage.setItem('studentFormProgress', JSON.stringify(formResponses));
+                } else {
+                    // Fall back to localStorage
+                    const savedData = localStorage.getItem('studentFormProgress');
+                    if (savedData) {
+                        try {
+                            const parsedData = JSON.parse(savedData);
+                            if (parsedData.formId === formId) {
+                                for (const key in parsedData) {
+                                    if (key !== 'formId' && parsedData[key]?.value) {
+                                        formResponses[key] = parsedData[key];
+                                    }
+                                }
+                            }
+                        } catch (e) {
+                            console.warn("Invalid saved progress", e);
+                        }
+                    }
+                }
+                formResponses.formId = formId;
+
+                // ✅ Finish initialization
                 initializeForm();
+                checkLocalStorage()
+                renderSectionsStartingAt(currentSectionIndex);
+
             } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('form-title').textContent = 'Error loading form';
+                console.error('Error fetching form data:', error);
                 alert('Failed to load form. Please try again later.');
             }
         }
 
+
         function initializeForm() {
             if (!formData) return;
-            
+
             document.getElementById('form-title').textContent = formData.form_name || 'Untitled Form';
             document.getElementById('form-description').textContent = formData.description || '';
-            formResponses.formId = formData.form_index;
-            
+
             updateProgress();
             renderSectionsStartingAt(currentSectionIndex);
+            // Save initial state
+            saveCurrentSectionResponses();
         }
 
         function renderSectionsStartingAt(startIndex) {
@@ -412,6 +353,7 @@
 
                 if (section.questions && section.questions.length > 0) {
                     section.questions.forEach(question => {
+                        console.log("Rendering question:", question);
                         const questionCard = document.createElement('div');
                         questionCard.className = 'question-card';
 
@@ -423,6 +365,7 @@
 
                         const inputElement = createInputElement(question);
                         questionCard.appendChild(inputElement);
+                        
                         loadSavedResponse(question.id, inputElement);
 
                         sectionElement.appendChild(questionCard);
@@ -498,7 +441,7 @@
                     input.type = 'radio';
                     input.name = `question_${question.id}`;
                     input.id = inputId;
-                    input.value = option.choice_index;  // Correct usage
+                    input.value = option.choice_index;
                     input.dataset.questionId = question.id;
                     input.dataset.questionType = question.type;
                     input.required = question.required || false;
@@ -506,7 +449,7 @@
                     const label = document.createElement('label');
                     label.className = 'form-check-label';
                     label.htmlFor = inputId;
-                    label.textContent = option.choice_text;  // Correct usage
+                    label.textContent = option.choice_text;
                     label.style.cursor = 'pointer';
 
                     div.appendChild(input);
@@ -543,7 +486,6 @@
                 otherInput.dataset.otherFor = question.id;
                 otherInput.disabled = true;
 
-                // Attach event listeners for "Other"
                 input.addEventListener('change', function () {
                     otherInput.disabled = this.value !== 'other';
                     if (this.value === 'other') otherInput.focus();
@@ -723,68 +665,6 @@
             return input;
         }
 
-        function loadSavedResponse(questionId, inputElement) {
-            if (!questionId || !inputElement) return;
-            
-            if (formResponses[questionId]) {
-                const response = formResponses[questionId];
-                
-                // Handle checkbox inputs
-                if (response.type === 'checkbox') {
-                    const checkboxes = inputElement.querySelectorAll(`input[type="checkbox"]`);
-                    checkboxes.forEach(checkbox => {
-                        if (response.value && response.value.includes(checkbox.value)) {
-                            checkbox.checked = true;
-                        }
-                    });
-                    
-                    // Handle "other" option for checkboxes
-                    if (response.value && response.value.includes('other') && inputElement.querySelector('input[data-other-for]')) {
-                        const otherInput = inputElement.querySelector('input[data-other-for]');
-                        otherInput.value = response.otherText || '';
-                        otherInput.disabled = false;
-                    }
-                } 
-                // Handle radio button inputs
-                else if (response.type === 'multiple') {
-                    const radios = inputElement.querySelectorAll(`input[type="radio"]`);
-                    radios.forEach(radio => {
-                        if (radio.value === response.value) {
-                            radio.checked = true;
-                        }
-                    });
-                    
-                    // Handle "other" option for radio buttons
-                    if (response.value === 'other' && inputElement.querySelector('input[data-other-for]')) {
-                        const otherInput = inputElement.querySelector('input[data-other-for]');
-                        otherInput.value = response.otherText || '';
-                        otherInput.disabled = false;
-                    }
-                } 
-                // Handle dropdown inputs
-                else if (response.type === 'dropdown') {
-                    if (inputElement.tagName === 'SELECT') {
-                        inputElement.value = response.value || '';
-                    }
-                } 
-                // Handle grid inputs
-                else if (response.type === 'grid') {
-                    if (response.value) {
-                        response.value.forEach(gridResponse => {
-                            const radio = inputElement.querySelector(
-                                `input[type="radio"][name="question_${questionId}_row_${gridResponse.rowIndex}"][value="${gridResponse.optionIndex}"]`
-                            );
-                            if (radio) radio.checked = true;
-                        });
-                    }
-                } 
-                // Handle all other input types (text, textarea, date, etc.)
-                else {
-                    inputElement.value = response.value || '';
-                }
-            }
-        }
-
         function handleNextAction() {
             if (!validateCurrentSection()) {
                 alert('Please complete all required fields');
@@ -793,11 +673,10 @@
 
             saveCurrentSectionResponses();
 
-            // Check if this is the last logical page
-            const isLastPage = currentSectionIndex >= sections.length - 1 || 
-                            (currentSectionIndex === sections.length - 2 && 
-                            sections[sections.length - 1].behavior === 'same-page');
-            
+            const isLastPage = currentSectionIndex >= sections.length - 1 ||
+                (currentSectionIndex === sections.length - 2 &&
+                    sections[sections.length - 1].behavior === 'same-page');
+
             if (isLastPage) {
                 submitForm();
             } else {
@@ -808,17 +687,15 @@
         }
 
         function findNextLogicalPage(index) {
-            // If we're at the last section, return the current index
             if (index >= sections.length - 1) {
                 return index;
             }
-            
-            // Find the next section that isn't marked as 'same-page'
+
             let nextIndex = index + 1;
             while (nextIndex < sections.length && sections[nextIndex].behavior === 'same-page') {
                 nextIndex++;
             }
-            
+
             return Math.min(nextIndex, sections.length - 1);
         }
 
@@ -841,22 +718,22 @@
 
         function validateCurrentSection() {
             let isValid = true;
-            
+
             for (let i = currentSectionIndex; i >= 0 && (i === currentSectionIndex || sections[i].behavior === 'same-page'); i--) {
                 const section = sections[i];
                 const sectionElement = document.querySelector(`.form-section[data-section-index="${i}"]`);
-                
+
                 if (!section || !sectionElement || !section.questions) continue;
-                
+
                 section.questions.forEach(question => {
                     if (!question.required) return;
-                    
+
                     const questionId = question.id;
                     const questionType = question.type;
                     const questionElement = sectionElement.querySelector(`[data-question-id="${questionId}"]`);
-                    
+
                     if (!questionElement) return;
-                    
+
                     if (questionType === 'checkbox') {
                         const checkboxes = sectionElement.querySelectorAll(
                             `input[type="checkbox"][name^="question_${questionId}_"]:checked`
@@ -911,21 +788,20 @@
                     }
                 });
             }
-            
+
             return isValid;
         }
 
         function updateNavigationButtons() {
             const prevBtn = document.getElementById('prev-section-btn');
             const nextBtn = document.getElementById('next-section-btn');
-            
+
             prevBtn.disabled = currentSectionIndex <= 0;
-            
-            // Check if this is the last logical page
-            const isLastPage = currentSectionIndex >= sections.length - 1 || 
-                            (currentSectionIndex === sections.length - 2 && 
-                            sections[sections.length - 1].behavior === 'same-page');
-            
+
+            const isLastPage = currentSectionIndex >= sections.length - 1 ||
+                (currentSectionIndex === sections.length - 2 &&
+                    sections[sections.length - 1].behavior === 'same-page');
+
             if (isLastPage) {
                 nextBtn.textContent = 'Submit';
                 nextBtn.classList.remove('btn-primary');
@@ -947,7 +823,6 @@
                 return;
             }
 
-            // Count logical pages
             let totalPages = 1;
             let prevBehavior = sections[0]?.behavior;
 
@@ -959,7 +834,6 @@
                 prevBehavior = currBehavior;
             }
 
-            // Determine current page number
             let currentPage = 1;
             prevBehavior = sections[0]?.behavior;
 
@@ -971,14 +845,12 @@
                 prevBehavior = currBehavior;
             }
 
-            // Hide progress bar if only one logical page
             if (totalPages <= 1) {
                 progressContainer.style.display = 'none';
             } else {
                 progressContainer.style.display = 'block';
             }
 
-            // Update progress bar and text
             const progress = (currentPage / totalPages) * 100;
             progressBar.style.width = `${progress}%`;
             progressText.textContent = `${currentPage}/${totalPages} ${totalPages > 1 ? 'pages' : 'page'}`;
@@ -989,9 +861,9 @@
                 for (let i = currentSectionIndex; i >= 0 && (i === currentSectionIndex || sections[i].behavior === 'same-page'); i--) {
                     const section = sections[i];
                     const sectionElement = document.querySelector(`.form-section[data-section-index="${i}"]`);
-                    
+
                     if (!section || !sectionElement || !section.questions) continue;
-                    
+
                     section.questions.forEach(question => {
                         const questionId = question.id;
                         delete formResponses[questionId];
@@ -1027,22 +899,26 @@
                         }
                     });
                 }
-                
+
                 localStorage.setItem('studentFormProgress', JSON.stringify(formResponses));
+                checkLocalStorage();
             }
         }
 
         function saveCurrentSectionResponses() {
-            if (!formData) return;
-            
+            if (!formData) {
+                setTimeout(saveCurrentSectionResponses, 500); // retry after 0.5s
+                return;
+            }
+
             formResponses.formId = formData.form_index;
-            
+
             for (let i = currentSectionIndex; i >= 0 && (i === currentSectionIndex || sections[i].behavior === 'same-page'); i--) {
                 const section = sections[i];
                 const sectionElement = document.querySelector(`.form-section[data-section-index="${i}"]`);
-                
+
                 if (!section || !sectionElement || !section.questions) continue;
-                
+
                 section.questions.forEach(question => {
                     const questionId = question.id;
                     const questionType = question.type;
@@ -1097,26 +973,106 @@
                         formResponses[questionId] = { type: questionType, value };
                         if (otherText !== null) formResponses[questionId].otherText = otherText;
                     }
+
                 });
             }
-            
-            localStorage.setItem('studentFormProgress', JSON.stringify(formResponses));
+
+            try {
+                localStorage.setItem('studentFormProgress', JSON.stringify(formResponses));
+                checkLocalStorage();
+            } catch (e) {
+                console.error("Failed to save to localStorage:", e);
+            }
+        }
+
+        async function autoSaveForm() {
+            if (!formData || Object.keys(formResponses).length <= 1) return; // Only formId is present
+
+            saveCurrentSectionResponses();
+
+            const submissionData = prepareSubmissionData(true);
+            console.log("Auto-saving payload:", submissionData) // <-- Add this line
+            try {
+                const response = await fetch('../backend/forms/submit_response.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(submissionData),
+                    credentials: 'include'
+                });
+
+                const responseData = await response.json();
+
+                if (!response.ok) {
+                    console.error('Auto-save failed:', responseData.error || 'Unknown error');
+                    return;
+                }
+
+                console.log('Form auto-saved successfully');
+            } catch (error) {
+                console.error('Auto-save error:', error);
+            }
         }
 
         async function submitForm() {
+            checkLocalStorage();
             const submitBtn = document.getElementById('next-section-btn');
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...';
 
-            saveCurrentSectionResponses(); // Ensure latest input is stored
+            saveCurrentSectionResponses();
 
+            const submissionData = prepareSubmissionData(false);
+
+            try {
+                const response = await fetch('..//backend/forms/submit_response.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(submissionData),
+                    credentials: 'include'
+                });
+
+                const responseData = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(responseData.error || 'Failed to submit form');
+                }
+
+                // Clear auto-save interval and local storage
+                clearInterval(autoSaveInterval);
+                localStorage.removeItem('studentFormProgress');
+
+                alert('Form submitted successfully!');
+                window.location.href = 'submission-success.html';
+            } catch (error) {
+                console.error('Error:', error);
+                alert(error.message || 'Failed to submit form. Please try again.');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Submit';
+            }
+        }
+
+        function checkLocalStorage() {
+            const content = localStorage.getItem('studentFormProgress');
+            console.log("Current localStorage content:", content);
+            if (!content) {
+                console.warn("No data found in localStorage");
+            } else {
+                try {
+                    console.log("Parsed localStorage:", JSON.parse(content));
+                } catch (e) {
+                    console.error("localStorage contains invalid JSON");
+                }
+            }
+        }
+
+        function prepareSubmissionData(isAutoSave) {
             const submissionData = {
                 form_index: formData.form_index,
                 answers: [],
-                grid_answers: []
+                grid_answers: [],
+                is_autosave: isAutoSave
             };
 
-            // Get all question IDs from the form data to ensure we don't miss any
             const allQuestionIds = [];
             sections.forEach(section => {
                 if (section.questions) {
@@ -1126,10 +1082,9 @@
                 }
             });
 
-            // Process each question
             allQuestionIds.forEach(questionId => {
                 const response = formResponses[questionId];
-                if (!response) return; // Skip unanswered questions
+                if (!response) return;
 
                 const main_question_index = parseInt(questionId);
                 const question = findQuestionById(questionId);
@@ -1146,7 +1101,7 @@
                             });
                         });
                     }
-                } 
+                }
                 else if (question.type === 'checkbox') {
                     if (Array.isArray(response.value)) {
                         response.value.forEach(value => {
@@ -1159,7 +1114,7 @@
                             });
                         });
                     }
-                } 
+                }
                 else if (question.type === 'multiple' || question.type === 'dropdown') {
                     const isOther = response.value === 'other';
                     submissionData.answers.push({
@@ -1168,9 +1123,8 @@
                         text_answer: isOther ? (response.otherText || '') : null,
                         is_other: isOther
                     });
-                } 
+                }
                 else {
-                    // Handle text, paragraph, date inputs
                     submissionData.answers.push({
                         main_question_index,
                         choice_index: null,
@@ -1180,41 +1134,9 @@
                 }
             });
 
-            try {
-                const response = await fetch('http://localhost/cgcc/backend/forms/submit_response.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(submissionData),
-                    credentials: 'include'
-                });
-
-                const rawResponse = await response.text();
-                console.log('Raw response from server:', rawResponse);
-
-                let responseData;
-                try {
-                    responseData = JSON.parse(rawResponse);
-                } catch (jsonError) {
-                    throw new Error(`Invalid JSON returned from server: ${rawResponse}`);
-                }
-
-                
-                if (!response.ok) {
-                    throw new Error(responseData.error || 'Failed to submit form');
-                }
-
-                localStorage.removeItem('studentFormProgress');
-                alert('Form submitted successfully!');
-                window.location.href = 'submission-success.html';
-            } catch (error) {
-                console.error('Error:', error);
-                alert(error.message || 'Failed to submit form. Please try again.');
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = 'Submit';
-            }
+            return submissionData;
         }
 
-        // Helper function to find question by ID
         function findQuestionById(questionId) {
             for (const section of sections) {
                 if (section.questions) {
@@ -1228,32 +1150,20 @@
             return null;
         }
 
-
         function highlightRequired(element) {
             if (!element) return;
-            
+
             element.style.borderColor = 'red';
             setTimeout(() => {
                 element.style.borderColor = '';
             }, 2000);
-            
+
             element.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
-        // Auto-save functionality
-        document.getElementById('form-container').addEventListener('input', () => {
-            saveCurrentSectionResponses();
-        });
-
-        // Handle beforeunload to warn about unsaved changes
-        window.addEventListener('beforeunload', (e) => {
-            if (Object.keys(formResponses).length > 1) { // More than just formId
-                e.preventDefault();
-                e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
-            }
-        });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
