@@ -569,6 +569,17 @@
                 label.htmlFor = optionId;
                 label.textContent = option.choice_text;
 
+                // Make the whole optionDiv clickable
+                optionDiv.addEventListener('click', (e) => {
+                    // Don't trigger if clicking directly on the input
+                    if (e.target !== input) {
+                        input.checked = !input.checked;
+                        // Trigger change event for validation
+                        const event = new Event('change');
+                        input.dispatchEvent(event);
+                    }
+                });
+
                 optionDiv.appendChild(input);
                 optionDiv.appendChild(label);
                 optionsContainer.appendChild(optionDiv);
@@ -597,6 +608,17 @@
                 const label = document.createElement('label');
                 label.htmlFor = optionId;
                 label.textContent = option.choice_text;
+
+                // Make the whole optionDiv clickable
+                optionDiv.addEventListener('click', (e) => {
+                    // Don't trigger if clicking directly on the input
+                    if (e.target !== input) {
+                        input.checked = !input.checked;
+                        // Trigger change event for validation
+                        const event = new Event('change');
+                        input.dispatchEvent(event);
+                    }
+                });
 
                 optionDiv.appendChild(input);
                 optionDiv.appendChild(label);
