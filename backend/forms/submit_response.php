@@ -52,7 +52,7 @@ if (!$data || !isset($data['form_index'])) {
 }
 
 $formId = (int)$data['form_index'];
-$isAutoSave = isset($data['is_autosave']) && $data['is_autosave'];
+$isAutoSave = isset($data['is_autosave']) ? (bool)$data['is_autosave'] : false;
 
 try {
     $conn->begin_transaction();
@@ -76,11 +76,10 @@ try {
     }
     $snapshotStmt->close();
 
-    // For auto-save, we'll update existing response if available
+    // 2. Handle auto-save updates or create new response
     $responseId = null;
-    
     if ($isAutoSave) {
-        // Check if there's an existing auto-save response
+        // Check for existing auto-save response
         $checkStmt = $conn->prepare("
             SELECT response_index FROM responses 
             WHERE form_index = ? AND student_index = ? AND is_autosave = 1
@@ -94,33 +93,32 @@ try {
         if ($checkResult->num_rows > 0) {
             $responseRow = $checkResult->fetch_assoc();
             $responseId = $responseRow['response_index'];
+            
+            // Update existing auto-save response
+            $updateStmt = $conn->prepare("
+                UPDATE responses 
+                SET snapshot_index = ?, updated_at = NOW()
+                WHERE response_index = ?
+            ");
+            $updateStmt->bind_param("ii", $snapshotIndex, $responseId);
+            $updateStmt->execute();
+            $updateStmt->close();
+            
+            // Delete previous answers to replace them
+            $deleteAnswers = $conn->prepare("DELETE FROM answers WHERE response_index = ?");
+            $deleteAnswers->bind_param("i", $responseId);
+            $deleteAnswers->execute();
+            $deleteAnswers->close();
+            
+            $deleteGridAnswers = $conn->prepare("DELETE FROM grid_answers WHERE response_index = ?");
+            $deleteGridAnswers->bind_param("i", $responseId);
+            $deleteGridAnswers->execute();
+            $deleteGridAnswers->close();
         }
-        $checkStmt->close();
     }
 
-    if ($responseId) {
-        // Update existing auto-save response
-        $updateStmt = $conn->prepare("
-            UPDATE responses 
-            SET snapshot_index = ?, updated_at = NOW()
-            WHERE response_index = ?
-        ");
-        $updateStmt->bind_param("ii", $snapshotIndex, $responseId);
-        $updateStmt->execute();
-        $updateStmt->close();
-        
-        // Delete previous answers to replace them
-        $deleteAnswers = $conn->prepare("DELETE FROM answers WHERE response_index = ?");
-        $deleteAnswers->bind_param("i", $responseId);
-        $deleteAnswers->execute();
-        $deleteAnswers->close();
-        
-        $deleteGridAnswers = $conn->prepare("DELETE FROM grid_answers WHERE response_index = ?");
-        $deleteGridAnswers->bind_param("i", $responseId);
-        $deleteGridAnswers->execute();
-        $deleteGridAnswers->close();
-    } else {
-        // Create new response record
+    // If not updating an auto-save, create new response record
+    if (!$responseId) {
         $stmt = $conn->prepare("
             INSERT INTO responses 
             (form_index, student_index, created_at, snapshot_index, is_autosave) 
@@ -136,7 +134,8 @@ try {
         $stmt->close();
     }
 
-    // Process regular answers (non-grid questions)
+    // 3. Process regular answers (non-grid questions)
+    // 3. Process regular answers (non-grid questions)
     if (isset($data['answers']) && is_array($data['answers'])) {
         $answerStmt = $conn->prepare("
             INSERT INTO answers 
@@ -145,31 +144,16 @@ try {
         ");
 
         foreach ($data['answers'] as $answer) {
+            error_log("Answer received: " . json_encode($answer));
             $questionId = (int)$answer['main_question_index'];
             
             // Initialize both fields as null
             $choiceId = null;
             $textAnswer = null;
             
-            // Handle different answer types
-            if (isset($answer['is_other']) && $answer['is_other']) {
-                $textAnswer = $answer['text_answer'] ?? '';
-                
-                $checkOther = $conn->prepare("
-                    SELECT include_other FROM main_questions 
-                    WHERE main_question_index = ?
-                ");
-                $checkOther->bind_param("i", $questionId);
-                $checkOther->execute();
-                $checkOther->bind_result($includeOther);
-                $checkOther->fetch();
-                $checkOther->close();
-
-                if (!$includeOther) {
-                    throw new Exception("Question $questionId doesn't allow 'other' option");
-                }
-            } 
-            else if (isset($answer['choice_index']) && $answer['choice_index'] !== null) {
+            // Check if this is a choice-based answer or text answer
+            if (isset($answer['choice_index']) && $answer['choice_index'] !== null) {
+                // This is a regular choice selection
                 $choiceId = (int)$answer['choice_index'];
 
                 $checkChoice = $conn->prepare("
@@ -184,23 +168,42 @@ try {
                     throw new Exception("Invalid choice_index $choiceId for question $questionId");
                 }
                 $checkChoice->close();
-            } 
-            else if (isset($answer['text_answer']) && $answer['text_answer'] !== '') {
+
+            } else if (isset($answer['text_answer']) && $answer['text_answer'] !== '') {
                 $textAnswer = $answer['text_answer'];
-            } 
-            else {
-                continue;
+
+                if (isset($answer['is_other']) && $answer['is_other']) {
+                    $checkOther = $conn->prepare("
+                        SELECT include_other FROM main_questions 
+                        WHERE main_question_index = ?
+                    ");
+                    $checkOther->bind_param("i", $questionId);
+                    $checkOther->execute();
+                    $checkOther->bind_result($includeOther);
+                    $checkOther->fetch();
+                    $checkOther->close();
+
+                    if (!$includeOther) {
+                        throw new Exception("Question $questionId doesn't allow 'other' option");
+                    }
+                }
+
+            } else {
+                continue; // No valid input
             }
+
             
+            // Insert the answer
             $answerStmt->bind_param("iiis", $responseId, $questionId, $choiceId, $textAnswer);
             if (!$answerStmt->execute()) {
                 throw new Exception("Failed to insert answer: " . $answerStmt->error);
             }
         }
+
         $answerStmt->close();
     }
 
-    // Process grid answers (matrix questions)
+    // 4. Process grid answers (matrix questions)
     if (isset($data['grid_answers']) && is_array($data['grid_answers'])) {
         $gridStmt = $conn->prepare("
             INSERT INTO grid_answers 
@@ -209,10 +212,17 @@ try {
         ");
 
         foreach ($data['grid_answers'] as $gridAnswer) {
+            if (!isset($gridAnswer['main_question_index']) || 
+                !isset($gridAnswer['sub_question_index']) || 
+                !isset($gridAnswer['choice_index'])) {
+                continue; // Skip invalid grid answers
+            }
+
             $questionId = (int)$gridAnswer['main_question_index'];
             $subQuestionId = (int)$gridAnswer['sub_question_index'];
             $choiceId = (int)$gridAnswer['choice_index'];
 
+            // Verify the sub-question exists for this main question
             $checkSubQuestion = $conn->prepare("
                 SELECT 1 FROM sub_questions 
                 WHERE sub_question_index = ? AND main_question_index = ?
@@ -226,6 +236,7 @@ try {
             }
             $checkSubQuestion->close();
             
+            // Verify the choice exists for this question
             $checkGridChoice = $conn->prepare("
                 SELECT 1 FROM choices 
                 WHERE choice_index = ? AND main_question_index = ?
@@ -239,6 +250,7 @@ try {
             }
             $checkGridChoice->close();
 
+            // Insert the grid answer
             $gridStmt->bind_param("iiii", $responseId, $questionId, $subQuestionId, $choiceId);
             if (!$gridStmt->execute()) {
                 throw new Exception("Failed to insert grid answer: " . $gridStmt->error);

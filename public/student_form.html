@@ -1,12 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Form Submission</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/student-form.css">
+    <style>
+        .question-card {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .required-label:after {
+            content: " *";
+            color: red;
+        }
+
+        .progress-container {
+            margin: 30px 0;
+        }
+
+        .section-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .grid-table th {
+            text-align: center;
+            background-color: #f8f9fa;
+        }
+
+        .grid-table td {
+            vertical-align: middle;
+        }
+
+        #form-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+    </style>
 </head>
+
 <body>
     <div class="container py-5">
         <div id="form-container">
@@ -14,7 +56,7 @@
                 <h1 id="form-title">Loading form...</h1>
                 <p id="form-description" class="lead"></p>
             </div>
-            
+
             <div id="sections-container"></div>
 
             <div class="progress-container">
@@ -23,7 +65,7 @@
                 </div>
                 <span id="progress-text">0/0 pages</span>
             </div>
-            
+
             <div class="section-navigation">
                 <button id="prev-section-btn" class="btn btn-outline-primary" disabled>Previous</button>
                 <div>
@@ -39,65 +81,246 @@
         let formData = null;
         let sections = [];
         let formResponses = {};
+        let autoSaveInterval;
+
+
+        let isDirty = false;
+        let autoSaveTimer;
+
+        // Initialize the autosave functionality
+        function initAutoSave() {
+            // Mark as dirty and schedule autosave when inputs change
+            document.addEventListener('input', function (e) {
+                const questionInput = e.target.closest('.form-section .form-control, .form-section select, .form-section input[type="radio"], .form-section input[type="checkbox"]');
+                if (questionInput) {
+                    markAsDirty();
+                    scheduleAutoSave();
+                }
+            });
+
+            // Also handle change events for radios/checkboxes
+            document.addEventListener('change', function (e) {
+                const questionInput = e.target.closest('.form-section input[type="checkbox"], .form-section input[type="radio"]');
+                if (questionInput) {
+                    markAsDirty();
+                    scheduleAutoSave();
+                }
+            });
+        }
+
+        function markAsDirty() {
+            isDirty = true;
+            console.log("Changes detected, will autosave...");
+        }
+
+        function scheduleAutoSave() {
+            // Clear any pending autosave
+            clearTimeout(autoSaveTimer);
+            
+            // Schedule new autosave
+            autoSaveTimer = setTimeout(() => {
+                if (isDirty) {
+                    saveCurrentSectionResponses(); // Save to local storage first
+                    autoSaveForm();              // Then send to server
+                    isDirty = false;
+                }
+            }, 1000); // 1 second debounce
+        }
 
         document.addEventListener('DOMContentLoaded', function () {
+            initAutoSave();
             const urlParams = new URLSearchParams(window.location.search);
             const formId = urlParams.get('id');
             if (!formId) {
                 alert('No form ID specified in URL');
                 return;
             }
+
+            const savedData = localStorage.getItem('studentFormProgress');
+            if (savedData) {
+                try {
+                    const parsedData = JSON.parse(savedData);
+                    if (parsedData.formId !== formId) {
+                        localStorage.removeItem('studentFormProgress');
+                    }
+                } catch (e) {
+                    localStorage.removeItem('studentFormProgress');
+                }
+            }
             fetchFormData(formId);
-            
+
             // Event listeners
             document.getElementById('prev-section-btn').addEventListener('click', showPreviousSection);
             document.getElementById('clear-section-btn').addEventListener('click', clearCurrentSection);
             document.getElementById('next-section-btn').addEventListener('click', handleNextAction);
+
+            // Optionally add a "change" event for checkboxes/radios that may not trigger "input"
+            document.addEventListener('change', function (e) {
+                const questionInput = e.target.closest('.form-section input[type="checkbox"], .form-section input[type="radio"]');
+                if (questionInput) {
+                    saveCurrentSectionResponses();
+                    markAsDirty();
+                }
+            });
         });
+
+
+        async function fetchSavedServerResponse(formId) {
+            try {
+                const response = await fetch(`../backend/forms/get_saved_response.php?formId=${formId}`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    console.warn("No saved response found on server");
+                    return null;
+                }
+
+                const data = await response.json();
+                console.log("Fetched saved response from server:", data);
+
+                if (data && data.formId === formId) {
+                    return data;
+                }
+
+                return null;
+            } catch (error) {
+                console.error("Error fetching saved response from server:", error);
+                return null;
+            }
+        }
+
+        function loadSavedResponse(questionId, inputElement) {
+            if (!questionId || !inputElement || !formResponses[questionId]) return;
+
+            const response = formResponses[questionId];
+            console.log(`Loading response for ${questionId}:`, response);
+
+            if (response.type === 'checkbox') {
+                if (!response.value || !Array.isArray(response.value) || response.value.length === 0) {
+                    return; // Skip if empty or not an array
+                }
+                const checkboxes = inputElement.querySelectorAll(`input[type="checkbox"]`);
+                checkboxes.forEach(checkbox => {
+                    if (response.value && Array.isArray(response.value) && response.value.includes(checkbox.value)) {
+                        checkbox.checked = true;
+                    }
+                });
+
+                if (response.value && Array.isArray(response.value)) {
+                    if (response.value.includes('other') && inputElement.querySelector('input[data-other-for]')) {
+                        const otherInput = inputElement.querySelector('input[data-other-for]');
+                        otherInput.value = response.otherText || '';
+                        otherInput.disabled = false;
+                        const otherCheckbox = inputElement.querySelector(`input[type="checkbox"][value="other"]`);
+                        if (otherCheckbox) otherCheckbox.checked = true;
+                    }
+                }
+            }
+            else if (response.type === 'multiple') {
+                const radios = inputElement.querySelectorAll(`input[type="radio"]`);
+                radios.forEach(radio => {
+                    if (radio.value === response.value) {
+                        radio.checked = true;
+                    }
+                });
+
+                if (response.value === 'other' && inputElement.querySelector('input[data-other-for]')) {
+                    const otherInput = inputElement.querySelector('input[data-other-for]');
+                    otherInput.value = response.otherText || '';
+                    otherInput.disabled = false;
+                }
+            }
+            else if (response.type === 'dropdown' && inputElement.tagName === 'SELECT') {
+                inputElement.value = response.value || '';
+            }
+            else if (response.type === 'grid') {
+                if (response.value && Array.isArray(response.value)) {
+                    response.value.forEach(gridResponse => {
+                        const radio = inputElement.querySelector(
+                            `input[type="radio"][name="question_${questionId}_row_${gridResponse.rowIndex}"][value="${gridResponse.optionIndex}"]`
+                        );
+                        if (radio) radio.checked = true;
+                    });
+                }
+            }
+            else if (inputElement.value !== undefined) {  // For text inputs, textareas, etc.
+                inputElement.value = response.value || '';
+            }
+        }
 
         async function fetchFormData(formId) {
             try {
-                const response = await fetch(`http://localhost/cgcc/backend/forms/get_form_student.php?id=${formId}`);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch form data');
-                }
+                const response = await fetch(`../backend/forms/get_form_student.php?id=${formId}`);
+                if (!response.ok) throw new Error('Failed to fetch form data');
+
                 formData = await response.json();
                 sections = formData.sections || [];
-                
-                // Restore formResponses from localStorage AFTER form data is loaded
-                const savedData = localStorage.getItem('studentFormProgress');
-                if (savedData) {
-                    try {
-                        formResponses = JSON.parse(savedData);
-                        // Verify the saved data matches the current form
-                        if (formResponses.formId !== formId) {
-                            formResponses = {}; // Reset if form ID doesn't match
-                        }
-                    } catch (e) {
-                        console.warn("Invalid saved progress");
-                        formResponses = {};
-                    }
-                } else {
-                    formResponses = {};
+
+                // ✅ Initialize formResponses with current form ID
+                formResponses = {};;
+
+                // ✅ Load saved responses from localStorage
+                let serverData = null;
+                try {
+                    serverData = await fetchSavedServerResponse(formId);
+                } catch (e) {
+                    console.error("Failed to fetch server-side response:", e);
                 }
-                
+
+                if (serverData) {
+                    // Use server data as primary source
+                    for (const key in serverData) {
+                        if (key !== 'formId' && serverData[key]?.value) {
+                            formResponses[key] = serverData[key];
+                        }
+                    }
+
+                    // Update localStorage to match server state
+                    localStorage.setItem('studentFormProgress', JSON.stringify(formResponses));
+                } else {
+                    // Fall back to localStorage
+                    const savedData = localStorage.getItem('studentFormProgress');
+                    if (savedData) {
+                        try {
+                            const parsedData = JSON.parse(savedData);
+                            if (parsedData.formId === formId) {
+                                for (const key in parsedData) {
+                                    if (key !== 'formId' && parsedData[key]?.value) {
+                                        formResponses[key] = parsedData[key];
+                                    }
+                                }
+                            }
+                        } catch (e) {
+                            console.warn("Invalid saved progress", e);
+                        }
+                    }
+                }
+                formResponses.formId = formId;
+
+                // ✅ Finish initialization
                 initializeForm();
+                checkLocalStorage()
+                renderSectionsStartingAt(currentSectionIndex);
+
             } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('form-title').textContent = 'Error loading form';
+                console.error('Error fetching form data:', error);
                 alert('Failed to load form. Please try again later.');
             }
         }
 
+
         function initializeForm() {
             if (!formData) return;
-            
+
             document.getElementById('form-title').textContent = formData.form_name || 'Untitled Form';
             document.getElementById('form-description').textContent = formData.description || '';
-            formResponses.formId = formData.form_index;
-            
+
             updateProgress();
             renderSectionsStartingAt(currentSectionIndex);
+            // Save initial state
+            saveCurrentSectionResponses();
         }
 
         function renderSectionsStartingAt(startIndex) {
@@ -130,6 +353,7 @@
 
                 if (section.questions && section.questions.length > 0) {
                     section.questions.forEach(question => {
+                        console.log("Rendering question:", question);
                         const questionCard = document.createElement('div');
                         questionCard.className = 'question-card';
 
@@ -141,6 +365,7 @@
 
                         const inputElement = createInputElement(question);
                         questionCard.appendChild(inputElement);
+                        
                         loadSavedResponse(question.id, inputElement);
 
                         sectionElement.appendChild(questionCard);
@@ -440,61 +665,6 @@
             return input;
         }
 
-        function loadSavedResponse(questionId, inputElement) {
-            if (!questionId || !inputElement) return;
-            
-            if (formResponses[questionId]) {
-                const response = formResponses[questionId];
-                
-                if (response.type === 'checkbox') {
-                    const checkboxes = inputElement.querySelectorAll(`input[type="checkbox"]`);
-                    checkboxes.forEach(checkbox => {
-                        if (response.value && response.value.includes(checkbox.value)) {
-                            checkbox.checked = true;
-                        }
-                    });
-                    
-                    if (response.value && response.value.includes('other') && inputElement.querySelector('input[data-other-for]')) {
-                        const otherInput = inputElement.querySelector('input[data-other-for]');
-                        otherInput.value = response.otherText || '';
-                        otherInput.disabled = false;
-                    }
-                } 
-                else if (response.type === 'multiple') {
-                    const radios = inputElement.querySelectorAll(`input[type="radio"]`);
-                    radios.forEach(radio => {
-                        if (radio.value === response.value) {
-                            radio.checked = true;
-                        }
-                    });
-                    
-                    if (response.value === 'other' && inputElement.querySelector('input[data-other-for]')) {
-                        const otherInput = inputElement.querySelector('input[data-other-for]');
-                        otherInput.value = response.otherText || '';
-                        otherInput.disabled = false;
-                    }
-                } 
-                else if (response.type === 'dropdown') {
-                    if (inputElement.tagName === 'SELECT') {
-                        inputElement.value = response.value || '';
-                    }
-                } 
-                else if (response.type === 'grid') {
-                    if (response.value) {
-                        response.value.forEach(gridResponse => {
-                            const radio = inputElement.querySelector(
-                                `input[type="radio"][name="question_${questionId}_row_${gridResponse.rowIndex}"][value="${gridResponse.optionIndex}"]`
-                            );
-                            if (radio) radio.checked = true;
-                        });
-                    }
-                } 
-                else {
-                    inputElement.value = response.value || '';
-                }
-            }
-        }
-
         function handleNextAction() {
             if (!validateCurrentSection()) {
                 alert('Please complete all required fields');
@@ -503,10 +673,10 @@
 
             saveCurrentSectionResponses();
 
-            const isLastPage = currentSectionIndex >= sections.length - 1 || 
-                            (currentSectionIndex === sections.length - 2 && 
-                            sections[sections.length - 1].behavior === 'same-page');
-            
+            const isLastPage = currentSectionIndex >= sections.length - 1 ||
+                (currentSectionIndex === sections.length - 2 &&
+                    sections[sections.length - 1].behavior === 'same-page');
+
             if (isLastPage) {
                 submitForm();
             } else {
@@ -520,12 +690,12 @@
             if (index >= sections.length - 1) {
                 return index;
             }
-            
+
             let nextIndex = index + 1;
             while (nextIndex < sections.length && sections[nextIndex].behavior === 'same-page') {
                 nextIndex++;
             }
-            
+
             return Math.min(nextIndex, sections.length - 1);
         }
 
@@ -548,22 +718,22 @@
 
         function validateCurrentSection() {
             let isValid = true;
-            
+
             for (let i = currentSectionIndex; i >= 0 && (i === currentSectionIndex || sections[i].behavior === 'same-page'); i--) {
                 const section = sections[i];
                 const sectionElement = document.querySelector(`.form-section[data-section-index="${i}"]`);
-                
+
                 if (!section || !sectionElement || !section.questions) continue;
-                
+
                 section.questions.forEach(question => {
                     if (!question.required) return;
-                    
+
                     const questionId = question.id;
                     const questionType = question.type;
                     const questionElement = sectionElement.querySelector(`[data-question-id="${questionId}"]`);
-                    
+
                     if (!questionElement) return;
-                    
+
                     if (questionType === 'checkbox') {
                         const checkboxes = sectionElement.querySelectorAll(
                             `input[type="checkbox"][name^="question_${questionId}_"]:checked`
@@ -618,20 +788,20 @@
                     }
                 });
             }
-            
+
             return isValid;
         }
 
         function updateNavigationButtons() {
             const prevBtn = document.getElementById('prev-section-btn');
             const nextBtn = document.getElementById('next-section-btn');
-            
+
             prevBtn.disabled = currentSectionIndex <= 0;
-            
-            const isLastPage = currentSectionIndex >= sections.length - 1 || 
-                            (currentSectionIndex === sections.length - 2 && 
-                            sections[sections.length - 1].behavior === 'same-page');
-            
+
+            const isLastPage = currentSectionIndex >= sections.length - 1 ||
+                (currentSectionIndex === sections.length - 2 &&
+                    sections[sections.length - 1].behavior === 'same-page');
+
             if (isLastPage) {
                 nextBtn.textContent = 'Submit';
                 nextBtn.classList.remove('btn-primary');
@@ -691,9 +861,9 @@
                 for (let i = currentSectionIndex; i >= 0 && (i === currentSectionIndex || sections[i].behavior === 'same-page'); i--) {
                     const section = sections[i];
                     const sectionElement = document.querySelector(`.form-section[data-section-index="${i}"]`);
-                    
+
                     if (!section || !sectionElement || !section.questions) continue;
-                    
+
                     section.questions.forEach(question => {
                         const questionId = question.id;
                         delete formResponses[questionId];
@@ -729,22 +899,26 @@
                         }
                     });
                 }
-                
+
                 localStorage.setItem('studentFormProgress', JSON.stringify(formResponses));
+                checkLocalStorage();
             }
         }
 
         function saveCurrentSectionResponses() {
-            if (!formData) return;
-            
+            if (!formData) {
+                setTimeout(saveCurrentSectionResponses, 500); // retry after 0.5s
+                return;
+            }
+
             formResponses.formId = formData.form_index;
-            
+
             for (let i = currentSectionIndex; i >= 0 && (i === currentSectionIndex || sections[i].behavior === 'same-page'); i--) {
                 const section = sections[i];
                 const sectionElement = document.querySelector(`.form-section[data-section-index="${i}"]`);
-                
+
                 if (!section || !sectionElement || !section.questions) continue;
-                
+
                 section.questions.forEach(question => {
                     const questionId = question.id;
                     const questionType = question.type;
@@ -799,23 +973,104 @@
                         formResponses[questionId] = { type: questionType, value };
                         if (otherText !== null) formResponses[questionId].otherText = otherText;
                     }
+
                 });
             }
-            
-            localStorage.setItem('studentFormProgress', JSON.stringify(formResponses));
+
+            try {
+                localStorage.setItem('studentFormProgress', JSON.stringify(formResponses));
+                checkLocalStorage();
+            } catch (e) {
+                console.error("Failed to save to localStorage:", e);
+            }
+        }
+
+        async function autoSaveForm() {
+            if (!formData || Object.keys(formResponses).length <= 1) return; // Only formId is present
+
+            saveCurrentSectionResponses();
+
+            const submissionData = prepareSubmissionData(true);
+            console.log("Auto-saving payload:", submissionData) // <-- Add this line
+            try {
+                const response = await fetch('../backend/forms/submit_response.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(submissionData),
+                    credentials: 'include'
+                });
+
+                const responseData = await response.json();
+
+                if (!response.ok) {
+                    console.error('Auto-save failed:', responseData.error || 'Unknown error');
+                    return;
+                }
+
+                console.log('Form auto-saved successfully');
+            } catch (error) {
+                console.error('Auto-save error:', error);
+            }
         }
 
         async function submitForm() {
+            checkLocalStorage();
             const submitBtn = document.getElementById('next-section-btn');
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...';
 
             saveCurrentSectionResponses();
 
+            const submissionData = prepareSubmissionData(false);
+
+            try {
+                const response = await fetch('..//backend/forms/submit_response.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(submissionData),
+                    credentials: 'include'
+                });
+
+                const responseData = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(responseData.error || 'Failed to submit form');
+                }
+
+                // Clear auto-save interval and local storage
+                clearInterval(autoSaveInterval);
+                localStorage.removeItem('studentFormProgress');
+
+                alert('Form submitted successfully!');
+                window.location.href = 'submission-success.html';
+            } catch (error) {
+                console.error('Error:', error);
+                alert(error.message || 'Failed to submit form. Please try again.');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Submit';
+            }
+        }
+
+        function checkLocalStorage() {
+            const content = localStorage.getItem('studentFormProgress');
+            console.log("Current localStorage content:", content);
+            if (!content) {
+                console.warn("No data found in localStorage");
+            } else {
+                try {
+                    console.log("Parsed localStorage:", JSON.parse(content));
+                } catch (e) {
+                    console.error("localStorage contains invalid JSON");
+                }
+            }
+        }
+
+        function prepareSubmissionData(isAutoSave) {
             const submissionData = {
                 form_index: formData.form_index,
                 answers: [],
-                grid_answers: []
+                grid_answers: [],
+                is_autosave: isAutoSave
             };
 
             const allQuestionIds = [];
@@ -846,7 +1101,7 @@
                             });
                         });
                     }
-                } 
+                }
                 else if (question.type === 'checkbox') {
                     if (Array.isArray(response.value)) {
                         response.value.forEach(value => {
@@ -859,7 +1114,7 @@
                             });
                         });
                     }
-                } 
+                }
                 else if (question.type === 'multiple' || question.type === 'dropdown') {
                     const isOther = response.value === 'other';
                     submissionData.answers.push({
@@ -868,7 +1123,7 @@
                         text_answer: isOther ? (response.otherText || '') : null,
                         is_other: isOther
                     });
-                } 
+                }
                 else {
                     submissionData.answers.push({
                         main_question_index,
@@ -879,37 +1134,7 @@
                 }
             });
 
-            try {
-                const response = await fetch('http://localhost/cgcc/backend/forms/submit_response.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(submissionData),
-                    credentials: 'include'
-                });
-
-                const rawResponse = await response.text();
-                console.log('Raw response from server:', rawResponse);
-
-                let responseData;
-                try {
-                    responseData = JSON.parse(rawResponse);
-                } catch (jsonError) {
-                    throw new Error(`Invalid JSON returned from server: ${rawResponse}`);
-                }
-                
-                if (!response.ok) {
-                    throw new Error(responseData.error || 'Failed to submit form');
-                }
-
-                localStorage.removeItem('studentFormProgress');
-                alert('Form submitted successfully!');
-                window.location.href = 'submission-success.html';
-            } catch (error) {
-                console.error('Error:', error);
-                alert(error.message || 'Failed to submit form. Please try again.');
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = 'Submit';
-            }
+            return submissionData;
         }
 
         function findQuestionById(questionId) {
@@ -927,12 +1152,12 @@
 
         function highlightRequired(element) {
             if (!element) return;
-            
+
             element.style.borderColor = 'red';
             setTimeout(() => {
                 element.style.borderColor = '';
             }, 2000);
-            
+
             element.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
@@ -940,4 +1165,5 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
