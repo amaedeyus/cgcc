@@ -5,285 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Form Submission</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        /* Main background and typography */
-        body {
-            background-color: #e8f6e9; /* Light gray background */
-            color: #212529;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            min-height: 100vh;
-            padding: 20px 0;
-        }
-
-        /* Form container */
-        #form-container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: #ffffff; /* White container */
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        /* Form sections */
-        .form-section {
-            background-color: #ffffff; /* White sections */
-            border-radius: 10px;
-            padding: 25px;
-            margin-bottom: 25px;
-            border: 1px solid #e0e0e0; /* Light gray border */
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        /* Section titles */
-        .section-title {
-            color: #1B5E20; /* Dark green */
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #C8E6C9; /* Light green accent */
-            padding-bottom: 8px;
-        }
-
-        /* Section descriptions */
-        .section-description {
-            color: #2E7D32; /* Medium green */
-            margin-bottom: 20px;
-            font-size: 1.1rem;
-        }
-
-        /* Question cards - now with stronger visual focus */
-        .question-card {
-            background-color: #ffffff; /* White cards */
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-left: 4px solid #4fbc9c; /* Green accent border */
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-        }
-
-        .question-card:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            transform: translateY(-2px);
-        }
-
-        /* Question text - more prominent */
-        .question-card .form-label {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-            display: block;
-            color: #1B5E20; /* Dark green */
-        }
-
-        .required-label::after {
-            content: " *";
-            color: #d32f2f;
-            font-weight: bold;
-        }
-
-        /* Form elements */
-        .form-check {
-            padding: 8px 0;
-            padding-left: 2.2em;
-            margin-bottom: 10px;
-            background-color: #f8f9fa; /* Light gray background for options */
-            border-radius: 4px;
-            transition: background-color 0.2s;
-        }
-
-        .form-check:hover {
-            background-color: #e8f5e9; /* Light green on hover */
-        }
-
-        .form-check-input {
-            width: 1.3em;
-            height: 1.3em;
-            margin-top: 0.15em;
-            margin-left: -1.8em;
-            border: 1px solid #81C784;
-        }
-
-        .form-check-label {
-            font-size: 1rem;
-            padding-left: 0.5em;
-            vertical-align: middle;
-            cursor: pointer;
-            display: inline-block;
-            width: calc(100% - 2em);
-            color: #2E7D32; /* Medium green */
-        }
-
-        /* Grid table */
-        .grid-table {
-            width: 100%;
-            margin: 15px 0;
-            border-collapse: separate;
-            border-spacing: 0;
-        }
-
-        .grid-table th {
-            text-align: center;
-            background-color: #E8F5E9; /* Lighter green header */
-            color: #1B5E20;
-            padding: 12px;
-            border: 1px solid #C8E6C9;
-            font-weight: 600;
-        }
-
-        .grid-table td {
-            padding: 12px;
-            border: 1px solid #e0e0e0;
-            background-color: #ffffff;
-        }
-
-        /* Buttons */
-        .btn-outline-primary {
-            border-color: #4fbc9c;
-            color: #4fbc9c;
-            padding: 8px 20px;
-            font-weight: 500;
-        }
-
-        .btn-outline-primary:hover {
-            background-color:#4fbc9c;
-            color: #ffffff;
-        }
-
-        .btn-outline-danger {
-            border-color: #d32f2f;
-            color: #d32f2f;
-            padding: 8px 20px;
-            font-weight: 500;
-        }
-
-        .btn-outline-danger:hover {
-            background-color: #d32f2f;
-            color: #ffffff;
-        }
-
-        .btn-primary {
-            background-color: #4fbc9c;
-            border-color: #4fbc9c;
-            padding: 8px 20px;
-            font-weight: 500;
-        }
-
-        .btn-primary:hover {
-            background-color: #3d8b40;
-            border-color: #3d8b40;
-        }
-
-        /* Focus states */
-        .form-control:focus, 
-        .form-select:focus, 
-        textarea.form-control:focus {
-            border-color: #81C784;
-            box-shadow: 0 0 0 0.25rem rgba(76, 175, 80, 0.25);
-            outline: none;
-        }
-
-        .form-check-input:focus {
-            box-shadow: 0 0 0 0.25rem rgba(76, 175, 80, 0.25);
-        }
-
-        /* Progress bar */
-        .progress-bar {
-            background-color: #4fbc9c;
-        }
-
-        /* Interactive elements */
-        .form-check-label:hover,
-        .grid-table label:hover {
-            background-color: rgba(0,0,0,0.03);
-        }
-
-        .grid-table label {
-            display: block;
-            width: 100%;
-            height: 100%;
-            margin: -12px;
-            padding: 12px;
-        }
-
-        .form-check-input:checked {
-            background-color: #4fbc9c;
-            border-color: #4fbc9c;
-        }
-
-        /* Layout */
-        .section-navigation {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 25px;
-            padding-top: 20px;
-            border-top: 1px solid #e0e0e0;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .progress-container {
-            margin-bottom: 20px;
-        }
-
-        .progress {
-            background-color: #E9ECEF;
-            height: 10px;
-            border-radius: 5px;
-        }
-
-        #progress-text {
-            margin-top: 6px;
-            display: block;
-            text-align: right;
-            font-size: 14px;
-            color: #6c757d;
-        }
-
-        /* Feedback message */
-        .save-feedback {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
-            padding: 12px 20px;
-            background-color: #4fbc9c;
-            color: white;
-            border-radius: 6px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            animation: fadeInOut 3s ease-in-out;
-            opacity: 0;
-        }
-
-        @keyframes fadeInOut {
-            0% { opacity: 0; transform: translateY(20px); }
-            20% { opacity: 1; transform: translateY(0); }
-            80% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(20px); }
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            #form-container {
-                padding: 15px;
-            }
-            
-            .form-section {
-                padding: 15px;
-            }
-            
-            .question-card {
-                padding: 15px;
-            }
-            
-            .question-card .form-label {
-                font-size: 1.1rem;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="css/student-form.css">
 </head>
 <body>
     <div class="container py-5">
@@ -312,11 +34,7 @@
         </div>
     </div>
 
-    <div id="save-feedback" class="save-feedback alert alert-success" style="display: none;">
-        Responses saved successfully
-    </div>
     <script>
-        // Global variables
         let currentSectionIndex = 0;
         let formData = null;
         let sections = [];
@@ -498,7 +216,7 @@
                     input.type = 'radio';
                     input.name = `question_${question.id}`;
                     input.id = inputId;
-                    input.value = option.choice_index;  // Correct usage
+                    input.value = option.choice_index;
                     input.dataset.questionId = question.id;
                     input.dataset.questionType = question.type;
                     input.required = question.required || false;
@@ -506,7 +224,7 @@
                     const label = document.createElement('label');
                     label.className = 'form-check-label';
                     label.htmlFor = inputId;
-                    label.textContent = option.choice_text;  // Correct usage
+                    label.textContent = option.choice_text;
                     label.style.cursor = 'pointer';
 
                     div.appendChild(input);
@@ -543,7 +261,6 @@
                 otherInput.dataset.otherFor = question.id;
                 otherInput.disabled = true;
 
-                // Attach event listeners for "Other"
                 input.addEventListener('change', function () {
                     otherInput.disabled = this.value !== 'other';
                     if (this.value === 'other') otherInput.focus();
@@ -729,7 +446,6 @@
             if (formResponses[questionId]) {
                 const response = formResponses[questionId];
                 
-                // Handle checkbox inputs
                 if (response.type === 'checkbox') {
                     const checkboxes = inputElement.querySelectorAll(`input[type="checkbox"]`);
                     checkboxes.forEach(checkbox => {
@@ -738,14 +454,12 @@
                         }
                     });
                     
-                    // Handle "other" option for checkboxes
                     if (response.value && response.value.includes('other') && inputElement.querySelector('input[data-other-for]')) {
                         const otherInput = inputElement.querySelector('input[data-other-for]');
                         otherInput.value = response.otherText || '';
                         otherInput.disabled = false;
                     }
                 } 
-                // Handle radio button inputs
                 else if (response.type === 'multiple') {
                     const radios = inputElement.querySelectorAll(`input[type="radio"]`);
                     radios.forEach(radio => {
@@ -754,20 +468,17 @@
                         }
                     });
                     
-                    // Handle "other" option for radio buttons
                     if (response.value === 'other' && inputElement.querySelector('input[data-other-for]')) {
                         const otherInput = inputElement.querySelector('input[data-other-for]');
                         otherInput.value = response.otherText || '';
                         otherInput.disabled = false;
                     }
                 } 
-                // Handle dropdown inputs
                 else if (response.type === 'dropdown') {
                     if (inputElement.tagName === 'SELECT') {
                         inputElement.value = response.value || '';
                     }
                 } 
-                // Handle grid inputs
                 else if (response.type === 'grid') {
                     if (response.value) {
                         response.value.forEach(gridResponse => {
@@ -778,7 +489,6 @@
                         });
                     }
                 } 
-                // Handle all other input types (text, textarea, date, etc.)
                 else {
                     inputElement.value = response.value || '';
                 }
@@ -793,7 +503,6 @@
 
             saveCurrentSectionResponses();
 
-            // Check if this is the last logical page
             const isLastPage = currentSectionIndex >= sections.length - 1 || 
                             (currentSectionIndex === sections.length - 2 && 
                             sections[sections.length - 1].behavior === 'same-page');
@@ -808,12 +517,10 @@
         }
 
         function findNextLogicalPage(index) {
-            // If we're at the last section, return the current index
             if (index >= sections.length - 1) {
                 return index;
             }
             
-            // Find the next section that isn't marked as 'same-page'
             let nextIndex = index + 1;
             while (nextIndex < sections.length && sections[nextIndex].behavior === 'same-page') {
                 nextIndex++;
@@ -921,7 +628,6 @@
             
             prevBtn.disabled = currentSectionIndex <= 0;
             
-            // Check if this is the last logical page
             const isLastPage = currentSectionIndex >= sections.length - 1 || 
                             (currentSectionIndex === sections.length - 2 && 
                             sections[sections.length - 1].behavior === 'same-page');
@@ -947,7 +653,6 @@
                 return;
             }
 
-            // Count logical pages
             let totalPages = 1;
             let prevBehavior = sections[0]?.behavior;
 
@@ -959,7 +664,6 @@
                 prevBehavior = currBehavior;
             }
 
-            // Determine current page number
             let currentPage = 1;
             prevBehavior = sections[0]?.behavior;
 
@@ -971,14 +675,12 @@
                 prevBehavior = currBehavior;
             }
 
-            // Hide progress bar if only one logical page
             if (totalPages <= 1) {
                 progressContainer.style.display = 'none';
             } else {
                 progressContainer.style.display = 'block';
             }
 
-            // Update progress bar and text
             const progress = (currentPage / totalPages) * 100;
             progressBar.style.width = `${progress}%`;
             progressText.textContent = `${currentPage}/${totalPages} ${totalPages > 1 ? 'pages' : 'page'}`;
@@ -1108,7 +810,7 @@
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...';
 
-            saveCurrentSectionResponses(); // Ensure latest input is stored
+            saveCurrentSectionResponses();
 
             const submissionData = {
                 form_index: formData.form_index,
@@ -1116,7 +818,6 @@
                 grid_answers: []
             };
 
-            // Get all question IDs from the form data to ensure we don't miss any
             const allQuestionIds = [];
             sections.forEach(section => {
                 if (section.questions) {
@@ -1126,10 +827,9 @@
                 }
             });
 
-            // Process each question
             allQuestionIds.forEach(questionId => {
                 const response = formResponses[questionId];
-                if (!response) return; // Skip unanswered questions
+                if (!response) return;
 
                 const main_question_index = parseInt(questionId);
                 const question = findQuestionById(questionId);
@@ -1170,7 +870,6 @@
                     });
                 } 
                 else {
-                    // Handle text, paragraph, date inputs
                     submissionData.answers.push({
                         main_question_index,
                         choice_index: null,
@@ -1197,7 +896,6 @@
                 } catch (jsonError) {
                     throw new Error(`Invalid JSON returned from server: ${rawResponse}`);
                 }
-
                 
                 if (!response.ok) {
                     throw new Error(responseData.error || 'Failed to submit form');
@@ -1214,7 +912,6 @@
             }
         }
 
-        // Helper function to find question by ID
         function findQuestionById(questionId) {
             for (const section of sections) {
                 if (section.questions) {
@@ -1228,7 +925,6 @@
             return null;
         }
 
-
         function highlightRequired(element) {
             if (!element) return;
             
@@ -1240,18 +936,6 @@
             element.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
-        // Auto-save functionality
-        document.getElementById('form-container').addEventListener('input', () => {
-            saveCurrentSectionResponses();
-        });
-
-        // Handle beforeunload to warn about unsaved changes
-        window.addEventListener('beforeunload', (e) => {
-            if (Object.keys(formResponses).length > 1) { // More than just formId
-                e.preventDefault();
-                e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
-            }
-        });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

@@ -12,9 +12,6 @@ if (!isset($_SESSION['user_index'])) {
     exit;
 }
 
-file_put_contents('session_debug.log', print_r($_SESSION, true), FILE_APPEND);
-
-
 // Get user type and index
 $userIndex = $_SESSION['user_index'];
 $userType = $_SESSION['user_type'];
@@ -55,11 +52,12 @@ if (!$data || !isset($data['form_index'])) {
 }
 
 $formId = (int)$data['form_index'];
+$isAutoSave = isset($data['is_autosave']) && $data['is_autosave'];
 
 try {
     $conn->begin_transaction();
 
-    // 1. Get active snapshot for this form (to maintain form state at time of submission)
+    // 1. Get active snapshot for this form
     $snapshotIndex = null;
     $snapshotStmt = $conn->prepare("
         SELECT snapshot_index 
@@ -78,20 +76,67 @@ try {
     }
     $snapshotStmt->close();
 
-    // 2. Create the main response record
-    $stmt = $conn->prepare("
-        INSERT INTO responses (form_index, student_index, created_at, snapshot_index) 
-        VALUES (?, ?, NOW(), ?)
-    ");
-    $stmt->bind_param("iii", $formId, $studentId, $snapshotIndex);
+    // For auto-save, we'll update existing response if available
+    $responseId = null;
     
-    if (!$stmt->execute()) {
-        throw new Exception("Failed to create response: " . $stmt->error);
+    if ($isAutoSave) {
+        // Check if there's an existing auto-save response
+        $checkStmt = $conn->prepare("
+            SELECT response_index FROM responses 
+            WHERE form_index = ? AND student_index = ? AND is_autosave = 1
+            ORDER BY created_at DESC 
+            LIMIT 1
+        ");
+        $checkStmt->bind_param("ii", $formId, $studentId);
+        $checkStmt->execute();
+        $checkResult = $checkStmt->get_result();
+        
+        if ($checkResult->num_rows > 0) {
+            $responseRow = $checkResult->fetch_assoc();
+            $responseId = $responseRow['response_index'];
+        }
+        $checkStmt->close();
     }
-    $responseId = $conn->insert_id;
-    $stmt->close();
 
-    // 3. Process regular answers (non-grid questions)
+    if ($responseId) {
+        // Update existing auto-save response
+        $updateStmt = $conn->prepare("
+            UPDATE responses 
+            SET snapshot_index = ?, updated_at = NOW()
+            WHERE response_index = ?
+        ");
+        $updateStmt->bind_param("ii", $snapshotIndex, $responseId);
+        $updateStmt->execute();
+        $updateStmt->close();
+        
+        // Delete previous answers to replace them
+        $deleteAnswers = $conn->prepare("DELETE FROM answers WHERE response_index = ?");
+        $deleteAnswers->bind_param("i", $responseId);
+        $deleteAnswers->execute();
+        $deleteAnswers->close();
+        
+        $deleteGridAnswers = $conn->prepare("DELETE FROM grid_answers WHERE response_index = ?");
+        $deleteGridAnswers->bind_param("i", $responseId);
+        $deleteGridAnswers->execute();
+        $deleteGridAnswers->close();
+    } else {
+        // Create new response record
+        $stmt = $conn->prepare("
+            INSERT INTO responses 
+            (form_index, student_index, created_at, snapshot_index, is_autosave) 
+            VALUES (?, ?, NOW(), ?, ?)
+        ");
+        $isAutoSaveInt = $isAutoSave ? 1 : 0;
+        $stmt->bind_param("iiii", $formId, $studentId, $snapshotIndex, $isAutoSaveInt);
+        
+        if (!$stmt->execute()) {
+            throw new Exception("Failed to create response: " . $stmt->error);
+        }
+        $responseId = $conn->insert_id;
+        $stmt->close();
+    }
+
+    // Process regular answers (non-grid questions)
     if (isset($data['answers']) && is_array($data['answers'])) {
         $answerStmt = $conn->prepare("
             INSERT INTO answers 
@@ -108,10 +153,8 @@ try {
             
             // Handle different answer types
             if (isset($answer['is_other']) && $answer['is_other']) {
-                // This is an "other" option with text answer
                 $textAnswer = $answer['text_answer'] ?? '';
                 
-                // Verify the question allows "other" option
                 $checkOther = $conn->prepare("
                     SELECT include_other FROM main_questions 
                     WHERE main_question_index = ?
@@ -127,7 +170,6 @@ try {
                 }
             } 
             else if (isset($answer['choice_index']) && $answer['choice_index'] !== null) {
-                // This is a regular choice selection
                 $choiceId = (int)$answer['choice_index'];
 
                 $checkChoice = $conn->prepare("
@@ -144,14 +186,12 @@ try {
                 $checkChoice->close();
             } 
             else if (isset($answer['text_answer']) && $answer['text_answer'] !== '') {
-                // This is a direct text answer (for text, paragraph, etc.)
                 $textAnswer = $answer['text_answer'];
             } 
             else {
-                continue; // Skip if no valid answer provided
+                continue;
             }
             
-            // Insert the answer
             $answerStmt->bind_param("iiis", $responseId, $questionId, $choiceId, $textAnswer);
             if (!$answerStmt->execute()) {
                 throw new Exception("Failed to insert answer: " . $answerStmt->error);
@@ -160,7 +200,7 @@ try {
         $answerStmt->close();
     }
 
-    // 4. Process grid answers (matrix questions)
+    // Process grid answers (matrix questions)
     if (isset($data['grid_answers']) && is_array($data['grid_answers'])) {
         $gridStmt = $conn->prepare("
             INSERT INTO grid_answers 
@@ -173,7 +213,6 @@ try {
             $subQuestionId = (int)$gridAnswer['sub_question_index'];
             $choiceId = (int)$gridAnswer['choice_index'];
 
-            // Verify the sub-question exists for this main question
             $checkSubQuestion = $conn->prepare("
                 SELECT 1 FROM sub_questions 
                 WHERE sub_question_index = ? AND main_question_index = ?
@@ -187,7 +226,6 @@ try {
             }
             $checkSubQuestion->close();
             
-            // Verify the choice exists for this question
             $checkGridChoice = $conn->prepare("
                 SELECT 1 FROM choices 
                 WHERE choice_index = ? AND main_question_index = ?
@@ -201,13 +239,11 @@ try {
             }
             $checkGridChoice->close();
 
-            // Insert the grid answer
             $gridStmt->bind_param("iiii", $responseId, $questionId, $subQuestionId, $choiceId);
             if (!$gridStmt->execute()) {
                 throw new Exception("Failed to insert grid answer: " . $gridStmt->error);
             }
         }
-
         $gridStmt->close();
     }
 
@@ -216,21 +252,21 @@ try {
     // Successful response
     echo json_encode([
         'success' => true,
-        'message' => 'Response submitted successfully',
+        'message' => $isAutoSave ? 'Response auto-saved successfully' : 'Response submitted successfully',
         'response_index' => $responseId,
-        'snapshot_index' => $snapshotIndex
+        'snapshot_index' => $snapshotIndex,
+        'is_autosave' => $isAutoSave
     ]);
 
 } catch (Exception $e) {
     $conn->rollback();
     http_response_code(500);
     echo json_encode([
-        'error' => 'Failed to submit response',
+        'error' => $isAutoSave ? 'Auto-save failed' : 'Failed to submit response',
         'message' => $e->getMessage(),
-        'trace' => $e->getTrace() // Only for debugging, remove in production
+        'is_autosave' => $isAutoSave
     ]);
 }
 
-// Close connection
 $conn->close();
 ?>

@@ -122,6 +122,32 @@
     color: rgb(36, 154, 118);
 }
 
+.autosave-status {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px 15px;
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 1000;
+}
+.autosave-status.show {
+    opacity: 1;
+}
+.autosave-status.saving {
+    background-color: #fff3cd;
+    color: #856404;
+}
+.autosave-status.saved {
+    background-color: #d4edda;
+    color: #155724;
+}
+.autosave-status.error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
 
 .page-right{
     padding: 70px;
@@ -130,10 +156,20 @@
     justify-content: flex-start;
 }
 
-/* Greetings Section */
-.greetings {
-    margin-top: 20px;
-    margin-bottom: 20px;
+.header-section {
+    margin-bottom: 30px;
+}
+
+.header-section h1 {
+    color: rgb(2, 55, 2);
+    margin: 0;
+    font-size: 1.8rem;
+}
+
+.header-section p {
+    color: #023702;
+    margin: 5px 0 0;
+    font-size: 0.95rem;
 }
 
 .h1 {

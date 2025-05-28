@@ -45,8 +45,8 @@ $firstName = isset($_SESSION['first_name']) ? $_SESSION['first_name'] : 'Guest';
                 <a onclick="goToPage()">➤ Counseling Schedule</a>
                 <div class="dropdown" onclick="toggleDropdown('Forms')">➤ Forms</div>
                     <div id="Forms" class="dropdown-content">
-                        <a href="../student-profile-form.html">Student Information</a>
-                        <a href="../student_form.html?id=1">General Mental Health Screening</a>
+                        <a href="student-profile-form.html">Student Information</a>
+                        <a href="student_form.html?id=1">General Mental Health Screening</a>
                         <a href="#">Counseling Concerns & Exit Interview</a>
                         <a href="#">Counseling Evaluation</a>
                         <a href="#">Exit Interview</a>

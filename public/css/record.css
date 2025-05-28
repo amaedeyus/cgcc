@@ -19,7 +19,7 @@
     color: #023802;
 }
 
-    h2{
+h2{
     margin-bottom: 5px;
     font-size: 28px;
 }
@@ -31,7 +31,7 @@
 
 
 .top-container{
-        display: flex;
+    display: flex;
     justify-content: space-between;
     align-items: flex-start;
     flex-wrap: wrap;
