@@ -12,10 +12,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 
-    // Query to get user and student name
-  // Modify your query to left join:
+    // Query to get user and student details including student_index
     $query = "
-        SELECT users.*, students.first_name, students.last_name 
+        SELECT users.*, students.student_index, students.first_name, students.last_name 
         FROM users 
         LEFT JOIN students ON users.user_index = students.user_index 
         WHERE users.email = ?
@@ -32,14 +31,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if (password_verify($password, $hashed_password)) {
 
-            // Temporarily add this debug code:
-            echo "Stored hash: ".$hashed_password."<br>";
-            echo "Input password: ".$password."<br>";
-            echo "Verification: ".(password_verify($password, $hashed_password) ? 'true' : 'false');
+            // Debug lines (you can remove these later)
+            // echo "Stored hash: ".$hashed_password."<br>";
+            // echo "Input password: ".$password."<br>";
+            // echo "Verification: ".(password_verify($password, $hashed_password) ? 'true' : 'false');
+
             // Set session variables
             $_SESSION['user_index'] = $row['user_index'];
             $_SESSION['email'] = $row['email'];
             $_SESSION['user_type'] = $row['type'];
+
+            // Set student_index if available
+            if (!empty($row['student_index'])) {
+                $_SESSION['student_index'] = $row['student_index'];
+            }
 
             // Name values
             $firstName = $row['first_name'] ?? 'User';
@@ -52,7 +57,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Redirect based on user type
             if ($row['type'] === 'admin') {
                 header("Location: ../public/admin/admin-manage-forms.html");
-            } else if ($row['type'] === 'counselor'){
+            } else if ($row['type'] === 'counselor') {
                 header("Location: ../public/counselor/student-record.php");
             } else {
                 header("Location: ../public/main.php");
