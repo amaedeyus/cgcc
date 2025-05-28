@@ -41,7 +41,7 @@
 
 <div class="page-right">
     <div class="table-container">
-  <h2>Student Management</h2>
+<h2>Student Management</h2>
   <p>Add, edit, and manage student records</p>
   <button class="btn-success" onclick="location.href='add_student.php'">+ Add New Student</button>
   <div class="search-box">

@@ -37,13 +37,18 @@ form{
 /* Input + Select styling */
 form input[type="text"],
 form select{
-    outline-color: rgb(41, 51, 41);
+    outline-color: #316b50;
     padding: 12px 15px;
     border: none;
     border-radius: 30px;
     background-color: #fff;
     font-size: 1em;
     box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
+}
+
+input[type="text"][readonly] {
+     color: #828e82; 
+     cursor:default
 }
 
 input[type="radio"]{
@@ -61,12 +66,13 @@ input[type="radio"]{
 
 .button-container{
     margin-top: 20px;
+    gap: 30px;
     display:flex;
     justify-content: center;
 }
 
-button[type="submit"] {
-    width: 50%;
+button[type="submit"], .button-container button[type="button"] {
+    width: 30%;
     padding: 12px 30px;
     border: none;
     background-color: rgb(79, 189, 156);

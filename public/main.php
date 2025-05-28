@@ -1,5 +1,24 @@
 <?php
 session_start();
+
+require "../backend/connect2.php";  // include the database connection
+
+$student_index = $_SESSION['student_index'] ?? null;
+$student = [];
+
+if ($student_index) {
+    $stmt = $conn->prepare("
+        SELECT s.*, u.email 
+        FROM students s
+        LEFT JOIN users u ON s.user_index = u.user_index
+        WHERE s.student_index = ?
+    ");
+    $stmt->bind_param("i", $student_index);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $student = $result->fetch_assoc();
+}
+
 $fullName = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Guest';
 $firstName = isset($_SESSION['first_name']) ? $_SESSION['first_name'] : 'Guest';
 ?>
@@ -11,7 +30,7 @@ $firstName = isset($_SESSION['first_name']) ? $_SESSION['first_name'] : 'Guest';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="cgcc2.png">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/base.css?v=<?= time() ?>">
     <link rel="stylesheet" href="css/main-page.css?v=<?= time() ?>">
     <title>CGCC</title>
 </head>
@@ -35,10 +54,10 @@ $firstName = isset($_SESSION['first_name']) ? $_SESSION['first_name'] : 'Guest';
         <div class="left-bg"></div>
         <div class="page-left">
             <div class="profile">
-                <div class="profile-picture"></div>
+                <div class="profile-picture"><img src="<?= htmlspecialchars($student['image_path'] ?? 'default-profile.png') ?>"></div>
                 <span id="user-name"><?= htmlspecialchars($fullName)?></span> <!-- papalitan ng id ni user -->
                     <div class="edit">
-                        <a href="../edit-profile.html">✎Edit Profile</a>
+                        <a href="edit-profile.php">✎Edit Profile</a>
                     </div>
             </div>
             <div class="sidebar-nav">
