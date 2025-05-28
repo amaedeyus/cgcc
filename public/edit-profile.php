@@ -49,6 +49,43 @@ if (!empty($student['section_index'])) {
     }
 }
 
+$dept_index = null;
+
+if (!empty($program_index)) {
+    $dept_stmt = $conn->prepare("SELECT dept_index FROM programs WHERE program_index = ?");
+    $dept_stmt->bind_param("i", $program_index);
+    $dept_stmt->execute();
+    $dept_result = $dept_stmt->get_result();
+    $dept_data = $dept_result->fetch_assoc();
+
+    if ($dept_data) {
+        $dept_index = $dept_data['dept_index'];
+    }
+}
+
+
+$departments = [];
+
+$dept_stmt = $conn->prepare("SELECT dept_index, dept_code FROM departments");
+$dept_stmt->execute();
+$dept_result = $dept_stmt->get_result();
+
+while ($row = $dept_result->fetch_assoc()) {
+    $departments[] = $row;
+}
+
+
+$programs = [];
+
+$program_stmt = $conn->prepare("SELECT program_index, program_name FROM programs");
+$program_stmt->execute();
+$program_result = $program_stmt->get_result();
+
+while ($row = $program_result->fetch_assoc()) {
+    $programs[] = $row;
+}
+
+
 // Fetch sections based on program_index and year_level for the dropdown
 $sections = [];
 
@@ -169,6 +206,8 @@ $guardian_full_name = trim(($guardian['first_name'] ?? '') . ' ' . ($guardian['l
     <form action="../backend/upload-profile.php" method="POST" enctype="multipart/form-data">
         <input type="hidden" name="student_index" value="<?=htmlspecialchars($student['student_index'] ?? '') ?>" />
         <input type="hidden" name="program_index" value="<?=htmlspecialchars($student['program_index'] ?? '') ?>" />
+        <input type="hidden" name="dept_index_original" value="<?= htmlspecialchars($dept_index ?? '') ?>" />
+
 
         <div class="profile-section">
             <div class="profile-title">Profile Picture</div>
@@ -194,12 +233,12 @@ $guardian_full_name = trim(($guardian['first_name'] ?? '') . ' ' . ($guardian['l
         <input type="text" id="contact-number" name="contact_number" value="<?= htmlspecialchars($student['contact_number'] ?? '') ?>" placeholder="Ex. 09123456789" />
 
         <label for="guardian-index">Guardian</label>
-        <input type="text" id="guardian-full-name" name="guardian_full_name" 
+        <input readonly type="text" id="guardian-full-name" name="guardian_full_name" 
         value="<?= htmlspecialchars($guardian_full_name) ?>" placeholder="Guardian Full Name" />
         
 
         <label for="guardian-index">Guardian Contact No.</label>
-        <input type="text" id="guardian-contact-number" name="guardian_contact_number" 
+        <input readonly type="text" id="guardian-contact-number" name="guardian_contact_number" 
         value="<?= htmlspecialchars($guardian['contact_number'] ?? '') ?>" placeholder="Guardian Contact Number" />
         
 
@@ -224,6 +263,32 @@ for ($y = 1; $y <= 4; $y++) {
 
         </div>
 
+        <label for="dept_index">Department</label>
+<select id="dept_index" name="dept_index">
+    <option value="">-- Select Department --</option>
+    <?php foreach ($departments as $department): 
+        $selected = ($dept_index ?? '') == $department['dept_index'] ? 'selected' : '';
+    ?>
+        <option value="<?= htmlspecialchars($department['dept_index']) ?>" <?= $selected ?>>
+            <?= htmlspecialchars($department['dept_code']) ?>
+        </option>
+    <?php endforeach; ?>
+</select>
+
+
+
+        <label for="program_index">Program</label>
+<select id="program_index" name="program_index">
+    <option value="">-- Select Program --</option>
+    <?php foreach ($programs as $program): 
+        $selected = ($program_index == $program['program_index']) ? 'selected' : '';
+    ?>
+        <option value="<?= htmlspecialchars($program['program_index']) ?>" <?= $selected ?>>
+            <?= htmlspecialchars($program['program_name']) ?>
+        </option>
+    <?php endforeach; ?>
+</select>
+
         <label for="section-index">Section</label>
         <select id="section-index" name="section_index">
         <option value="">-- Select Section --</option>
@@ -245,17 +310,6 @@ for ($y = 1; $y <= 4; $y++) {
 
 <script>
     // Preview image when uploaded
-    document.getElementById('profile-upload').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                document.getElementById('profile-picture').src = event.target.result;
-            }
-            reader.readAsDataURL(file);
-        }
-    });
-</script><script>
     // Update sections dropdown when year level changes
     document.querySelectorAll('input[name="year_level"]').forEach(radio => {
         radio.addEventListener('change', function() {
@@ -292,6 +346,63 @@ for ($y = 1; $y <= 4; $y++) {
             reader.readAsDataURL(file);
         }
     });
+
+
+document.getElementById('dept_index').addEventListener('change', function () {
+    const deptIndex = this.value;
+    const programSelect = document.getElementById('program_index');
+    const sectionSelect = document.getElementById('section-index');
+
+    // Clear programs and sections
+    programSelect.innerHTML = '<option value="">-- Select Program --</option>';
+    sectionSelect.innerHTML = '<option value="">-- Select Section --</option>'; // ✅ Reset Section
+
+    // AJAX request to get programs for selected department
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', 'student-program.php?dept_index=' + deptIndex, true);
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            const programs = JSON.parse(xhr.responseText);
+            programSelect.innerHTML = '<option value="">-- Select Program --</option>';
+            programs.forEach(function (program) {
+                const option = document.createElement('option');
+                option.value = program.program_index;
+                option.text = program.program_name;
+                programSelect.appendChild(option);
+            });
+        } else {
+            programSelect.innerHTML = '<option value="">Error loading programs</option>';
+        }
+    };
+    xhr.send();
+});
+
+
+    
+
+    document.getElementById('program_index').addEventListener('change', function() {
+    const programIndex = this.value;
+    const yearLevel = document.querySelector('input[name="year_level"]:checked')?.value;
+
+    if (!programIndex || !yearLevel) return;
+
+    fetch(`student-section.php?program_index=${programIndex}&year_level=${yearLevel}`)
+        .then(res => res.json())
+        .then(data => {
+            const select = document.getElementById('section-index');
+            select.innerHTML = '<option value="">-- Select Section --</option>';
+            data.forEach(section => {
+                const option = document.createElement('option');
+                option.value = section.section_index;
+                option.textContent = section.section_name;
+                select.appendChild(option);
+            });
+        })
+        .catch(err => {
+            console.error('Error fetching sections:', err);
+        });
+});
+
 </script>
 
 

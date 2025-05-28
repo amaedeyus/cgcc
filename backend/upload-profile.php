@@ -5,7 +5,9 @@ require("../backend/connect2.php"); // include your DB connection
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $student_id = $_POST['student_index'] ?? null;
     $year_level = $_POST['year_level'] ?? null;
+    $program_index = $_POST['program_index'] ?? null;
     $section_index = $_POST['section_index'] ?? null;
+    
 
     if (!$student_id) {
         echo "Student ID is missing or empty.";
@@ -15,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $updateImage = false;
     $relative_path = null;
 
-    // Handle image upload if a file is uploaded
+    
     if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === 0) {
         $upload_dir = __DIR__ . '/../../public/Media/uploads/';
         $filename = uniqid() . "-" . basename($_FILES["profile_image"]["name"]);
@@ -34,22 +36,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Build and prepare the update query
+    
+    $contact_number = $_POST['contact_number'] ?? null;
+
+
     if ($updateImage) {
         $stmt = $conn->prepare("
-            UPDATE students 
-            SET year_level = ?, section_index = ?, image_path = ? 
-            WHERE student_index = ?
-        ");
-        $stmt->bind_param("sisi", $year_level, $section_index, $relative_path, $student_id);
+    UPDATE students 
+    SET year_level = ?, section_index = ?, contact_number = ?, image_path = ?
+    WHERE student_index = ?
+    ");
+    $stmt->bind_param("iissi", $year_level, $section_index, $contact_number, $relative_path, $student_id);
+
+
     } else {
         $stmt = $conn->prepare("
             UPDATE students 
-            SET year_level = ?, section_index = ? 
+            SET year_level = ?, section_index = ?, contact_number = ?
             WHERE student_index = ?
         ");
-        $stmt->bind_param("sii", $year_level, $section_index, $student_id);
-    }
+        $stmt->bind_param("sisi", $year_level, $section_index, $contact_number, $student_id);
+}
+
 
     if (!$stmt) {
         echo "Prepare failed: (" . $conn->errno . ") " . $conn->error;
@@ -59,11 +67,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute();
 
     if ($stmt->affected_rows > 0) {
-        header("Location: ../public/edit-profile.php");
+        echo "<script>
+        alert('Profile Saved!');
+        window.location.href = '../public/edit-profile.php';
+        </script>";
         exit;
     } else {
-        // It's possible the user didn't change anything, so still redirect
-        header("Location: ../public/edit-profile.php");
+        echo "<script>
+        alert('Profile Saved!');
+        window.location.href = '../public/edit-profile.php';
+        </script>";
         exit;
     }
 
