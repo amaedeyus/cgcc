@@ -6,6 +6,10 @@ html, body {
     background-color: rgb(243, 255, 243);
 }
 
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
 form{
     display: flex;
     flex-direction: column;

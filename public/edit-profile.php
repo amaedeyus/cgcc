@@ -99,7 +99,7 @@ $guardian_full_name = trim(($guardian['first_name'] ?? '') . ' ' . ($guardian['l
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/png" href="cgcc2.png" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/base.css?v=<?= time() ?>" />
     <link rel="stylesheet" href="css/form.css?v=<?= time() ?>" />
     <title>CGCC - Edit Profile</title>
     <style>
