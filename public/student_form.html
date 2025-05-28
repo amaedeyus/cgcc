@@ -769,7 +769,7 @@
                             }
                         });
                     }
-                } else if (questionType === 'radio') {
+                } else if (questionType === 'multiple') {  // Changed from 'radio' to 'multiple'
                     // Handle radio answers (single selection)
                     if (responseData.value && responseData.value.length > 0) {
                         const input = document.querySelector(
@@ -779,13 +779,23 @@
                             input.checked = true;
                         }
                     }
-                } else if (questionType === 'text' || questionType === 'textarea') {
-                    // Handle text inputs
+                } else if (questionType === 'short' || questionType === 'paragraph' || questionType === 'date') {
+                    // Handle text inputs (short, paragraph, date)
                     const input = document.querySelector(
-                        `input[name="${questionId}"], textarea[name="${questionId}"]`
+                        `input[name="${questionId}"], 
+                        textarea[name="${questionId}"],
+                        input[type="date"][name="${questionId}"]`
                     );
                     if (input && responseData.value) {
                         input.value = responseData.value;
+                    }
+                } else if (questionType === 'dropdown') {
+                    // Handle dropdown inputs
+                    const select = document.querySelector(
+                        `select[name="${questionId}"]`
+                    );
+                    if (select && responseData.value && responseData.value.length > 0) {
+                        select.value = responseData.value[0];
                     }
                 }
             }
@@ -891,7 +901,7 @@
                 section.questions.forEach(question => {
                     if (question.type === 'display') return;
                     switch (question.type) {
-                        case 'multiple':
+                        case 'multiple': // radio buttons
                             const checkedRadio = document.querySelector(
                                 `[data-question-id="${question.id}"] input[name="${question.id}"]:checked`
                             );
@@ -899,7 +909,8 @@
                             if (checkedRadio) {
                                 formDataToSubmit.answers.push({
                                     main_question_index: parseInt(question.id),
-                                    choice_index: parseInt(checkedRadio.value)
+                                    choice_index: parseInt(checkedRadio.value),
+                                    text_answer: null
                                 });
                             }
                             break;
@@ -912,7 +923,8 @@
                             checkedCheckboxes.forEach(input => {
                                 formDataToSubmit.answers.push({
                                     main_question_index: parseInt(question.id),
-                                    choice_index: parseInt(input.value)
+                                    choice_index: parseInt(input.value),
+                                    text_answer: null
                                 });
                             });
                             break;
@@ -924,7 +936,7 @@
                                 [data-question-id="${question.id}"] textarea[name="${question.id}"]`
                             );
                             
-                            if (textInput && textInput.value.trim() !== '') {
+                            if (textInput) {
                                 formDataToSubmit.answers.push({
                                     main_question_index: parseInt(question.id),
                                     choice_index: null,
@@ -941,7 +953,8 @@
                             if (selectInput && selectInput.value !== '') {
                                 formDataToSubmit.answers.push({
                                     main_question_index: parseInt(question.id),
-                                    choice_index: parseInt(selectInput.value)
+                                    choice_index: parseInt(selectInput.value),
+                                    text_answer: null
                                 });
                             }
                             break;

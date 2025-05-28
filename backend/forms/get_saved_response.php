@@ -84,6 +84,7 @@ try {
     $stmt->execute();
     $result = $stmt->get_result();
 
+    // In get_saved_response.php, modify the answer processing section:
     while ($row = $result->fetch_assoc()) {
         $questionId = $row['main_question_index'];
         $choice = $row['choice_index'];
@@ -91,20 +92,16 @@ try {
 
         if (!isset($savedData[$questionId])) {
             $savedData[$questionId] = [
-                'type' => 'unknown',
                 'value' => []
             ];
         }
 
-        // Convert choice_index to string
-        $stringValue = $choice !== null ? (string)$choice : null;
-
-        if ($stringValue !== null) {
-            // Normal choice selected (as string)
-            $savedData[$questionId]['type'] = 'checkbox';
-            $savedData[$questionId]['value'][] = $stringValue;
+        if ($choice !== null) {
+            // This is a choice-based answer (checkbox, radio, or dropdown)
+            $savedData[$questionId]['type'] = 'choice';
+            $savedData[$questionId]['value'][] = (string)$choice;
         } elseif ($text !== null && $text !== '') {
-            // Text input (non-grid)
+            // This is a text-based answer (short, paragraph, or date)
             $savedData[$questionId]['type'] = 'text';
             $savedData[$questionId]['value'] = $text;
         }

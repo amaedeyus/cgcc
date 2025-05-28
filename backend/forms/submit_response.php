@@ -134,45 +134,55 @@ try {
         $stmt->close();
     }
 
-    // 3. Process regular answers (choice-based only)
+    // 3. Process regular answers (choice-based and text answers)
     if (isset($data['answers']) && is_array($data['answers'])) {
         $answerStmt = $conn->prepare("
             INSERT INTO answers 
-            (response_index, main_question_index, choice_index) 
-            VALUES (?, ?, ?)
+            (response_index, main_question_index, choice_index, text_answer) 
+            VALUES (?, ?, ?, ?)
         ");
 
         foreach ($data['answers'] as $answer) {
-            error_log("Answer received: " . json_encode($answer));
-            
-            if (!isset($answer['main_question_index']) || !isset($answer['choice_index'])) {
+            if (!isset($answer['main_question_index'])) {
                 continue; // Skip invalid answers
             }
 
             $questionId = (int)$answer['main_question_index'];
-            $choiceId = (int)$answer['choice_index'];
+            $choiceId = isset($answer['choice_index']) ? (int)$answer['choice_index'] : null;
+            $textAnswer = isset($answer['text_answer']) ? $answer['text_answer'] : null;
 
-            // Verify the choice exists for this question
-            $checkChoice = $conn->prepare("
-                SELECT 1 FROM choices 
-                WHERE choice_index = ? AND main_question_index = ?
-            ");
-            $checkChoice->bind_param("ii", $choiceId, $questionId);
-            $checkChoice->execute();
-            $checkChoice->store_result();
-
-            if ($checkChoice->num_rows === 0) {
-                throw new Exception("Invalid choice_index $choiceId for question $questionId");
+            // For text answers, skip choice validation
+            if ($textAnswer !== null) {
+                $answerStmt->bind_param("iiis", $responseId, $questionId, $choiceId, $textAnswer);
+                if (!$answerStmt->execute()) {
+                    throw new Exception("Failed to insert text answer: " . $answerStmt->error);
+                }
+                continue;
             }
-            $checkChoice->close();
-            
-            // Insert the answer
-            $answerStmt->bind_param("iii", $responseId, $questionId, $choiceId);
-            if (!$answerStmt->execute()) {
-                throw new Exception("Failed to insert answer: " . $answerStmt->error);
+
+            // For choice answers, validate the choice
+            if ($choiceId !== null) {
+                // Verify the choice exists for this question
+                $checkChoice = $conn->prepare("
+                    SELECT 1 FROM choices 
+                    WHERE choice_index = ? AND main_question_index = ?
+                ");
+                $checkChoice->bind_param("ii", $choiceId, $questionId);
+                $checkChoice->execute();
+                $checkChoice->store_result();
+
+                if ($checkChoice->num_rows === 0) {
+                    throw new Exception("Invalid choice_index $choiceId for question $questionId");
+                }
+                $checkChoice->close();
+                
+                // Insert the answer
+                $answerStmt->bind_param("iiis", $responseId, $questionId, $choiceId, $textAnswer);
+                if (!$answerStmt->execute()) {
+                    throw new Exception("Failed to insert answer: " . $answerStmt->error);
+                }
             }
         }
-
         $answerStmt->close();
     }
 
