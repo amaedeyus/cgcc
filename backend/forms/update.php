@@ -106,6 +106,7 @@ try {
             foreach ($section['questions'] as $question) {
                 $type = $question['type'] ?? 'short';
                 $required = $question['required'] ? 1 : 0;
+                $subtype = ($type === 'short') ? ($question['subtype'] ?? 'text') : null;
 
                 // Add this after $required:
                 $subtype = ($type === 'short') ? ($question['subtype'] ?? 'text') : null;
