@@ -42,10 +42,10 @@ $firstName = isset($_SESSION['first_name']) ? $_SESSION['first_name'] : 'Guest';
             College Guidance and Counseling Center
         </div>
         <nav class="navigation">
-            <a href="../main.html">Home</a>
-            <a href="../contact.html">Contact</a>
-            <a href="../about-mental-health.html">About Mental Health</a>
-            <a href="../faq.html">FAQ</a>
+            <a href="main.php">Home</a>
+            <a href="contact.html">Contact</a>
+            <a href="about-mental-health.html">About Mental Health</a>
+            <a href="faq.html">FAQ</a>
         </nav>
     </header>
 
