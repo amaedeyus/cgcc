@@ -1,0 +1,123 @@
+[2025-05-30 00:37:39] Received Form Data:
+Array
+(
+    [form_index] => 7
+    [form_name] => sdfsdfdf
+    [description] => sfdfsdf
+    [sections] => Array
+        (
+            [0] => Array
+                (
+                    [title] => Untitled Section
+                    [description] => sfdsdfsdfsdf
+                    [behavior] => same-page
+                    [questions] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [question] => number
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                        )
+
+                )
+
+        )
+
+)
+
+--------------------------------------------------------------------------------
+
+[2025-05-30 00:38:26] Received Form Data:
+Array
+(
+    [form_index] => 7
+    [form_name] => sdfsdfdf
+    [description] => sfdfsdf
+    [sections] => Array
+        (
+            [0] => Array
+                (
+                    [title] => Untitled Section
+                    [description] => sfdsdfsdfsdf
+                    [behavior] => same-page
+                    [questions] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [question] => number
+                                    [type] => short
+                                    [subtype] => phone
+                                    [required] => 
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                        )
+
+                )
+
+        )
+
+)
+
+--------------------------------------------------------------------------------
+
+[2025-05-30 00:42:03] Received Form Data:
+Array
+(
+    [form_index] => 7
+    [form_name] => sdfsdfdf
+    [description] => sfdfsdf
+    [sections] => Array
+        (
+            [0] => Array
+                (
+                    [title] => Untitled Section
+                    [description] => sfdsdfsdfsdf
+                    [behavior] => same-page
+                    [questions] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [question] => number
+                                    [type] => short
+                                    [subtype] => email
+                                    [required] => 
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                        )
+
+                )
+
+        )
+
+)
+
+--------------------------------------------------------------------------------
+

@@ -1428,7 +1428,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="short-answer ${questionData.type !== 'short' ? 'd-none' : ''}">
+                                        <div class="short-answer d-none>
                                             <input type="text" class="form-control" placeholder="Short answer text" disabled>
                                             <div class="subtype-selection mt-2">
                                                 <label class="form-label">Answer Format:</label>
@@ -1621,6 +1621,8 @@
                             </select>
                         </div>
                     `);
+
+                    
 
                     // Reattach event listener for subtype change
                     questionCard.find('.question-subtype').on('change', function () {
@@ -2103,6 +2105,7 @@
                     description: $('#form-description').val().trim(),
                     sections: []
                 };
+                
 
                 $('.section-card').each(function () {
                     const $section = $(this);
@@ -2158,7 +2161,9 @@
                         },
                         body: JSON.stringify(formData),
                         credentials: 'include'
+                        
                     });
+                    console.log("Sending form data to backend:", JSON.parse(JSON.stringify(formData)));
 
                     if (!response.ok) {
                         throw new Error(`Failed to ${method === 'POST' ? 'create' : 'update'} form`);
@@ -2297,10 +2302,19 @@
                 }
             });
 
+            $('body').on('click', '.add-question', function () {
+                console.log('Add Question clicked');
+                const sectionCard = $(this).closest('.section-card');
+                const questionsContainer = sectionCard.find('.questions-container');
+                addNewQuestion(questionsContainer);
+            });
+
+
             // Add question to section
             $(document).on('click', '.add-question', function () {
                 const section = $(this).closest('.section-card');
                 const sectionId = section.data('section-id');
+                const questionsContainer = section.find('.questions-container'); // ✅ Define container
                 const questionId = nextQuestionId++;
 
                 const questionHtml = `
@@ -2344,7 +2358,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="short-answer ${questionData.type !== 'short' ? 'd-none' : ''}">
+                                        <div class="short-answer d-none>
                                             <input type="text" class="form-control" placeholder="Short answer text" disabled>
                                             <div class="subtype-selection mt-2">
                                                 <label class="form-label">Answer Format:</label>
