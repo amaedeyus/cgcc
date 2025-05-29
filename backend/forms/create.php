@@ -58,7 +58,7 @@ try {
         $sectionInsert = $conn->prepare("INSERT INTO form_sections (form_index, section_title, section_description, section_order, behavior) VALUES (?, ?, ?, ?, ?)");
         if (!$sectionInsert) throw new Exception("Prepare form_sections failed: " . $conn->error);
 
-        $questionInsert = $conn->prepare("INSERT INTO main_questions (form_index, form_section_index, main_question_text, type_index, is_required) VALUES (?, ?, ?, (SELECT type_index FROM question_types WHERE type_name = ?), ?)");        if (!$questionInsert) throw new Exception("Prepare main_questions failed: " . $conn->error);
+        $questionInsert = $conn->prepare("INSERT INTO main_questions (form_index, form_section_index, main_question_text, type_index, subtype, is_required) VALUES (?, ?, ?, (SELECT type_index FROM question_types WHERE type_name = ?), ?, ?)");
 
         $choiceInsert = $conn->prepare("INSERT INTO choices (main_question_index, choice_text) VALUES (?, ?)");
         if (!$choiceInsert) throw new Exception("Prepare choices failed: " . $conn->error);
@@ -84,19 +84,19 @@ try {
                     $type = $question['type'] ?? 'short';
                     $required = $question['required'] ? 1 : 0;
 
-                    $questionText = $question['question'] ?? '';
-                    $questionType = $type;
+                    // Add this after $required:
+                    $subtype = ($type === 'short') ? ($question['subtype'] ?? 'text') : null;
 
-                    // Insert question
+                    // Update the bind_param call:
                     $questionInsert->bind_param(
-                    "iissi", // Changed from "iissii"
-                    $formId,
-                    $sectionIndex,
-                    $questionText,
-                    $questionType,
-                    $required
-                    // Removed: $includeOther
-                );
+                        "iissis", // Changed to 6 parameters
+                        $formId,
+                        $sectionIndex,
+                        $question['question'],  // Use actual question text
+                        $type,                   // Use question type
+                        $subtype,
+                        $required
+                    );
 
                     if (!$questionInsert->execute()) {
                         throw new Exception("Question insert failed: " . $questionInsert->error);
@@ -151,6 +151,7 @@ try {
             q.main_question_index,
             q.main_question_text,
             qt.type_name AS type_name,
+            q.subtype, -- Add this line
             q.is_required,
             c.choice_index,
             c.choice_text,
@@ -199,8 +200,8 @@ try {
                     'main_question_index' => $row['main_question_index'],
                     'main_question_text' => $row['main_question_text'],
                     'type' => $row['type_name'],
+                    'subtype' => $row['subtype'],
                     'is_required' => (bool)$row['is_required'],
-                    // Removed: 'include_other' => (bool)$row['include_other'],
                     'options' => [],
                     'rows' => [],
                     'form_section_index' => $row['form_section_index']

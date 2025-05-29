@@ -9,541 +9,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        .header {
-            background-color: #4fbc9c;
-            color: #e9f5e9;
-            margin-bottom: 20px;
-        }
+    <link rel="stylesheet" href="../css/formbuilder.css">
 
-        .header h1 {
-            font-weight: 700;
-        }
-
-        .instructions .card {
-            border-left: 5px solid #4fbc9c;
-        }
-
-        .instructions ol {
-            padding-left: 20px;
-        }
-
-        .instructions li {
-            margin-bottom: 8px;
-        }
-
-        /* Main background and typography - from form builder */
-        body {
-            background-color: #e8f5e9;
-            /* Light green background from form builder */
-            color: #212529;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            min-height: 100vh;
-            padding: 20px 0;
-        }
-
-        /* Form container - from form submission */
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: #ffffff;
-            /* White container */
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        /* For the form title/description card */
-        .form-title-card {
-            border-left: 5px solid #4fbc9c;
-        }
-
-        /* Section cards - from form builder with improvements */
-        .section-card {
-            background-color: #ffffff;
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 20px;
-            border: 1px solid #C8E6C9;
-            /* Green border from form builder */
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-            border-left: 5px solid #4fbc9c;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .section-card:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            transform: translateY(-2px);
-        }
-
-        #sections-container {
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-        }
-
-        /* Section header - from form builder */
-        .section-header-card {
-            margin-bottom: 1.5rem;
-            background-color: transparent;
-            border: none;
-        }
-
-        /* Section title input - from form builder */
-        .section-title-input {
-            border: none;
-            background: transparent;
-            font-size: 1.5rem;
-            font-weight: bold;
-            padding: 0;
-            width: 100%;
-            resize: none;
-            overflow: hidden;
-            min-height: 1.5em;
-            line-height: 1.5;
-            color: #1B5E20;
-        }
-
-        .section-title-input:focus {
-            outline: none;
-            box-shadow: none;
-            border-bottom: 2px solid #4fbc9c;
-        }
-
-        /* Section description input - from form builder */
-        .section-description-input {
-            border: none;
-            background: transparent;
-            padding: 0;
-            width: 100%;
-            resize: none;
-            overflow: hidden;
-            min-height: 1.5em;
-            line-height: 1.5;
-            color: #2E7D32;
-        }
-
-        .section-description-input:focus {
-            outline: none;
-            box-shadow: none;
-            border-bottom: 2px solid #81C784;
-        }
-
-        /* Question cards - combined styles */
-        .question-card {
-            background-color: #f8f9fa;
-            /* Light gray from form builder */
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 25px;
-            border: 1px solid #C8E6C9;
-            color: #2E7D32;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-        }
-
-        .question-card:hover {
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-            transform: translateY(-2px);
-            /* Added from form submission */
-        }
-
-        /* Drag handle - from form builder */
-        .drag-handle {
-            cursor: grab;
-            color: #4fbc9c;
-        }
-
-        .drag-handle:active {
-            cursor: grabbing;
-        }
-
-        .dragging {
-            opacity: 0.5;
-            background: #f8f9fa;
-        }
-
-        /* Question text - from form builder */
-        .question-text {
-            border: none;
-            background: transparent;
-            padding: 0;
-            width: 100%;
-            resize: none;
-            overflow: hidden;
-            min-height: 1.5em;
-            line-height: 1.5;
-            font-size: 1.2rem;
-            color: #1B5E20;
-        }
-
-        .question-text:focus {
-            outline: none;
-            box-shadow: none;
-            border-bottom: 2px solid #4fbc9c;
-        }
-
-        /* Form elements - combined styles */
-        .form-check {
-            padding: 8px 0;
-            padding-left: 2.2em;
-            margin-bottom: 10px;
-            background-color: #f8f9fa;
-            /* Light gray background for options */
-            border-radius: 4px;
-            transition: background-color 0.2s;
-        }
-
-        .form-check:hover {
-            background-color: #e8f5e9;
-            /* Light green on hover */
-        }
-
-        .form-check-input {
-            width: 1.3em;
-            height: 1.3em;
-            margin-top: 0.15em;
-            margin-left: -1.8em;
-            border: 1px solid #81C784;
-        }
-
-        .form-check-label {
-            font-size: 1rem;
-            padding-left: 0.5em;
-            vertical-align: middle;
-            cursor: pointer;
-            display: inline-block;
-            width: calc(100% - 2em);
-            color: #2E7D32;
-        }
-
-        .required-label::after {
-            content: " *";
-            color: #d32f2f;
-            font-weight: bold;
-        }
-
-        /* Option rows - from form builder */
-        .option-row {
-            margin-bottom: 0.5rem;
-        }
-
-        /* Section behavior - from form builder */
-        .section-behavior-container {
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid #C8E6C9;
-        }
-
-        /* Questions container - from form builder */
-        .questions-container {
-            margin-top: 1.5rem;
-        }
-
-        /* Auto-expand - from form builder */
-        .auto-expand {
-            resize: none;
-            overflow: hidden;
-        }
-
-        /* Display text - from form builder */
-        .display-text {
-            padding: 0.5rem;
-            background-color: #f8f9fa;
-            border-radius: 0.25rem;
-        }
-
-        /* Grid table - combined styles */
-        .grid-table {
-            width: 100%;
-            margin-bottom: 1rem;
-            border-collapse: collapse;
-        }
-
-        .grid-table th {
-            text-align: center;
-            background-color: #C8E6C9;
-            color: #1B5E20;
-            padding: 12px;
-            border: 1px solid #E8F5E9;
-            font-weight: 600;
-        }
-
-        .grid-table td {
-            padding: 12px;
-            border: 1px solid #e0e0e0;
-            background-color: #ffffff;
-            text-align: center;
-        }
-
-        .grid-table label {
-            display: block;
-            width: 100%;
-            height: 100%;
-            margin: -12px;
-            padding: 12px;
-        }
-
-        .grid-table label:hover {
-            background-color: rgba(0, 0, 0, 0.03);
-        }
-
-        /* Buttons - combined styles */
-        .btn-outline-primary {
-            border-color: #4fbc9c;
-            color: #4fbc9c;
-            padding: 8px 20px;
-            font-weight: 500;
-        }
-
-        .btn-outline-primary:hover {
-            background-color: #4fbc9c;
-            color: #ffffff;
-        }
-
-        .btn-outline-danger {
-            border-color: #d32f2f;
-            color: #d32f2f;
-            padding: 8px 20px;
-            font-weight: 500;
-        }
-
-        .btn-outline-danger:hover {
-            background-color: #d32f2f;
-            color: #ffffff;
-        }
-
-        .btn-primary {
-            background-color: #4fbc9c;
-            border-color: #4fbc9c;
-            padding: 8px 20px;
-            font-weight: 500;
-        }
-
-        .btn-primary:hover {
-            background-color: #3d8b40;
-            border-color: #3d8b40;
-        }
-
-        /* Focus states - combined */
-        .form-control:focus,
-        .form-select:focus,
-        textarea.form-control:focus {
-            border-color: #81C784;
-            box-shadow: 0 0 0 0.25rem rgba(76, 175, 80, 0.25);
-            outline: none;
-        }
-
-        .form-check-input:focus {
-            box-shadow: 0 0 0 0.25rem rgba(76, 175, 80, 0.25);
-        }
-
-        /* Section navigation - combined */
-        .section-navigation {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 25px;
-            padding-top: 20px;
-            border-top: 1px solid #e0e0e0;
-        }
-
-        /* Hidden - from form builder */
-        .hidden {
-            display: none !important;
-        }
-
-        /* Progress bar - from form submission */
-        .progress-container {
-            margin-bottom: 20px;
-        }
-
-        .progress {
-            background-color: #E9ECEF;
-            height: 10px;
-            border-radius: 5px;
-        }
-
-        .progress-bar {
-            background-color: #4fbc9c;
-        }
-
-        #progress-text {
-            margin-top: 6px;
-            display: block;
-            text-align: right;
-            font-size: 14px;
-            color: #6c757d;
-        }
-
-        /* Save feedback - combined */
-        .save-feedback {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
-            padding: 12px 20px;
-            background-color: #4fbc9c;
-            color: white;
-            border-radius: 6px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            animation: fadeInOut 3s ease-in-out;
-            opacity: 0;
-        }
-
-        @keyframes fadeInOut {
-            0% {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            20% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-
-            80% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-
-            100% {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-        }
-
-        /* Preview mode - from form builder */
-        .preview-mode .edit-only {
-            display: none;
-        }
-
-        .edit-mode .preview-only {
-            display: none;
-        }
-
-        .preview-question-text {
-            color: #1B5E20;
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-        }
-
-        .preview-required-text {
-            color: #d32f2f;
-        }
-
-        /* Toggle preview button - from form builder */
-        .toggle-preview {
-            transition: all 0.3s ease;
-        }
-
-
-        #form-title:focus {
-            border-bottom-color: #4fbc9c;
-            box-shadow: none;
-        }
-
-        /* Label Styling */
-        .form-title-card .form-label {
-            font-weight: 600;
-            color: #1B5E20;
-            margin-bottom: 8px;
-        }
-
-        /* Card Header Effect */
-        .form-title-card .card-body {
-            border-radius: 8px;
-            background-color: #f8f9fa;
-        }
-
-        .floating-buttons {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            z-index: 1050;
-        }
-
-        /* Floating Button Styles */
-        .floating-btn {
-            padding: 12px 20px;
-            border-radius: 50px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            white-space: nowrap;
-        }
-
-        .floating-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-        }
-
-        .floating-back-btn {
-            background-color: #6c757d;
-            border-color: #6c757d;
-            color: white;
-        }
-
-        .floating-back-btn:hover {
-            background-color: #5a6268;
-            border-color: #545b62;
-            color: white;
-        }
-
-        .floating-save-btn {
-            background-color: #4fbc9c;
-            border-color: #4fbc9c;
-            color: white;
-        }
-
-        .floating-save-btn:hover {
-            background-color: #3d8b40;
-            border-color: #3d8b40;
-            color: white;
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .floating-buttons {
-                bottom: 20px;
-                right: 20px;
-            }
-
-            .floating-btn {
-                padding: 10px 16px;
-                font-size: 14px;
-            }
-        }
-
-        /* Responsive adjustments - combined */
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-            }
-
-            .section-card {
-                padding: 15px;
-            }
-
-            .question-card {
-                padding: 15px;
-            }
-
-            .question-text {
-                font-size: 1.1rem;
-            }
-
-            .section-title-input {
-                font-size: 1.3rem;
-            }
-        }
-    </style>
 </head>
 
 <body>
@@ -655,10 +122,21 @@
                                                     </select>
                                                 </div>
                                             </div>
+                                            <div class="row mb-2 short-subtype-row d-none">
+                                                <label class="col-sm-2 col-form-label">Subtype</label>
+                                                <div class="col-sm-10">
+                                                    <select class="form-select short-subtype">
+                                                        <option value="text">Text</option>
+                                                        <option value="number">Number</option>
+                                                        <option value="phone">Phone (09xxxxxxxxx)</option>
+                                                        <option value="email">Email</option>
+                                                    </select>
+                                                </div>
+                                            </div>
 
                                             <div class="short-answer">
-                                                <input type="text" class="form-control" placeholder="Short answer text"
-                                                    disabled>
+                                                <input type="text" class="form-control short-answer-input" 
+                                                    placeholder="Short answer text" disabled>
                                             </div>
 
                                             <div class="options-container">
@@ -751,7 +229,28 @@
 
             switch (questionType) {
                 case 'short':
-                    previewHtml = '<input type="text" class="form-control" placeholder="Your answer">';
+                    const subtype = questionCard.find('.short-subtype').val() || 'text';
+                    let placeholder = "Your answer";
+                    let inputType = "text";
+                    
+                    switch(subtype) {
+                        case 'number': 
+                            placeholder = "Enter a number";
+                            inputType = "number";
+                            break;
+                        case 'phone': 
+                            placeholder = "09xxxxxxxxx"; 
+                            inputType = "tel";
+                            break;
+                        case 'email': 
+                            placeholder = "name@example.com"; 
+                            inputType = "email";
+                            break;
+                    }
+                    
+                    previewHtml = `<input type="${inputType}" 
+                                            class="form-control" 
+                                            placeholder="${placeholder}">`;
                     break;
                 case 'paragraph':
                     previewHtml = '<textarea class="form-control" rows="3" placeholder="Your answer"></textarea>';
@@ -1042,45 +541,45 @@
                 state.sections.forEach(section => {
                     const sectionId = section.id || nextSectionId++;
                     const sectionHtml = `
-        <div class="section-card" data-section-id="${sectionId}">
-            <div class="card section-header-card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <textarea class="section-title-input auto-expand" placeholder="Section title">${section.title || 'Untitled Section'}</textarea>
-                        <button type="button" class="btn btn-outline-danger btn-sm delete-section">
-                            Delete Section
-                        </button>
-                    </div>
-                    <textarea class="section-description-input mt-2 w-100 auto-expand" placeholder="Section description (optional)">${section.description || ''}</textarea>
-                    
-                    <div class="section-behavior-container mt-3">
-                        <div class="row mb-2">
-                            <label class="col-sm-3 col-form-label">Section Behavior</label>
-                            <div class="col-sm-9">
-                                <select class="form-select section-behavior">
-                                    <option value="same-page" ${section.behavior === 'same-page' ? 'selected' : ''}>Stay on same page</option>
-                                    <option value="next-page" ${section.behavior === 'next-page' ? 'selected' : ''}>Go to next section/page</option>
-                                </select>
+                        <div class="section-card" data-section-id="${sectionId}">
+                            <div class="card section-header-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <textarea class="section-title-input auto-expand" placeholder="Section title">${section.title || 'Untitled Section'}</textarea>
+                                        <button type="button" class="btn btn-outline-danger btn-sm delete-section">
+                                            Delete Section
+                                        </button>
+                                    </div>
+                                    <textarea class="section-description-input mt-2 w-100 auto-expand" placeholder="Section description (optional)">${section.description || ''}</textarea>
+                                    
+                                    <div class="section-behavior-container mt-3">
+                                        <div class="row mb-2">
+                                            <label class="col-sm-3 col-form-label">Section Behavior</label>
+                                            <div class="col-sm-9">
+                                                <select class="form-select section-behavior">
+                                                    <option value="same-page" ${section.behavior === 'same-page' ? 'selected' : ''}>Stay on same page</option>
+                                                    <option value="next-page" ${section.behavior === 'next-page' ? 'selected' : ''}>Go to next section/page</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="questions-container" data-section-id="${sectionId}">
+                                <!-- Questions will be added here -->
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <button type="button" class="btn btn-outline-primary add-question">
+                                        <i class="fas fa-plus me-1"></i>
+                                        Add Question
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="questions-container" data-section-id="${sectionId}">
-                <!-- Questions will be added here -->
-            </div>
-            
-            <div class="card">
-                <div class="card-body text-center">
-                    <button type="button" class="btn btn-outline-primary add-question">
-                        <i class="fas fa-plus me-1"></i>
-                        Add Question
-                    </button>
-                </div>
-            </div>
-        </div>
-        `;
+                        `;
 
                     $('#sections-container').append(sectionHtml);
                     const questionsContainer = $(`.questions-container[data-section-id="${sectionId}"]`);
@@ -1089,96 +588,114 @@
                     section.questions.forEach(questionData => {
                         const questionId = questionData.id || nextQuestionId++;
                         const questionHtml = `
-            <div class="card question-card mb-3" data-question-id="${questionId}">
-                <div class="card-body">
-                    <div class="d-flex align-items-start">
-                        <div class="me-2 mt-1 drag-handle">
-                            <i class="fas fa-grip-vertical"></i>
-                        </div>
-                        <div style="flex: 1;">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <label>Question</label>
-                                <div>
-                                    <button type="button" class="btn btn-outline-danger btn-sm me-2 delete-question">
-                                        Delete
-                                    </button>
-                                    <button type="button" class="btn btn-outline-secondary btn-sm toggle-preview">
-                                        Preview
-                                    </button>
-                                </div>
-                            </div>
+                        <div class="card question-card mb-3" data-question-id="${questionId}">
+                            <div class="card-body">
+                                <div class="d-flex align-items-start">
+                                    <div class="me-2 mt-1 drag-handle">
+                                        <i class="fas fa-grip-vertical"></i>
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <label>Question</label>
+                                            <div>
+                                                <button type="button" class="btn btn-outline-danger btn-sm me-2 delete-question">
+                                                    Delete
+                                                </button>
+                                                <button type="button" class="btn btn-outline-secondary btn-sm toggle-preview">
+                                                    Preview
+                                                </button>
+                                            </div>
+                                        </div>
 
-                            <div class="edit-mode">
-                                <div class="mb-2">
-                                    <textarea class="question-text auto-expand" placeholder="Enter your question">${questionData.text || ''}</textarea>
-                                </div>
+                                        <div class="edit-mode">
+                                            <div class="mb-2">
+                                                <textarea class="question-text auto-expand" placeholder="Enter your question">${questionData.text || ''}</textarea>
+                                            </div>
 
-                                <div class="row mb-2">
-                                    <label class="col-sm-2 col-form-label">Type</label>
-                                    <div class="col-sm-10">
-                                        <select class="form-select question-type">
-                                            <option value="short" ${questionData.type === 'short' ? 'selected' : ''}>Short Answer</option>
-                                            <option value="paragraph" ${questionData.type === 'paragraph' ? 'selected' : ''}>Paragraph</option>
-                                            <option value="multiple" ${questionData.type === 'multiple' ? 'selected' : ''}>Multiple Choice</option>
-                                            <option value="checkbox" ${questionData.type === 'checkbox' ? 'selected' : ''}>Checkboxes</option>
-                                            <option value="dropdown" ${questionData.type === 'dropdown' ? 'selected' : ''}>Dropdown</option>
-                                            <option value="grid" ${questionData.type === 'grid' ? 'selected' : ''}>Multiple Choice Grid</option>
-                                            <option value="date" ${questionData.type === 'date' ? 'selected' : ''}>Date</option>
-                                            <option value="display" ${questionData.type === 'display' ? 'selected' : ''}>Display Text</option>
-                                        </select>
+                                            <div class="row mb-2">
+                                                <label class="col-sm-2 col-form-label">Type</label>
+                                                <div class="col-sm-10">
+                                                    <select class="form-select question-type">
+                                                        <option value="short" ${questionData.type === 'short' ? 'selected' : ''}>Short Answer</option>
+                                                        <option value="paragraph" ${questionData.type === 'paragraph' ? 'selected' : ''}>Paragraph</option>
+                                                        <option value="multiple" ${questionData.type === 'multiple' ? 'selected' : ''}>Multiple Choice</option>
+                                                        <option value="checkbox" ${questionData.type === 'checkbox' ? 'selected' : ''}>Checkboxes</option>
+                                                        <option value="dropdown" ${questionData.type === 'dropdown' ? 'selected' : ''}>Dropdown</option>
+                                                        <option value="grid" ${questionData.type === 'grid' ? 'selected' : ''}>Multiple Choice Grid</option>
+                                                        <option value="date" ${questionData.type === 'date' ? 'selected' : ''}>Date</option>
+                                                        <option value="display" ${questionData.type === 'display' ? 'selected' : ''}>Display Text</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-2 short-subtype-row">
+                                                <label class="col-sm-2 col-form-label">Subtype</label>
+                                                <div class="col-sm-10">
+                                                    <select class="form-select short-subtype">
+                                                        <option value="text">Text</option>
+                                                        <option value="number">Number</option>
+                                                        <option value="phone">Phone (09xxxxxxxxx)</option>
+                                                        <option value="email">Email</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="short-answer">
+                                                <input type="text" class="form-control short-answer-input" placeholder="Short answer text" disabled>
+                                            </div>
+
+                                            <div class="paragraph-answer ${questionData.type !== 'paragraph' ? 'd-none' : ''}">
+                                                <textarea class="form-control" placeholder="Long answer text" disabled rows="3"></textarea>
+                                            </div>
+
+                                            <div class="options-container ${!['multiple', 'checkbox', 'dropdown', 'grid'].includes(questionData.type) ? 'd-none' : ''}">
+                                                <!-- Options will be added here -->
+                                            </div>
+
+                                            <div class="grid-rows-container ${questionData.type !== 'grid' ? 'd-none' : ''}">
+                                                <!-- Rows will be added here -->
+                                            </div>
+
+                                            <div class="display-text ${questionData.type !== 'display' ? 'd-none' : ''}">
+                                                <!-- Display text only -->
+                                            </div>
+
+                                            <div class="date-answer ${questionData.type !== 'date' ? 'd-none' : ''}">
+                                                <input type="date" class="form-control" disabled>
+                                            </div>
+
+                                            <div class="form-check form-switch mt-3 me-2 ${questionData.type === 'display' ? 'd-none' : ''}">
+                                                <input class="form-check-input required-switch" type="checkbox" id="required-switch-${questionId}" ${questionData.required ? 'checked' : ''}>
+                                                <label class="form-check-label" for="required-switch-${questionId}">Required</label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="preview-mode d-none">
+                                            <h5 class="preview-question-text mb-3">${questionData.text || 'Untitled Question'}</h5>
+                                            <div class="preview-content">
+                                                <!-- Preview will be generated here -->
+                                            </div>
+                                            <small class="text-muted preview-required-text ${!questionData.required ? 'd-none' : ''}">* Required</small>
+                                        </div>
                                     </div>
                                 </div>
-
-                                <div class="short-answer ${questionData.type !== 'short' ? 'd-none' : ''}">
-                                    <input type="text" class="form-control" placeholder="Short answer text" disabled>
-                                </div>
-
-                                <div class="paragraph-answer ${questionData.type !== 'paragraph' ? 'd-none' : ''}">
-                                    <textarea class="form-control" placeholder="Long answer text" disabled rows="3"></textarea>
-                                </div>
-
-                                <div class="options-container ${!['multiple', 'checkbox', 'dropdown', 'grid'].includes(questionData.type) ? 'd-none' : ''}">
-                                    <!-- Options will be added here -->
-                                </div>
-
-                                <div class="grid-rows-container ${questionData.type !== 'grid' ? 'd-none' : ''}">
-                                    <!-- Rows will be added here -->
-                                </div>
-
-                                <div class="display-text ${questionData.type !== 'display' ? 'd-none' : ''}">
-                                    <!-- Display text only -->
-                                </div>
-
-                                <div class="date-answer ${questionData.type !== 'date' ? 'd-none' : ''}">
-                                    <input type="date" class="form-control" disabled>
-                                </div>
-
-                                <div class="form-check form-switch mt-3 me-2 ${questionData.type === 'display' ? 'd-none' : ''}">
-                                    <input class="form-check-input required-switch" type="checkbox" id="required-switch-${questionId}" ${questionData.required ? 'checked' : ''}>
-                                    <label class="form-check-label" for="required-switch-${questionId}">Required</label>
-                                </div>
-                            </div>
-                            
-                            <div class="preview-mode d-none">
-                                <h5 class="preview-question-text mb-3">${questionData.text || 'Untitled Question'}</h5>
-                                <div class="preview-content">
-                                    <!-- Preview will be generated here -->
-                                </div>
-                                <small class="text-muted preview-required-text ${!questionData.required ? 'd-none' : ''}">* Required</small>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-            `;
+                        `;
 
                         questionsContainer.append(questionHtml);
                         const questionCard = $(`[data-question-id="${questionId}"]`);
 
                         // Initialize question type UI
                         updateQuestionType(questionCard);
+                        questionCard.find('.short-subtype').val(questionData.subtype || 'text');
 
-                        // Add options if needed
+                        // Now update the input field based on selected subtype
+                        if (questionData.type === 'short') {
+                            updateShortAnswerInput(questionCard);
+                        }
+
+
                         // Add options if needed
                         if (['multiple', 'checkbox', 'dropdown', 'grid'].includes(questionData.type)) {
                             const optionsContainer = questionCard.find('.options-container');
@@ -1215,23 +732,23 @@
 
                             questionData.rows.forEach((row, idx) => {
                                 const rowHtml = `
-                    <div class="grid-row mb-2 d-flex align-items-center">
-                        <input type="text" class="form-control grid-row-input" placeholder="Question ${idx + 1}" value="${row}">
-                        <button type="button" class="btn btn-outline-danger ms-2 remove-grid-row">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                    `;
+                                <div class="grid-row mb-2 d-flex align-items-center">
+                                    <input type="text" class="form-control grid-row-input" placeholder="Question ${idx + 1}" value="${row}">
+                                    <button type="button" class="btn btn-outline-danger ms-2 remove-grid-row">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                                `;
                                 rowsContainer.append(rowHtml);
                             });
 
                             // Add "Add Row" button
                             rowsContainer.append(`
-                <button type="button" class="btn btn-outline-primary mt-2 add-grid-row">
-                    <i class="fas fa-plus me-1"></i>
-                    Add Row
-                </button>
-                `);
+                            <button type="button" class="btn btn-outline-primary mt-2 add-grid-row">
+                                <i class="fas fa-plus me-1"></i>
+                                Add Row
+                            </button>
+                            `);
                         }
 
                         // Initialize auto-expand for the question textarea
@@ -1277,6 +794,29 @@
 
                 // Update button states
                 updateUndoRedoButtons();
+            }
+
+            // Inside updateShortAnswerInput function
+            function updateShortAnswerInput(questionCard) {
+                const subtype = questionCard.find('.short-subtype').val() || 'text';
+                const placeholderMap = {
+                    'text': 'Your answer',
+                    'number': 'Enter a number',
+                    'phone': '09xxxxxxxxx',
+                    'email': 'name@example.com'
+                };
+                const inputType = subtype === 'number' ? 'number' : 
+                                 subtype === 'phone' ? 'tel' : 
+                                 subtype === 'email' ? 'email' : 'text';
+                const placeholder = placeholderMap[subtype] || 'Your answer';
+
+                // Replace the input field with the correct one
+                questionCard.find('.short-answer').html(`
+                    <input type="${inputType}" 
+                           class="form-control short-answer-input" 
+                           placeholder="${placeholder}" 
+                           disabled>
+                `);
             }
 
             // Helper function to initialize question event handlers
@@ -1339,6 +879,36 @@
                     $(this).before(newRow);
                     saveState();
                 });
+
+                questionCard.find('.short-subtype').on('change', function () {
+                    const questionCard = $(this).closest('.question-card');
+                    const subtype = $(this).val();
+                    const placeholderMap = {
+                        'text': 'Your answer',
+                        'number': 'Enter a number',
+                        'phone': '09xxxxxxxxx',
+                        'email': 'name@example.com'
+                    };
+                    questionCard.find('.short-answer').html(`
+                        <input type="${subtype === 'number' ? 'number' : 'text'}"
+                            class="form-control short-answer-input"
+                            placeholder="${placeholderMap[subtype]}"
+                            disabled>`);
+                    saveState();
+                });
+            }
+
+            function updateShortAnswerInput(questionCard) {
+                const subtype = questionCard.find('.short-subtype').val() || 'text';
+                const placeholderMap = {
+                    'text': 'Your answer',
+                    'number': 'Enter a number',
+                    'phone': '09xxxxxxxxx',
+                    'email': 'name@example.com'
+                };
+                const input = questionCard.find('.short-answer-input');
+                input.attr('type', subtype === 'number' ? 'number' : 'text');
+                input.attr('placeholder', placeholderMap[subtype]);
             }
 
             // Helper function to add a new question
@@ -1386,7 +956,8 @@
                                         </div>
 
                                         <div class="short-answer">
-                                            <input type="text" class="form-control" placeholder="Short answer text" disabled>
+                                            <input type="text" class="form-control short-answer-input" 
+                                                placeholder="Short answer text" disabled>
                                         </div>
 
                                         <div class="paragraph-answer d-none">
@@ -1501,14 +1072,30 @@
                     const questionCard = $(this);
                     updateQuestionType(questionCard);
 
+                    // Restore short answer input based on subtype
+                    const savedSubtype = questionCard.find('.short-subtype').val() || 'text';
+                    if (questionCard.find('.question-type').val() === 'short') {
+                        updateShortAnswerInput(questionCard); // Apply correct input field
+                    }
+
                     // Reattach event handlers
-                    questionCard.find('.question-type').on('change', function () {
+                    questionCard.find('.question-type').off('change').on('change', function () {
                         updateQuestionType(questionCard);
+                        const newType = questionCard.find('.question-type').val();
+
+                        if (newType === 'short') {
+                            updateShortAnswerInput(questionCard);
+                        }
+
                         saveState();
                     });
 
+                    questionCard.find('.short-subtype').off('change').on('change', function () {
+                        updateShortAnswerInput(questionCard);
+                        saveState();
+                    });
 
-                    questionCard.find('.toggle-preview').on('click', function (e) {
+                    questionCard.find('.toggle-preview').off('click').on('click', function (e) {
                         e.stopPropagation();
                         togglePreviewMode(questionCard);
                     });
@@ -1551,6 +1138,14 @@
             function updateQuestionType(questionCard) {
 
                 const questionType = questionCard.find('.question-type').val(); // get type
+                // Toggle subtype row visibility
+                const shortSubtypeRow = questionCard.find('.short-subtype-row');
+                if (questionType === 'short') {
+                    shortSubtypeRow.removeClass('d-none');
+                } else {
+                    shortSubtypeRow.addClass('d-none');
+                }
+
                 const questionData = {
                     type: questionType,
                     options: [],
@@ -1560,40 +1155,6 @@
                 // Remove existing dynamic fields
                 questionCard.find('.short-answer, .paragraph-answer, .options-container, .grid-rows-container, .display-text, .date-answer').addClass('d-none');
                 questionCard.find('.short-answer, .paragraph-answer, .options-container, .grid-rows-container, .display-text, .date-answer').empty();
-
-                switch (questionType) {
-                    case 'short':
-                        questionCard.find('.short-answer').removeClass('d-none').html('<input type="text" class="form-control" placeholder="Short answer text">');
-                        break;
-                    case 'paragraph':
-                        questionCard.find('.paragraph-answer').removeClass('d-none').html('<textarea class="form-control" rows="3" placeholder="Longer paragraph text"></textarea>');
-                        break;
-                    case 'multiple':
-                    case 'checkbox':
-                    case 'dropdown':
-                        const optionsContainer = questionCard.find('.options-container').removeClass('d-none');
-                        if (optionsContainer.find('.option-row').length === 0) {
-                            optionsContainer.append(`
-                                <div class="option-row mb-2 d-flex align-items-center">
-                                    <div class="form-check me-2">
-                                        <input class="form-check-input" type="${questionType === 'multiple' ? 'radio' : 'checkbox'}" disabled>
-                                    </div>
-                                    <input type="text" class="form-control option-input" placeholder="Option 1">
-                                    <button type="button" class="btn btn-sm btn-outline-danger ms-2 add-option"><i class="fas fa-plus"></i></button>
-                                </div>`);
-                        }
-                        break;
-                    case 'grid':
-                        questionCard.find('.options-container').removeClass('d-none');
-                        questionCard.find('.grid-rows-container').removeClass('d-none');
-                        break;
-                    case 'date':
-                        questionCard.find('.date-answer').removeClass('d-none').html('<input type="date" class="form-control">');
-                        break;
-                    case 'display':
-                        questionCard.find('.display-text').removeClass('d-none');
-                        break;
-                }
 
                 // Rebind events
                 questionCard.find('.add-option').off('click').on('click', function () {
@@ -1619,7 +1180,9 @@
                 // Show appropriate answer type and initialize if needed
                 switch (questionType) {
                     case 'short':
-                        questionCard.find('.short-answer').removeClass('d-none').html('<input type="text" class="form-control" placeholder="Short answer text" disabled>');
+                        questionCard.find('.short-answer').removeClass('d-none');
+                        updateShortAnswerInput(questionCard); // this will set input type & placeholder
+                        questionCard.find('.short-subtype-row').removeClass('d-none');
                         break;
                     case 'paragraph':
                         questionCard.find('.paragraph-answer').removeClass('d-none').html('<textarea class="form-control" rows="3" placeholder="Long answer text" disabled></textarea>');
@@ -1698,6 +1261,15 @@
                     case 'display':
                         questionCard.find('.display-text').removeClass('d-none');
                         break;
+
+                    if (questionType !== 'short') {
+                        questionCard.find('.short-subtype-row').addClass('d-none');
+                    }
+
+                    
+                }
+                if (questionType === 'short') {
+                    updateShortAnswerInput(questionCard);
                 }
             }
 
@@ -1812,91 +1384,99 @@
             function addQuestionFromData(container, questionData) {
                 const questionId = nextQuestionId++;
                 const questionHtml = `
-                <div class="card question-card mb-3" data-question-id="${questionId}">
-                    <div class="card-body">
-                        <div class="d-flex align-items-start">
-                            <div class="me-2 mt-1 drag-handle">
-                                <i class="fas fa-grip-vertical"></i>
-                            </div>
-                            <div style="flex: 1;">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <label>Question</label>
-                                    <div>
-                                        <button type="button" class="btn btn-outline-danger btn-sm me-2 delete-question">
-                                            Delete
-                                        </button>
-                                        <button type="button" class="btn btn-outline-secondary btn-sm toggle-preview">
-                                            Preview
-                                        </button>
-                                    </div>
+                    <div class="card question-card mb-3" data-question-id="${questionId}">
+                        <div class="card-body">
+                            <div class="d-flex align-items-start">
+                                <div class="me-2 mt-1 drag-handle">
+                                    <i class="fas fa-grip-vertical"></i>
                                 </div>
-
-                                <div class="edit-mode">
-                                    <div class="mb-2">
-                                        <textarea class="question-text auto-expand" placeholder="Enter your question">${questionData.question || ''}</textarea>
-                                    </div>
-
-                                    <div class="row mb-2">
-                                        <label class="col-sm-2 col-form-label">Type</label>
-                                        <div class="col-sm-10">
-                                            <select class="form-select question-type">
-                                                <option value="short" ${questionData.type === 'short' ? 'selected' : ''}>Short Answer</option>
-                                                <option value="paragraph" ${questionData.type === 'paragraph' ? 'selected' : ''}>Paragraph</option>
-                                                <option value="multiple" ${questionData.type === 'multiple' ? 'selected' : ''}>Multiple Choice</option>
-                                                <option value="checkbox" ${questionData.type === 'checkbox' ? 'selected' : ''}>Checkboxes</option>
-                                                <option value="dropdown" ${questionData.type === 'dropdown' ? 'selected' : ''}>Dropdown</option>
-                                                <option value="grid" ${questionData.type === 'grid' ? 'selected' : ''}>Multiple Choice Grid</option>
-                                                <option value="date" ${questionData.type === 'date' ? 'selected' : ''}>Date</option>
-                                                <option value="display" ${questionData.type === 'display' ? 'selected' : ''}>Display Text</option>
-                                            </select>
+                                <div style="flex: 1;">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <label>Question</label>
+                                        <div>
+                                            <button type="button" class="btn btn-outline-danger btn-sm me-2 delete-question">
+                                                Delete
+                                            </button>
+                                            <button type="button" class="btn btn-outline-secondary btn-sm toggle-preview">
+                                                Preview
+                                            </button>
                                         </div>
                                     </div>
 
-                                    <div class="short-answer ${questionData.type !== 'short' ? 'd-none' : ''}">
-                                        <input type="text" class="form-control" placeholder="Short answer text" disabled>
-                                    </div>
+                                    <div class="edit-mode">
+                                        <div class="mb-2">
+                                            <textarea class="question-text auto-expand" placeholder="Enter your question">${questionData.question || ''}</textarea>
+                                        </div>
 
-                                    <div class="paragraph-answer ${questionData.type !== 'paragraph' ? 'd-none' : ''}">
-                                        <textarea class="form-control" placeholder="Long answer text" disabled rows="3"></textarea>
-                                    </div>
+                                        <div class="row mb-2">
+                                            <label class="col-sm-2 col-form-label">Type</label>
+                                            <div class="col-sm-10">
+                                                <select class="form-select question-type">
+                                                    <option value="short" ${questionData.type === 'short' ? 'selected' : ''}>Short Answer</option>
+                                                    <option value="paragraph" ${questionData.type === 'paragraph' ? 'selected' : ''}>Paragraph</option>
+                                                    <option value="multiple" ${questionData.type === 'multiple' ? 'selected' : ''}>Multiple Choice</option>
+                                                    <option value="checkbox" ${questionData.type === 'checkbox' ? 'selected' : ''}>Checkboxes</option>
+                                                    <option value="dropdown" ${questionData.type === 'dropdown' ? 'selected' : ''}>Dropdown</option>
+                                                    <option value="grid" ${questionData.type === 'grid' ? 'selected' : ''}>Multiple Choice Grid</option>
+                                                    <option value="date" ${questionData.type === 'date' ? 'selected' : ''}>Date</option>
+                                                    <option value="display" ${questionData.type === 'display' ? 'selected' : ''}>Display Text</option>
+                                                </select>
+                                            </div>
+                                        </div>
 
-                                    <div class="options-container ${!['multiple', 'checkbox', 'dropdown', 'grid'].includes(questionData.type) ? 'd-none' : ''}">
-                                        <!-- Options will be added here for multiple choice, checkboxes, etc. -->
-                                    </div>
+                                        <div class="short-answer ${questionData.type !== 'short' ? 'd-none' : ''}">
+                                            <input type="text" class="form-control short-answer-input" placeholder="Short answer text" disabled>
+                                        </div>
 
-                                    <div class="grid-rows-container ${questionData.type !== 'grid' ? 'd-none' : ''}">
-                                        <!-- Rows will be added here for grid questions -->
-                                    </div>
+                                        <div class="paragraph-answer ${questionData.type !== 'paragraph' ? 'd-none' : ''}">
+                                            <textarea class="form-control" placeholder="Long answer text" disabled rows="3"></textarea>
+                                        </div>
 
-                                    <div class="display-text ${questionData.type !== 'display' ? 'd-none' : ''}">
-                                        <!-- Display text only -->
-                                    </div>
+                                        <div class="options-container ${!['multiple', 'checkbox', 'dropdown', 'grid'].includes(questionData.type) ? 'd-none' : ''}">
+                                            <!-- Options will be added here for multiple choice, checkboxes, etc. -->
+                                        </div>
 
-                                    <div class="date-answer ${questionData.type !== 'date' ? 'd-none' : ''}">
-                                        <input type="date" class="form-control" disabled>
-                                    </div>
+                                        <div class="grid-rows-container ${questionData.type !== 'grid' ? 'd-none' : ''}">
+                                            <!-- Rows will be added here for grid questions -->
+                                        </div>
 
-                                    <div class="form-check form-switch mt-3 me-2 ${questionData.type === 'display' ? 'd-none' : ''}">
-                                        <input class="form-check-input required-switch" type="checkbox" id="required-switch-${questionId}" ${questionData.required ? 'checked' : ''}>
-                                        <label class="form-check-label" for="required-switch-${questionId}">Required</label>
+                                        <div class="display-text ${questionData.type !== 'display' ? 'd-none' : ''}">
+                                            <!-- Display text only -->
+                                        </div>
+
+                                        <div class="date-answer ${questionData.type !== 'date' ? 'd-none' : ''}">
+                                            <input type="date" class="form-control" disabled>
+                                        </div>
+
+                                        <div class="form-check form-switch mt-3 me-2 ${questionData.type === 'display' ? 'd-none' : ''}">
+                                            <input class="form-check-input required-switch" type="checkbox" id="required-switch-${questionId}" ${questionData.required ? 'checked' : ''}>
+                                            <label class="form-check-label" for="required-switch-${questionId}">Required</label>
+                                        </div>
                                     </div>
-                                </div>
-                                
-                                <div class="preview-mode d-none">
-                                    <h5 class="preview-question-text mb-3">${questionData.question || 'Untitled Question'}</h5>
-                                    <div class="preview-content">
-                                        <!-- Preview will be generated here -->
+                                    
+                                    <div class="preview-mode d-none">
+                                        <h5 class="preview-question-text mb-3">${questionData.question || 'Untitled Question'}</h5>
+                                        <div class="preview-content">
+                                            <!-- Preview will be generated here -->
+                                        </div>
+                                        <small class="text-muted preview-required-text ${!questionData.required ? 'd-none' : ''}">* Required</small>
                                     </div>
-                                    <small class="text-muted preview-required-text ${!questionData.required ? 'd-none' : ''}">* Required</small>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            `;
+                `;
 
                 container.append(questionHtml);
                 const questionCard = $(`[data-question-id="${questionId}"]`);
+                // Initialize question type UI
+                updateQuestionType(questionCard);
+                questionCard.find('.short-subtype').val(questionData.subtype || 'text');
+
+                // Now update the input field based on selected subtype
+                if (questionData.type === 'short') {
+                    updateShortAnswerInput(questionCard);
+                }
 
                 // Add options if needed
                 if (['multiple', 'checkbox', 'dropdown', 'grid'].includes(questionData.type)) {
@@ -2001,6 +1581,10 @@
                             rows: []
                         };
 
+                        if (type === 'short') {
+                            questionData.subtype = $question.find('.short-subtype').val();
+                        }
+
                         if (['multiple', 'checkbox', 'dropdown'].includes(type)) {
                             $question.find('.option-input').each(function () {
                                 const val = $(this).val().trim();
@@ -2080,6 +1664,14 @@
             // Initialize form elements
             initializeFormElements();
 
+            // Explicitly update question types for initial questions
+            $('.question-card').each(function() {
+                updateQuestionType($(this));
+                if ($(this).find('.question-type').val() === 'short') {
+                    updateShortAnswerInput($(this));
+                }
+            });
+
             // Load form if editing
             if (formId) {
                 loadForm(formId);
@@ -2087,6 +1679,7 @@
                 // Save initial state for new forms
                 saveState();
             }
+
 
             // Add new section
             $('#add-section').click(function () {
@@ -2219,8 +1812,21 @@
                                             </div>
                                         </div>
 
+                                        <!-- Add this inside .edit-mode -->
+                                        <div class="row mb-2 short-subtype-row">
+                                            <label class="col-sm-2 col-form-label">Subtype</label>
+                                            <div class="col-sm-10">
+                                                <select class="form-select short-subtype">
+                                                    <option value="text">Text</option>
+                                                    <option value="number">Number</option>
+                                                    <option value="phone">Phone (09xxxxxxxxx)</option>
+                                                    <option value="email">Email</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
                                         <div class="short-answer">
-                                            <input type="text" class="form-control" placeholder="Short answer text" disabled>
+                                            <input type="text" class="form-control short-answer-input" placeholder="Short answer text" disabled>                                        
                                         </div>
 
                                         <div class="paragraph-answer d-none">
