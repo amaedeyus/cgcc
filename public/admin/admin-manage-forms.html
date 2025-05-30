@@ -1,206 +1,240 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/png" href="cgcc2.png" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="../css/base.css" />
-    <link rel="stylesheet" href="../css/manage-forms.css" />
-    <title>CGCC</title>
-  </head>
 
-  <body>
-    <header>
-      <div class="logo">
-        <img src="../Media/cgcc.png" alt="cgcc-logo" class="logo-img" />
-        College Guidance and Counseling Center
-      </div>
-    </header>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="cgcc2.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/manage-forms.css" />
+  <title>CGCC</title>
+</head>
 
-    <div class="grid-body">
-      <div class="left-bg"></div>
-      <div class="page-left">
-        <div class="profile">
-          <div class="profile-picture"></div>
-          <span id="user-name"></span>
-          <div class="edit">
-            <a href="#">✎Edit Profile</a>
-          </div>
-        </div>
-        <div class="sidebar-nav">
-          <a href="admin-manage-forms.html" class="nav-link active"
-            >Manage Forms</a
-          >
-          <a href="admin-manage-counselor.html" class="nav-link"
-            >Manage Counselors</a
-          >
-          <a href="admin-manage-program.html" class="nav-link"
-            >Manage Programs</a
-          >
-        </div>
+<body>
+  <header>
+    <div class="logo">
+      <img src="../Media/cgcc.png" alt="cgcc-logo" class="logo-img" />
+      College Guidance and Counseling Center
+    </div>
+  </header>
 
-        <div class="logout-wrapper">
-          <form method="POST" action="../../backend/logout.php">
-            <button type="submit" class="logout-btn">Log Out</button>
-          </form>
+  <div class="grid-body">
+    <div class="left-bg"></div>
+    <div class="page-left">
+      <div class="profile">
+        <div class="profile-picture"></div>
+        <span id="user-name"></span>
+        <div class="edit">
+          <a href="#">✎Edit Profile</a>
         </div>
       </div>
+      <div class="sidebar-nav">
+        <a href="admin-manage-forms.html" class="nav-link">Manage Forms</a>
+        <a href="admin-manage-counselor.html" class="nav-link">Manage Counselors</a>
+        <a href="admin-manage-program.html" class="nav-link">Manage Programs</a>
+        <a href="admin-archived-forms.html" class="nav-link">Archived Forms</a>
+      </div>
 
-      <div class="page-right">
-        <div class="header-section">
-            <h1>Form Management</h1>
-            <p>Add, edit and manage guidance counseling forms</p>
-        </div>
-
-        <h2 class="section-title">Manage Forms</h2>
-        <div class="form-cards-section">
-          <div id="form-card-container" class="cards-grid">
-            <!-- Cards will be inserted here -->
-          </div>
-        </div>
-        <!-- Floating Create Form Button -->
-        <button
-          class="floating-btn"
-          onclick="location.href='formbuilder.html';"
-          title="Create New Form"
-        >
-          + Create Form
-        </button>
+      <div class="logout-wrapper">
+        <form method="POST" action="../../backend/logout.php">
+          <button type="submit" class="logout-btn">Log Out</button>
+        </form>
       </div>
     </div>
 
-    <div id="settingsModal" class="modal">
-      <div class="modal-content">
-        <span class="close-modal">&times;</span>
-        <h3>Form Settings</h3>
-        <div id="modalFormId" style="display: none"></div>
-        <div class="modal-body">
-          <div class="form-setting">
-            <label for="formStatusToggle">Form Status:</label>
-            <label class="toggle-switch">
-              <input type="checkbox" id="formStatusToggle" />
-              <span class="slider"></span>
-            </label>
-            <span id="statusText" class="status-text active-status"
-              >Active</span
-            >
-          </div>
-          <div class="form-setting">
-            <button id="saveSettingsBtn" class="save-btn">Save Changes</button>
-          </div>
+    <div class="page-right">
+      <div class="header-section">
+        <h1>Form Management</h1>
+        <p>Add, edit and manage guidance counseling forms</p>
+      </div>
+
+      <h2 class="section-title">Manage Forms</h2>
+      <div class="form-cards-section">
+        <div id="form-card-container" class="cards-grid">
+          <!-- Cards will be inserted here -->
         </div>
       </div>
+      <!-- Floating Create Form Button -->
+      <button class="floating-btn" onclick="location.href='formbuilder.html';" title="Create New Form">
+        + Create Form
+      </button>
     </div>
-    <script>
-      const userName = localStorage.getItem("username") || "Admin";
+  </div>
 
-      document.getElementById("user-name").innerText = userName;
-      const greetingElements = document.querySelectorAll(".user-name");
-      greetingElements.forEach((element) => {
-        element.innerText = userName;
+  <!-- Dropdown Menu -->
+  <div id="dropdownMenu" class="dropdown-menu">
+    <div class="dropdown-content">
+      <div class="form-setting">
+        <div class="status-label">
+          <label>Form Status</label>
+          <span class="info-icon"
+            title="Toggle to publish/unpublish the form. Published forms are visible to students.">ⓘ</span>
+        </div>
+        <div class="status-controls">
+          <label class="toggle-switch">
+            <input type="checkbox" id="dropdownStatusToggle" />
+            <span class="slider"></span>
+          </label>
+          <span id="dropdownStatusText" class="status-text"></span>
+        </div>
+      </div>
+      <div class="dropdown-footer">
+        <button id="dropdownSaveBtn" class="save-btn">Save Changes</button>
+        <button id="dropdownArchiveBtn" class="delete-btn">Archive</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const userName = localStorage.getItem("username") || "Admin";
+    let currentFormId = null;
+    let currentMenuElement = null;
+    let currentFormStatus = null;
+
+    document.getElementById("user-name").innerText = userName;
+    const greetingElements = document.querySelectorAll(".user-name");
+    greetingElements.forEach((element) => {
+      element.innerText = userName;
+    });
+
+    // Status mapping
+    const statusMap = {
+      '1': { text: 'Published', class: 'published-status' },
+      '0': { text: 'Unpublished', class: 'unpublished-status' },
+      '-1': { text: 'Archived', class: 'archived-status' }
+    };
+
+    // Fetch and display forms
+    async function loadForms() {
+      try {
+        const response = await fetch(
+          "http://localhost/cgcc/backend/forms/form.php",
+          {
+            credentials: "include",
+          }
+        );
+
+        if (!response.ok) throw new Error("Failed to fetch form data");
+
+        const data = await response.json();
+        const container = document.getElementById("form-card-container");
+        container.innerHTML = "";
+
+        if (!data || !Array.isArray(data) || data.length === 0) {
+          container.innerHTML = '<div class="no-forms">No forms available at the moment.</div>';
+          return;
+        }
+
+        data.forEach((form) => {
+          // Skip archived forms in the main view
+          if (form.is_active === '-1') return;
+
+          const card = document.createElement("div");
+          card.classList.add("form-card");
+
+          const statusInfo = statusMap[form.is_active] || statusMap['0'];
+          const statusClass = `status-indicator ${statusInfo.class}`;
+
+          let description = form.description || "No description";
+          const truncatedDescription =
+            description.length > 100
+              ? description.substring(0, 100) + "..."
+              : description;
+
+          card.innerHTML = `
+            <div class="form-card-menu" onclick="openSettingsMenu(${form.form_index}, '${form.is_active}', event)">⋮</div>
+            <div class="${statusClass}"></div>
+            <h3>${form.form_name}</h3>
+            <p class="form-description">${truncatedDescription.replace(/\n/g, " ")}</p>
+            <a href="http://localhost/cgcc/public/admin/formbuilder.html?id=${form.form_index}">Open Form</a>
+          `;
+
+          container.appendChild(card);
+        });
+      } catch (error) {
+        console.error("Error fetching forms:", error);
+        document.getElementById("form-card-container").innerHTML =
+          '<div class="no-forms">Failed to load forms. Please try again later.</div>';
+      }
+    }
+
+    // Dropdown menu functions
+    function openSettingsMenu(formId, status, event) {
+      event.stopPropagation();
+      const dropdown = document.getElementById("dropdownMenu");
+
+      // Close if clicking the same menu
+      if (currentMenuElement === event.target && dropdown.style.display === "block") {
+        closeSettingsMenu();
+        return;
+      }
+
+      // Close any open menus
+      closeSettingsMenu();
+
+      currentFormId = formId;
+      currentFormStatus = status;
+      currentMenuElement = event.target;
+
+      // Position the dropdown near the clicked button
+      const buttonRect = event.target.getBoundingClientRect();
+
+      dropdown.style.display = "block";
+      dropdown.style.top = `${buttonRect.bottom + window.scrollY}px`;
+      dropdown.style.left = `${buttonRect.right + window.scrollX - 280}px`;
+
+      // Load form data
+      loadFormSettings(formId, status);
+    }
+
+    function closeSettingsMenu() {
+      document.getElementById("dropdownMenu").style.display = "none";
+      currentMenuElement = null;
+      currentFormStatus = null;
+    }
+
+    function loadFormSettings(formId, status) {
+      const toggle = document.getElementById("dropdownStatusToggle");
+      const statusText = document.getElementById("dropdownStatusText");
+      const archiveBtn = document.getElementById("dropdownArchiveBtn");
+
+      // Update UI based on status
+      const statusInfo = statusMap[status] || statusMap['0'];
+
+      statusText.textContent = statusInfo.text;
+      statusText.className = `status-text ${statusInfo.class}`;
+
+      // Set toggle state (only for published/unpublished, not archived)
+      toggle.checked = status === '1';
+      toggle.disabled = status === '-1';
+
+      // Update archive button text and visibility
+      if (status === '-1') {
+        archiveBtn.textContent = "Unarchive";
+        archiveBtn.style.backgroundColor = "#4fbd9c";
+      } else {
+        archiveBtn.textContent = "Archive";
+        archiveBtn.style.backgroundColor = "#f44336";
+      }
+    }
+
+    // Event listeners
+    document.addEventListener("DOMContentLoaded", () => {
+      // Load forms
+      loadForms();
+
+      // Close menu when clicking outside
+      document.addEventListener("click", (event) => {
+        if (!event.target.closest('.dropdown-menu') && !event.target.closest('.form-card-menu')) {
+          closeSettingsMenu();
+        }
       });
 
-      // Fetch and display forms
-      async function loadForms() {
+      // Status toggle handler
+      document.getElementById("dropdownSaveBtn").addEventListener("click", async function () {
         try {
-          const response = await fetch(
-            "http://localhost/cgcc/backend/forms/form.php",
-            {
-              credentials: "include",
-            }
-          );
-
-          if (!response.ok) throw new Error("Failed to fetch form data");
-
-          const data = await response.json();
-          const container = document.getElementById("form-card-container");
-          container.innerHTML = "";
-
-          if (!data || !Array.isArray(data) || data.length === 0) {
-            container.innerHTML = "<p>No forms available at the moment.</p>";
-            return;
-          }
-
-          data.forEach((form) => {
-            const card = document.createElement("div");
-            card.classList.add("form-card");
-
-            // Add status indicator
-            const statusClass = form.is_active
-              ? "active-indicator"
-              : "inactive-indicator";
-
-            let description = form.description || "No description";
-            const truncatedDescription =
-              description.length > 100
-                ? description.substring(0, 100) + "..."
-                : description;
-
-            card.innerHTML = `
-                            <div class="form-card-menu" onclick="openSettingsModal(${
-                              form.form_index
-                            })">⋮</div>
-                            <div class="form-status ${statusClass}"></div>
-                            <h3>${form.form_name}</h3>
-                            <p class="form-description">${truncatedDescription.replace(
-                              /\n/g,
-                              " "
-                            )}</p>
-                            <a href="http://localhost/cgcc/public/admin/formbuilder.html?id=${
-                              form.form_index
-                            }">Open Form</a>
-                        `;
-
-            container.appendChild(card);
-          });
-        } catch (error) {
-          console.error("Error fetching forms:", error);
-          document.getElementById("form-card-container").innerHTML =
-            "<p>Failed to load forms.</p>";
-        }
-      }
-
-      // Modal functions
-      async function openSettingsModal(formId) {
-        try {
-          const modal = document.getElementById("settingsModal");
-          document.getElementById("modalFormId").textContent = formId;
-
-          // Load form data
-          const response = await fetch(
-            `http://localhost/cgcc/backend/forms/form.php?form_index=${formId}`,
-            {
-              credentials: "include",
-            }
-          );
-
-          if (!response.ok) throw new Error("Failed to fetch form data");
-
-          const form = await response.json();
-          const toggle = document.getElementById("formStatusToggle");
-          const statusText = document.getElementById("statusText");
-
-          toggle.checked = form.is_active;
-          statusText.textContent = form.is_active ? "Active" : "Inactive";
-          statusText.className = `status-text ${
-            form.is_active ? "active-status" : "inactive-status"
-          }`;
-
-          modal.style.display = "block";
-        } catch (error) {
-          console.error("Error:", error);
-          alert("Failed to load form settings");
-        }
-      }
-
-      async function saveFormSettings() {
-        try {
-          const formId = document.getElementById("modalFormId").textContent;
-          const isActive = document.getElementById("formStatusToggle").checked;
+          const isActive = document.getElementById("dropdownStatusToggle").checked ? '1' : '0';
 
           const response = await fetch(
             "http://localhost/cgcc/backend/forms/form.php",
@@ -209,69 +243,92 @@
               credentials: "include",
               headers: {
                 "Content-Type": "application/json",
+                "X-Requested-With": "XMLHttpRequest" // Add this header
               },
               body: JSON.stringify({
-                form_id: formId,
-                is_active: isActive,
+                form_id: currentFormId,
+                is_active: isActive
               }),
             }
           );
 
-          if (!response.ok) throw new Error("Failed to update form status");
-
           const result = await response.json();
+
+          if (!response.ok) {
+            throw new Error(result.message || "Failed to update form status");
+          }
+
           if (result.success) {
-            closeSettingsModal();
-            loadForms(); // Refresh the list
-            if (isActive) {
-              alert("Form status updated: available to students");
-            } else {
-              alert("Form status updated: not available to students");
-            }
+            closeSettingsMenu();
+            loadForms();
+            showStatusMessage(`Form status updated to ${isActive === '1' ? "published" : "unpublished"}`, 'success');
           } else {
             throw new Error(result.message || "Update failed");
           }
         } catch (error) {
           console.error("Error:", error);
-          alert("Failed to save settings: " + error.message);
+          showStatusMessage("Failed to save settings: " + error.message, 'error');
         }
-      }
-
-      function closeSettingsModal() {
-        document.getElementById("settingsModal").style.display = "none";
-      }
-
-      // Event listeners
-      document.addEventListener("DOMContentLoaded", () => {
-        // Load forms
-        loadForms();
-
-        // Modal close handlers
-        document
-          .querySelector(".close-modal")
-          .addEventListener("click", closeSettingsModal);
-        window.addEventListener("click", (event) => {
-          if (event.target === document.getElementById("settingsModal")) {
-            closeSettingsModal();
-          }
-        });
-
-        // Status toggle handler
-        document
-          .getElementById("formStatusToggle")
-          .addEventListener("change", function () {
-            const statusText = document.getElementById("statusText");
-            statusText.textContent = this.checked ? "Active" : "Inactive";
-            statusText.className = `status-text ${
-              this.checked ? "active-status" : "inactive-status"
-            }`;
-          });
-
-        // Save button handler
-        document
-          .getElementById("saveSettingsBtn")
-          .addEventListener("click", saveFormSettings);
       });
-    </script>
-  </body>
+
+      // Updated Archive button handler
+      document.getElementById("dropdownArchiveBtn").addEventListener("click", async function () {
+        const action = currentFormStatus === '-1' ? "unarchive" : "archive";
+        const confirmAction = confirm(`Are you sure you want to ${action} this form?`);
+
+        if (!confirmAction) return;
+
+        try {
+          const newStatus = currentFormStatus === '-1' ? '0' : '-1';
+
+          const response = await fetch(
+            "http://localhost/cgcc/backend/forms/form.php",
+            {
+              method: "POST",
+              credentials: "include",
+              headers: {
+                "Content-Type": "application/json",
+                "X-Requested-With": "XMLHttpRequest" // Add this header
+              },
+              body: JSON.stringify({
+                form_id: currentFormId,
+                is_active: newStatus
+              }),
+            }
+          );
+
+          const result = await response.json();
+
+          if (!response.ok) {
+            throw new Error(result.message || "Failed to update form status");
+          }
+
+          if (result.success) {
+            closeSettingsMenu();
+            loadForms();
+            showStatusMessage(`Form ${newStatus === '-1' ? "archived" : "unarchived"} successfully`, 'success');
+          } else {
+            throw new Error(result.message || "Update failed");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          showStatusMessage("Failed to archive form: " + error.message, 'error');
+        }
+      });
+
+      // Helper function to show status messages
+      function showStatusMessage(message, type) {
+        const statusElement = document.createElement('div');
+        statusElement.className = `autosave-status show ${type}`;
+        statusElement.textContent = message;
+        document.body.appendChild(statusElement);
+
+        setTimeout(() => {
+          statusElement.remove();
+        }, 3000);
+      }
+    });
+  </script>
+</body>
+
 </html>

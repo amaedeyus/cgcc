@@ -56,6 +56,17 @@
     .section-error.show {
         display: block;
     }
+    
+    /* Subtype specific styles */
+    input[type="number"] {
+        -moz-appearance: textfield;
+    }
+    
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
 </style>
 <body>
     <div class="form-container">
@@ -170,7 +181,7 @@
             // Listen for text input (for textareas and text inputs)
             formSectionsEl.addEventListener('input', function(e) {
                 if (e.target.tagName === 'TEXTAREA' || 
-                    (e.target.tagName === 'INPUT' && e.target.type === 'text')) {
+                    (e.target.tagName === 'INPUT' && (e.target.type === 'text' || e.target.type === 'number' || e.target.type === 'email' || e.target.type === 'tel'))) {
                     triggerAutosave();
                     validateCurrentSection();
                 }
@@ -412,6 +423,8 @@
                         const errorEl = questionEl.querySelector('.error-message');
                         
                         let isAnswered = false;
+                        let isValid = true;
+                        let validationMessage = '';
                         
                         switch (question.type) {
                             case 'multiple':
@@ -424,7 +437,14 @@
                                 break;
                             case 'short':
                                 const textInput = questionEl.querySelector(`input[name="${question.id}"]`);
-                                isAnswered = textInput && textInput.value.trim() !== '';
+                                if (textInput) {
+                                    isAnswered = textInput.value.trim() !== '';
+                                    
+                                    // Validate subtype if exists
+                                    if (isAnswered && question.subtype) {
+                                        [isValid, validationMessage] = validateSubtype(textInput.value.trim(), question.subtype);
+                                    }
+                                }
                                 break;
                             case 'paragraph':
                                 const textareaInput = questionEl.querySelector(`textarea[name="${question.id}"]`);
@@ -461,12 +481,43 @@
                             if (!firstUnansweredQuestion) {
                                 firstUnansweredQuestion = questionEl;
                             }
+                        } else if (!isValid) {
+                            errorEl.textContent = validationMessage;
+                            errorEl.classList.add('show');
+                            
+                            if (!firstUnansweredQuestion) {
+                                firstUnansweredQuestion = questionEl;
+                            }
                         }
                     }
                 });
             });
             
             return firstUnansweredQuestion;
+        }
+        
+        // Validate input based on subtype
+        function validateSubtype(value, subtype) {
+            switch (subtype) {
+                case 'number':
+                    if (isNaN(value)) {
+                        return [false, 'Please enter a valid number'];
+                    }
+                    break;
+                case 'email':
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(value)) {
+                        return [false, 'Please enter a valid email address'];
+                    }
+                    break;
+                case 'phone':
+                    const phoneRegex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/;
+                    if (!phoneRegex.test(value)) {
+                        return [false, 'Please enter a valid phone number'];
+                    }
+                    break;
+            }
+            return [true, ''];
         }
         
         // Attempt to navigate to next section with validation
@@ -492,6 +543,7 @@
             questionEl.className = 'question';
             questionEl.dataset.questionId = question.id;
             questionEl.dataset.questionType = question.type;
+            questionEl.dataset.subtype = question.subtype || '';
 
             // Question text
             const questionText = document.createElement('div');
@@ -554,7 +606,7 @@
             optionsContainer.className = 'options-container';
 
             question.options.forEach((option, index) => {
-                const optionId = `${question.id}_${option.choice_index}`;
+                const optionId = `${question.id}_${index}`;
 
                 const optionDiv = document.createElement('div');
                 optionDiv.className = 'option';
@@ -562,12 +614,12 @@
                 const input = document.createElement('input');
                 input.type = 'radio';
                 input.name = question.id;
-                input.value = option.choice_index;
+                input.value = option.choice_index; // Store the choice ID
                 input.id = optionId;
 
                 const label = document.createElement('label');
                 label.htmlFor = optionId;
-                label.textContent = option.choice_text;
+                label.textContent = option.choice_text; // Display the choice text
 
                 // Make the whole optionDiv clickable
                 optionDiv.addEventListener('click', (e) => {
@@ -594,7 +646,7 @@
             optionsContainer.className = 'options-container';
 
             question.options.forEach((option, index) => {
-                const optionId = `${question.id}_${option.choice_index}`;
+                const optionId = `${question.id}_${index}`;
 
                 const optionDiv = document.createElement('div');
                 optionDiv.className = 'option';
@@ -602,12 +654,12 @@
                 const input = document.createElement('input');
                 input.type = 'checkbox';
                 input.name = question.id;
-                input.value = option.choice_index;
+                input.value = option.choice_index; // Store the choice ID
                 input.id = optionId;
 
                 const label = document.createElement('label');
                 label.htmlFor = optionId;
-                label.textContent = option.choice_text;
+                label.textContent = option.choice_text; // Display the choice text
 
                 // Make the whole optionDiv clickable
                 optionDiv.addEventListener('click', (e) => {
@@ -630,11 +682,42 @@
 
         // Create text input (for short answer questions)
         function createTextInput(container, question) {
-            const input = document.createElement('input');
-            input.type = 'text';
+            let input;
+            
+            // Check for subtype
+            if (question.subtype) {
+                switch (question.subtype) {
+                    case 'number':
+                        input = document.createElement('input');
+                        input.type = 'number';
+                        break;
+                    case 'email':
+                        input = document.createElement('input');
+                        input.type = 'email';
+                        break;
+                    case 'phone':
+                        input = document.createElement('input');
+                        input.type = 'tel';
+                        break;
+                    default:
+                        input = document.createElement('input');
+                        input.type = 'text';
+                }
+            } else {
+                input = document.createElement('input');
+                input.type = 'text';
+            }
+            
             input.name = question.id;
             input.id = question.id;
             input.className = 'text-input';
+            
+            // Add pattern for phone numbers if needed
+            if (question.subtype === 'phone') {
+                input.pattern = '[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}';
+                input.title = 'Please enter a valid phone number';
+            }
+            
             container.appendChild(input);
         }
 
@@ -662,10 +745,10 @@
             select.appendChild(defaultOption);
 
             // Add options
-            question.options.forEach(option => {
+            question.options.forEach((option, index) => {
                 const optionEl = document.createElement('option');
-                optionEl.value = option.choice_index;
-                optionEl.textContent = option.choice_text;
+                optionEl.value = option.choice_index; // Store the choice ID
+                optionEl.textContent = option.choice_text; // Display the choice text
                 select.appendChild(optionEl);
             });
 
@@ -697,35 +780,35 @@
 
             question.options.forEach(option => {
                 const th = document.createElement('th');
-                th.textContent = option.choice_text;
+                th.textContent = option.choice_text; // Display the choice text
                 headerRow.appendChild(th);
             });
 
             table.appendChild(headerRow);
 
             // Create rows with radio buttons
-            question.rows.forEach((rowText, rowIndex) => {
-                const row = document.createElement('tr');
+            question.rows.forEach((row, rowIndex) => {
+                const tr = document.createElement('tr');
 
                 const rowHeader = document.createElement('td');
-                rowHeader.textContent = rowText;
-                row.appendChild(rowHeader);
+                rowHeader.textContent = row.sub_question_text;
+                tr.appendChild(rowHeader);
 
-                question.options.forEach(option => {
+                question.options.forEach((option, optionIndex) => {
                     const td = document.createElement('td');
 
                     const radio = document.createElement('input');
                     radio.type = 'radio';
                     radio.name = `${question.id}_${rowIndex}`;
-                    radio.value = option.choice_index;
+                    radio.value = option.choice_index; // Store the choice ID
                     radio.dataset.questionId = question.id;
                     radio.dataset.rowIndex = rowIndex;
 
                     td.appendChild(radio);
-                    row.appendChild(td);
+                    tr.appendChild(td);
                 });
 
-                table.appendChild(row);
+                table.appendChild(tr);
             });
 
             gridDiv.appendChild(table);
@@ -828,6 +911,8 @@
                         const errorEl = questionEl.querySelector('.error-message');
                         
                         let isAnswered = false;
+                        let isValidAnswer = true;
+                        let validationMessage = '';
                         
                         switch (question.type) {
                             case 'multiple':
@@ -840,7 +925,14 @@
                                 break;
                             case 'short':
                                 const textInput = questionEl.querySelector(`input[name="${question.id}"]`);
-                                isAnswered = textInput && textInput.value.trim() !== '';
+                                if (textInput) {
+                                    isAnswered = textInput.value.trim() !== '';
+                                    
+                                    // Validate subtype if exists
+                                    if (isAnswered && question.subtype) {
+                                        [isValidAnswer, validationMessage] = validateSubtype(textInput.value.trim(), question.subtype);
+                                    }
+                                }
                                 break;
                             case 'paragraph':
                                 const textareaInput = questionEl.querySelector(`textarea[name="${question.id}"]`);
@@ -879,6 +971,11 @@
                             if (requiredQuestions.length === 1) {
                                 questionEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
                             }
+                        } else if (!isValidAnswer) {
+                            isValid = false;
+                            errorEl.textContent = validationMessage;
+                            errorEl.classList.add('show');
+                            requiredQuestions.push(question.id);
                         }
                     }
                 });
