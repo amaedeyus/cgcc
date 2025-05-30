@@ -70,23 +70,23 @@ try {
         $stmt->close();
     }
 
-    // 2. Delete existing sections and questions
-    $stmt = $conn->prepare("DELETE FROM form_sections WHERE form_index = ?");
+    // First delete dependent tables
+    $stmt = $conn->prepare("DELETE FROM choices WHERE main_question_index IN (SELECT main_question_index FROM main_questions WHERE form_index = ?)");
     $stmt->bind_param("i", $formId);
     $stmt->execute();
     $stmt->close();
 
-    $stmt = $conn->prepare("DELETE mq FROM main_questions mq INNER JOIN choices c ON mq.main_question_index = c.main_question_index WHERE mq.form_index = ?");
-    $stmt->bind_param("i", $formId);
-    $stmt->execute();
-    $stmt->close();
-
-    $stmt = $conn->prepare("DELETE mq FROM main_questions mq INNER JOIN sub_questions sq ON mq.main_question_index = sq.main_question_index WHERE mq.form_index = ?");
+    $stmt = $conn->prepare("DELETE FROM sub_questions WHERE main_question_index IN (SELECT main_question_index FROM main_questions WHERE form_index = ?)");
     $stmt->bind_param("i", $formId);
     $stmt->execute();
     $stmt->close();
 
     $stmt = $conn->prepare("DELETE FROM main_questions WHERE form_index = ?");
+    $stmt->bind_param("i", $formId);
+    $stmt->execute();
+    $stmt->close();
+
+    $stmt = $conn->prepare("DELETE FROM form_sections WHERE form_index = ?");
     $stmt->bind_param("i", $formId);
     $stmt->execute();
     $stmt->close();
@@ -115,12 +115,9 @@ try {
                 $required = $question['required'] ? 1 : 0;
                 $subtype = ($type === 'short') ? ($question['subtype'] ?? 'text') : null;
 
-                // Add this after $required:
-                $subtype = ($type === 'short') ? ($question['subtype'] ?? 'text') : null;
-
                 // Update the bind_param call:
                 $questionInsert->bind_param(
-                    "iissis", // Changed to 6 parameters
+                    "iisssi", // Changed to 6 parameters
                     $formId,
                     $sectionIndex,
                     $question['question'],
