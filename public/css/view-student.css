@@ -1,0 +1,22 @@
+.grid-body {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: 1fr;
+    grid-column-gap: 0px;
+    grid-row-gap: 0px;
+    }
+
+.page-left {
+    display: flex;
+    grid-column: 1;
+    box-shadow: 10px -15px 15px -10px rgba(2, 55, 2, 0.313);
+    height: 100vh;
+    padding: 40px;
+}
+
+.page-right {
+    display: flex;
+    grid-column: 2;
+    height: 100vh;
+    padding: 40px;
+}
