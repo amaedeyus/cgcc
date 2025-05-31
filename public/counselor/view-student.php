@@ -1,3 +1,42 @@
+<?php
+require("../../backend/connect2.php");
+
+if (!isset($_GET['id'])) {
+    echo "Student ID not provided.";
+    exit;
+}
+
+$studentId = (int) $_GET['id'];
+$sql = "
+    SELECT 
+        s.*, 
+        u.email AS student_email, 
+        CONCAT(g.first_name, ' ', g.last_name) AS guardian_fullname, 
+        g.contact_number AS guardian_contact,
+        sec.section_name, 
+        p.program_code, 
+        d.dept_code
+    FROM students s
+    JOIN users u ON s.user_index = u.user_index
+    JOIN guardians g ON s.guardian_index = g.guardian_index
+    JOIN sections sec ON s.section_index = sec.section_index
+    JOIN programs p ON sec.program_index = p.program_index
+    JOIN departments d ON p.dept_index = d.dept_index
+    WHERE s.student_index = $studentId
+";
+
+
+
+$result = $conn->query($sql);
+
+if ($result && $result->num_rows > 0) {
+    $student = $result->fetch_assoc();
+} else {
+    echo "Student not found.";
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,8 +59,59 @@
 
     <div class="grid-body">
         <div class="page-left">
-            hi
+            <h1 class="form-title">Student Information</h1>
+    <div class="profile-section">
+            <div class="profile-title">Profile Picture</div>
+            <img src="<?= !empty($student['image_path']) ? htmlspecialchars($student['image_path']) : '../Media/user.jpg' ?>" alt="Profile Picture" class="profile-picture" id="profile-picture" />
+
+        </div>
+
+        <div class="form-container">
+            <div class="form-columns">
+       
+            <div class="form-group">
+            <label for="student-number">Student Number</label>
+            <input readonly type="text" id="student-number" name="student_number" value="<?= htmlspecialchars($student['student_number'] ?? '') ?>" placeholder="Ex. 2023-12345" />
+
+            <label for="first-name">First Name</label>
+            <input readonly type="text" id="first-name" name="first_name" value="<?= htmlspecialchars($student['first_name'] ?? '') ?>" placeholder="Ex. John" />
+
+            <label for="last-name">Last Name</label>
+            <input readonly type="text" id="last-name" name="last_name" value="<?= htmlspecialchars($student['last_name'] ?? '') ?>" placeholder="Ex. Dela Cerna" />
+        
+            <label for="contact-number">Year Level</label>
+            <input readonly type="text" id="year-level" name="contact_number" value="<?= htmlspecialchars($student['year_level'] ?? '') ?>" placeholder="Ex. 09123456789" />
+
+            <label for="contact-number">Section</label>
+            <input readonly type="text" id="section" name="contact_number" value="<?= htmlspecialchars($student['section_name'] ?? '') ?>" placeholder="Ex. 09123456789" />
+
+            <label for="contact-number">Department</label>
+            <input readonly type="text" id="department" name="contact_number" value="<?= htmlspecialchars($student['dept_code'] ?? '') ?>" placeholder="Ex. 09123456789" />
+
+            <label for="contact-number">Program</label>
+            <input readonly type="text" id="department" name="contact_number" value="<?= htmlspecialchars($student['program_code'] ?? '') ?>" placeholder="Ex. 09123456789" />
 </div>
+            <div class="form-group-one">
+            <label for="email">Email</label>
+            <input readonly type="text" id="email" name="email" value="<?= htmlspecialchars($student['student_email'] ?? '') ?>" placeholder="Ex. john@example.com" />
+
+            <label for="contact-number">Contact Number</label>
+            <input readonly type="text" id="contact-number" name="contact_number" value="<?= htmlspecialchars($student['contact_number'] ?? '') ?>" placeholder="Ex. 09123456789" />
+
+            <br>
+            <label for="contact-number">Guardian</label>
+            <input readonly type="text" id="department" name="contact_number" value="<?= htmlspecialchars($student['guardian_fullname'] ?? '') ?>" placeholder="Ex. 09123456789" />
+
+            <label for="guardian-index">Guardian Contact No.:</label>
+            <input readonly type="text" id="guardian-contact" name="guardian_contact" value="<?= htmlspecialchars($student['guardian_contact'] ?? '') ?>" placeholder="Ex. 09123456789" />
+</div>
+        </form>
+</div>
+        </div>
+
+    <button class="back" onclick="javascript:history.back()">Back</button>
+</div>
+    
     <div class="page-right">
     hello
-</div>
+    </div>

@@ -172,7 +172,7 @@
                 echo "<td>" . $row['first_name'] . "</td>";
                 echo "<td>" . $row['year_level'] . "</td>";
                 echo "<td>" . $row['section_name'] . "</td>";
-                echo "<td class='actions'><a href='view_student.php?id=" . $row['student_index'] . "'>View</a></td>";
+                echo "<td class='actions'><a href='view-student.php?id=" . $row['student_index'] . "'>View</a></td>";
                 echo "</tr>";
             }
         } else {

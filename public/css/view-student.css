@@ -1,4 +1,4 @@
-.grid-body {
+.grid-body{
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: 1fr;
@@ -6,15 +6,104 @@
     grid-row-gap: 0px;
     }
 
-.page-left {
+.page-left{
     display: flex;
     grid-column: 1;
     box-shadow: 10px -15px 15px -10px rgba(2, 55, 2, 0.313);
-    height: 100vh;
-    padding: 40px;
+    height: 100%;
+    padding-top: 20px;
+    padding-left: 40px;
+    padding-right: 40px;
+    padding-bottom: 50px;
+    flex-direction: column;
 }
 
-.page-right {
+.form-container{
+    align-self: center;
+    margin: 0 auto;
+    background-color: rgb(237, 253, 243);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 3px 10px rgba(0, 71, 0, 0.2);
+    width: 95%;
+    height: 550px;
+    
+}
+
+input[type="text"][readonly]{
+    outline-color: #316b50;
+    padding: 12px 15px;
+    border: none;
+    border-radius: 30px;
+    background-color: #fff;
+    font-size: 1em;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
+    color: #383d38; 
+    cursor:default
+}
+
+.form-columns{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 30px;
+}
+
+.form-group{
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group-one{
+    grid-column: 2;
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-section{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 20px auto;
+    width: fit-content;
+    text-align: center;
+}
+
+.profile-picture{
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #ddd;
+    background-color: #f5f5f5;
+    margin-bottom: 10px;
+}
+
+.back{
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 8px 15px;
+    background-color: rgb(79, 189, 156);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    width: 100px;
+    text-align: center;
+}
+
+.back:hover{
+    background: rgb(36, 154, 118);
+}
+.profile-title{
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+
+.page-right{
     display: flex;
     grid-column: 2;
     height: 100vh;
