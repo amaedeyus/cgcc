@@ -68,7 +68,8 @@ body {
     background-color: #f8f9fa;
     border-radius: 8px;
     border: 1px solid #C8E6C9;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    box-sizing: border-box; /* Add this */
+    overflow: hidden; /* Add this to contain any potential overflow */
 }
 
 .question-text {
@@ -146,17 +147,23 @@ textarea {
     min-height: 100px;
     font-family: inherit;
     resize: vertical;
+    box-sizing: border-box; /* Add this to include padding in width calculation */
+    max-width: 100%; /* Ensure it doesn't exceed parent's width */
 }
-
+/* Grid table styles - updated for mobile responsiveness */
 .grid-question {
     margin-top: 20px;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100%;
 }
 
 .grid-table {
-    width: 100%;
+    width: auto;
+    min-width: 100%;
     border-collapse: collapse;
     margin-bottom: 1rem;
+    table-layout: auto; /* Changed from fixed to auto for better mobile behavior */
 }
 
 .grid-table th {
@@ -166,6 +173,7 @@ textarea {
     padding: 12px;
     border: 1px solid #E8F5E9;
     font-weight: 600;
+    min-width: 120px; /* Increased minimum width for mobile */
 }
 
 .grid-table td {
@@ -173,20 +181,35 @@ textarea {
     border: 1px solid #e0e0e0;
     background-color: #ffffff;
     text-align: center;
+    min-width: 120px; /* Same as header for consistency */
 }
 
+/* First column (question) styling - sticky on mobile */
+.grid-table th:first-child,
+.grid-table td:first-child {
+    position: sticky;
+    left: 0;
+    background-color: #f8f9fa;
+    z-index: 2;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    text-align: left;
+    white-space: normal;
+    min-width: 150px; /* Wider for question text */
+}
+
+/* Label styling */
 .grid-table label {
     display: block;
     width: 100%;
     height: 100%;
     margin: -12px;
     padding: 12px;
+    cursor: pointer;
 }
 
 .grid-table label:hover {
     background-color: rgba(0, 0, 0, 0.03);
 }
-
 .action-buttons {
     display: flex;
     justify-content: space-between;
@@ -255,65 +278,139 @@ button {
 }
 
 .progress-container {
-        position: relative;
-        width: 100%;
-        background-color: #e8f5e9; /* Match body background */
-        border-radius: 6px;
-        margin: 30px 0;
-        height: 12px;
-        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    position: relative;
+    width: 100%;
+    background-color: #e8f5e9; /* Match body background */
+    border-radius: 6px;
+    margin: 30px 0;
+    height: 12px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.progress-bar {
+    height: 100%;
+    border-radius: 6px;
+    background-color: #4fbc9c; /* Primary green from buttons and headers */
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    position: absolute;
+    bottom: -25px;
+    right: 0;
+    font-size: 0.875rem; /* ~14px */
+    font-weight: 600;
+    color: #2E7D32; /* Dark green from section titles and labels */
+    white-space: nowrap;
+}
+
+.error-message {
+    color: #e74c3c;
+    font-size: 0.875rem;
+    margin-top: 5px;
+    display: none;
+}
+
+.error-message.show {
+    display: block;
+}
+
+.section-error {
+    color: #e74c3c;
+    font-weight: normal;
+    margin-top: 15px;
+    display: none;
+}
+
+.section-error.show {
+    display: block;
+}
+
+/* Subtype specific styles */
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.floating-buttons {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    z-index: 1050;
+}
+
+.floating-back-btn {
+    border-radius: 50px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    font-weight: 500;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    color: white; /* White text */
+    background-color: #4fbc9c; /* Green background */
+}
+
+.floating-back-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    background-color: #3d8b40; /* Darker green on hover */
+    color: white; /* Maintain white text on hover */
+}
+
+.floating-back-btn i {
+    font-size: 1.1rem;
+    color: white; /* Ensure icon is also white */
+}
+
+
+@media (max-width: 480px) {
+    .grid-table th,
+    .grid-table td {
+        padding: 8px; /* Smaller padding on mobile */
+        min-width: 90px; /* Slightly smaller min-width for very small screens */
+        font-size: 0.9rem; /* Slightly smaller font */
+    }
+    
+    .grid-table th:first-child,
+    .grid-table td:first-child {
+        min-width: 120px; /* Keep question column readable */
+    }
+    
+    .grid-table label {
+        padding: 8px;
+        margin: -8px;
     }
 
-    .progress-bar {
-        height: 100%;
-        border-radius: 6px;
-        background-color: #4fbc9c; /* Primary green from buttons and headers */
-        width: 0%;
-        transition: width 0.3s ease;
-    }
-
-    .progress-text {
-        position: absolute;
-        bottom: -25px;
-        right: 0;
-        font-size: 0.875rem; /* ~14px */
-        font-weight: 600;
-        color: #2E7D32; /* Dark green from section titles and labels */
-        white-space: nowrap;
+    .floating-buttons {
+        bottom: 20px;
+        right: 20px;
+        gap: 10px;
     }
     
-    .error-message {
-        color: #e74c3c;
-        font-size: 0.875rem;
-        margin-top: 5px;
-        display: none;
+    .floating-btn {
+        padding: 10px 16px;
+        font-size: 0.9rem;
     }
     
-    .error-message.show {
-        display: block;
+    .floating-btn i {
+        font-size: 1rem;
+        margin-right: 6px;
     }
-    
-    .section-error {
-        color: #e74c3c;
-        font-weight: normal;
-        margin-top: 15px;
-        display: none;
-    }
-    
-    .section-error.show {
-        display: block;
-    }
-    
-    /* Subtype specific styles */
-    input[type="number"] {
-        -moz-appearance: textfield;
-    }
-    
-    input[type="number"]::-webkit-outer-spin-button,
-    input[type="number"]::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
+}
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
@@ -348,5 +445,21 @@ button {
     
     button {
         width: 100%;
+    }
+
+    .floating-buttons {
+        bottom: 20px;
+        right: 20px;
+        gap: 10px;
+    }
+    
+    .floating-btn {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+    }
+    
+    .floating-btn i {
+        font-size: 1rem;
+        margin-right: 6px;
     }
 }

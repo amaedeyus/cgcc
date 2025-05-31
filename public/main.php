@@ -21,6 +21,31 @@ if ($student_index) {
 
 $fullName = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Guest';
 $firstName = isset($_SESSION['first_name']) ? $_SESSION['first_name'] : 'Guest';
+
+// Fetch all active forms
+$formsQuery = "
+    SELECT f.form_index, f.form_name, f.is_required, 
+           (SELECT COUNT(*) FROM responses r 
+            WHERE r.form_index = f.form_index AND r.student_index = ?) as has_responded
+    FROM forms f
+    WHERE f.is_active = '1'
+    ORDER BY f.is_required DESC, f.form_name ASC
+";
+$formsStmt = $conn->prepare($formsQuery);
+$formsStmt->bind_param("i", $student_index);
+$formsStmt->execute();
+$formsResult = $formsStmt->get_result();
+
+$counselingForms = [];
+$otherForms = [];
+
+while ($form = $formsResult->fetch_assoc()) {
+    if ($form['is_required']) {
+        $counselingForms[] = $form;
+    } else {
+        $otherForms[] = $form;
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -33,6 +58,7 @@ $firstName = isset($_SESSION['first_name']) ? $_SESSION['first_name'] : 'Guest';
     <link rel="stylesheet" href="css/base.css?v=<?= time() ?>">
     <link rel="stylesheet" href="css/main-page.css?v=<?= time() ?>">
     <title>CGCC</title>
+
 </head>
 <body>
 
@@ -55,21 +81,38 @@ $firstName = isset($_SESSION['first_name']) ? $_SESSION['first_name'] : 'Guest';
         <div class="page-left">
             <div class="profile">
                 <div class="profile-picture"><img src="<?= htmlspecialchars($student['image_path'] ?? 'default-profile.png') ?>"></div>
-                <span id="user-name"><?= htmlspecialchars($fullName)?></span> <!-- papalitan ng id ni user -->
+                <span id="user-name"><?= htmlspecialchars($fullName)?></span>
                     <div class="edit">
                         <a href="edit-profile.php">✎Edit Profile</a>
                     </div>
             </div>
             <div class="sidebar-nav">
                 <a onclick="goToPage()">➤ Counseling Schedule</a>
-                <div class="dropdown" onclick="toggleDropdown('Forms')">➤ Forms</div>
-                    <div id="Forms" class="dropdown-content">
-                        <a href="student-profile-form.html">Student Information</a>
-                        <a href="student_form.html?id=1">General Mental Health Screening</a>
-                        <a href="#">Counseling Concerns & Exit Interview</a>
-                        <a href="#">Counseling Evaluation</a>
-                        <a href="#">Exit Interview</a>
-                    </div>
+                    <!-- Counseling Forms Dropdown -->
+                    <?php if (!empty($counselingForms)): ?>
+                        <div class="dropdown" onclick="toggleDropdown('CounselingForms')">➤ Counseling Forms (Required)</div>
+                        <div id="CounselingForms" class="dropdown-content">
+                            <?php foreach ($counselingForms as $form): ?>
+                                <a href="student_form.html?id=<?= $form['form_index'] ?>" 
+                                class="form-item <?= $form['has_responded'] ? 'completed' : '' ?>">
+                                    <?= htmlspecialchars($form['form_name']) ?>
+                                </a>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                    
+                    <!-- Other Forms Dropdown -->
+                    <?php if (!empty($otherForms)): ?>
+                        <div class="dropdown" onclick="toggleDropdown('OtherForms')">➤ Other Forms</div>
+                        <div id="OtherForms" class="dropdown-content">
+                            <?php foreach ($otherForms as $form): ?>
+                                <a href="student_form.html?id=<?= $form['form_index'] ?>" 
+                                class="form-item <?= $form['has_responded'] ? 'completed' : '' ?>">
+                                    <?= htmlspecialchars($form['form_name']) ?>
+                                </a>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
             </div>
 
             <div class="logout-wrapper">
@@ -83,17 +126,17 @@ $firstName = isset($_SESSION['first_name']) ? $_SESSION['first_name'] : 'Guest';
         <div class="page-right">
             <div class="greetings">
                 <div class="h1">
-                    Hello, <span id="user-name"><?= htmlspecialchars($firstName)?></span>! <!-- papalitan ng id ni user --> Welcome to the College Guidance and Counseling Center!
+                    Hello, <span id="user-name"><?= htmlspecialchars($firstName)?></span>! Welcome to the College Guidance and Counseling Center!
                 </div>
                     <div class="subh1">
                         You Share, We Listen, We Care
                     </div>
                 </div>
             <div class="info">
-                <p>Welcome to the College Guidance and Counseling Center’s online platform — your space to book appointments, access support services, 
+                <p>Welcome to the College Guidance and Counseling Center's online platform — your space to book appointments, access support services, 
                 and submit forms with ease.</p>
 
-                <p>Rooted in the spirit of faith, zeal for service, and communion in mission, the center is dedicated to facilitating students’ academic, 
+                <p>Rooted in the spirit of faith, zeal for service, and communion in mission, the center is dedicated to facilitating students' academic, 
                 social-emotional, and career growth. This platform serves as a bridge to comprehensive, ethical, and evidence-based guidance services 
                 that promote mental well-being and help you reach your fullest potential.</p>
             </div>
@@ -112,7 +155,6 @@ $firstName = isset($_SESSION['first_name']) ? $_SESSION['first_name'] : 'Guest';
     </div>
 
 <script>
-
 function toggleDropdown(id){
     const content = document.getElementById(id);
     content.style.display = content.style.display === "block" ? "none" : "block";
@@ -126,7 +168,6 @@ function goToPage(){
         window.location.href = "../schedule-forms-uncompleted.html";
     }
 }
-
 </script>
 
 </body>

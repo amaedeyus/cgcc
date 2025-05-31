@@ -76,6 +76,10 @@
                 alert('No form ID specified in URL');
                 return;
             }
+
+            document.getElementById('floating-back-btn').addEventListener('click', function() {
+                window.history.back();
+            });
             
             try {
                 // Load form structure
@@ -99,6 +103,17 @@
                 
                 // Initialize section navigation
                 updateSectionNavigation();
+
+                document.querySelectorAll('.grid-table').forEach(table => {
+                    // Count the number of option columns (total columns - 1 for question column)
+                    const columnCount = table.querySelectorAll('th').length - 1;
+                    table.style.setProperty('--columns-count', columnCount);
+                    
+                    // Prevent text selection in grid cells
+                    table.querySelectorAll('td').forEach(cell => {
+                        cell.addEventListener('selectstart', e => e.preventDefault());
+                    });
+                });
                 
             } catch (error) {
                 console.error('Error initializing form:', error);
@@ -1227,6 +1242,16 @@
         });
         
         nextSectionBtn.addEventListener('click', attemptNextSection);
+
+        
     </script>
+
+    <!-- Floating Back Button -->
+     
+    <div class="floating-buttons">
+        <button type="button" class="btn floating-back-btn" id="floating-back-btn">
+            <i class="fas fa-arrow-left me-1"></i> <span id="floating-back-text">Back</span>
+        </button>
+    </div>
 </body>
 </html>
