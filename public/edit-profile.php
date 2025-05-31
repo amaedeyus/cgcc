@@ -1,6 +1,6 @@
 <?php
 session_start();
-require "../backend/connect2.php";  // Your DB connection
+require "../backend/connect3.php";  // Your DB connection
 
 if (!isset($_SESSION['student_index'])) {
     header("Location: login.php");
@@ -125,9 +125,6 @@ $guardian_full_name = trim(($guardian['first_name'] ?? '') . ' ' . ($guardian['l
 
 
 ?>
-
-
-
 
 <!DOCTYPE html>
 <html lang="en">

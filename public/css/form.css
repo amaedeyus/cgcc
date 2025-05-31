@@ -36,6 +36,8 @@ form{
 
 /* Input + Select styling */
 form input[type="text"],
+input[type="email"],         
+input[type="url"],
 form select{
     outline-color: #316b50;
     padding: 12px 15px;
@@ -46,7 +48,9 @@ form select{
     box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
 }
 
-input[type="text"][readonly] {
+
+input[type="text"][readonly],input[type="email"][readonly],         
+input[type="url"][readonly] {
      color: #828e82; 
      cursor:default
 }
