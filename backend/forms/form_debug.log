@@ -4129,3 +4129,915 @@ If you are a child/minor or unable to voluntarily consent, a guardian must give 
 
 --------------------------------------------------------------------------------
 
+[2025-05-31 03:03:15] Received Form Data:
+Array
+(
+    [form_index] => 1
+    [form_name] => STUDENT INDIVIDUAL INVENTORY (SII) & CLIENT CONSENT FORM AY 2024-2025
+    [description] => This form would only take 15- 20 minutes of your time.
+Every person's life is a developing story. The person you are today is a result of your upbringing and experiences, joys and sorrows, desires, and dreams. While we know that it's tempting to rush at times, please take some time to reflect on your life.
+    [sections] => Array
+        (
+            [0] => Array
+                (
+                    [title] => Consent
+                    [description] => This section outlines the terms and conditions regarding the collection, processing, and storage of personal information by the College Guidance and Counseling Center (CGCC) at De La Salle Lipa (DLSL).
+                    [behavior] => same-page
+                    [questions] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [question] => I understand that this form is considered an official record of De La Salle Lipa and that College Guidance and Counseling Center (CGCC) is required to keep my personal information and records until such time that these documents are due for disposal based on the DLSL data privacy retention policy. Some of the services of CGCC that would utilize this data are Counseling, Referral, and Research and Development. This form shall only be accessed by the CGCC team. CGCC shall retain the data in accordance with Document Retention Period and will be deleted upon disposal. By answering this form, you are giving CGCC consent to process and store this information. Please answer carefully and truthfully.
+                                    [type] => checkbox
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Yes
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [1] => Array
+                                (
+                                    [question] => Number
+                                    [type] => short
+                                    [subtype] => number
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [2] => Array
+                                (
+                                    [question] => 
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                        )
+
+                )
+
+            [1] => Array
+                (
+                    [title] => DETAILED CONCERNS
+                    [description] => The items below describe some of the concerns that students your age might experience. Please check your top five concerns in which the guidance counselor can help you with.
+                    [behavior] => same-page
+                    [questions] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [question] => SOCIAL/EMOTIONAL CONCERNS
+                                    [type] => checkbox
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Adjusting to change
+                                            [1] => Experiencing Bullying/Discrimination
+                                            [2] => Struggling with Relationship Problems
+                                            [3] => Issues with self-image
+                                            [4] => Concerns about sexuality/gender identity
+                                            [5] => Finding it difficult to express one's thoughts/feelings
+                                            [6] => Struggling in getting along with others/making friends
+                                            [7] => Spiritual/Religious issues
+                                            [8] => Lack of decision making skills
+                                            [9] => Lack of social support
+                                            [10] => Lacking of self-confidence
+                                            [11] => Lacks effective communication skills
+                                            [12] => Need to develop leadership skills
+                                            [13] => Need to have better self-concept
+                                            [14] => Experiencing harassment
+                                            [15] => Trust issue
+                                            [16] => Feeling very strong emotions
+                                            [17] => No social/emotional concern
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [1] => Array
+                                (
+                                    [question] => FAMILY & HOME CONCERNS
+                                    [type] => checkbox
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Absence of father/mother
+                                            [1] => Dealing with a loss
+                                            [2] => Feeling of being unloved
+                                            [3] => Financial difficulties
+                                            [4] => Struggling with parents’ marital conflicts/separationz
+                                            [5] => Health of a family member
+                                            [6] => Home environment is not conducive to study
+                                            [7] => Homesickness/Living away from home
+                                            [8] => Lacking parents' appreciation
+                                            [9] => Not getting along well with a family member/relative
+                                            [10] => Feeling pressured by high expectations from parents/family
+                                            [11] => Feeling invalidated by family members
+                                            [12] => Concerned about the health of a family member
+                                            [13] => Too many responsibilities at home
+                                            [14] => No Family/Home Concern
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [2] => Array
+                                (
+                                    [question] => MENTAL/PHYSICAL HEALTH CONCERNS
+                                    [type] => checkbox
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Struggling with addiction (substance use, internet, gaming, gambling, shopping)
+                                            [1] => Difficulty in managing emotions
+                                            [2] => Feeling burned out
+                                            [3] => Feeling tired/fatigued most of the time (physically/emotionally)
+                                            [4] => Having a physical illness that needs medical attention
+                                            [5] => Racing thoughts
+                                            [6] => Overthinking / Anxiety
+                                            [7] => Having panic attacks
+                                            [8] => Experiencing stress
+                                            [9] => Difficulty coping with stress
+                                            [10] => Deep feelings of sadness
+                                            [11] => Self-harm behavior (cutting, scratching, burning, etc.)
+                                            [12] => Erratic sleeping patterns
+                                            [13] => Suicidal thoughts
+                                            [14] => Suicide attempt
+                                            [15] => Difficulty concentrating/being more forgetful
+                                            [16] => Avoiding people, situations, or responsibilities
+                                            [17] => Unable to enjoy/loss of interest in activities
+                                            [18] => Feeling empty/Not feeling anything
+                                            [19] => Increased irritability
+                                            [20] => Crying spells
+                                            [21] => Changes in appetite (eating more or less)
+                                            [22] => No Mental/Physical Health Concerns
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [3] => Array
+                                (
+                                    [question] => ACADEMIC CONCERNS
+                                    [type] => checkbox
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Difficulty in adjusting to learning modality
+                                            [1] => Difficulty in meeting academic requirements
+                                            [2] => Difficulty working independently
+                                            [3] => Difficulty working in a group/pair
+                                            [4] => Dissatisfaction with academic performance/grades
+                                            [5] => Lacking effective study habits (note-taking, time management)
+                                            [6] => Difficulty overcoming distractions
+                                            [7] => Lacking motivation
+                                            [8] => Struggling with procrastination
+                                            [9] => Struggling to balance academics with extracurricular/non-academic activities
+                                            [10] => Test anxiety
+                                            [11] => No Academic concern
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [4] => Array
+                                (
+                                    [question] => PROFESSOR ISSUE CONCERNS
+                                    [type] => checkbox
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Favoritism/ unfair treatment
+                                            [1] => Inadequate background knowledge about the subjects
+                                            [2] => Unavailable most of the time
+                                            [3] => Difficult to reach or communicate with
+                                            [4] => Unethical/unprofessional behavior
+                                            [5] => Does not provide timely feedback
+                                            [6] => No Professor issues/concerns
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [5] => Array
+                                (
+                                    [question] => CAREER CONCERNS
+                                    [type] => checkbox
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Uncertainty about career choice/ wanting to shift to another program
+                                            [1] => Career choice is limited by financial resources
+                                            [2] => Unaware of strengths, abilities, or interests
+                                            [3] => Feeling lost and overwhelmed about making a career decision
+                                            [4] => Feeling pressured by peers/family to succeed
+                                            [5] => Need help with career planning
+                                            [6] => Dissatisfied with the present college program
+                                            [7] => Anxious about the future/world of work
+                                            [8] => No Career concern
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [6] => Array
+                                (
+                                    [question] => I have other concerns/questions that I want to directly consult or discuss with my counselor.
+                                    [type] => multiple
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Yes
+                                            [1] => No
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [7] => Array
+                                (
+                                    [question] => We appreciate your feedback. Please let us know how we can best improve our CGCC Student Individual Inventory (SII) Form. If you have comments/suggestions, please indicate them below:
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [8] => Array
+                                (
+                                    [question] => By submitting this form, I certify that the above information are true and correct. FALSIFICATION of any information will be subjected to DISCIPLINARY ACTION.
+                                    [type] => checkbox
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => I Certify
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [title] => CLIENT CONSENT FORM
+                    [description] => This form is a document provided by the CGCC to students in order to properly acquire consent for Counseling. The form contains information about the counseling service and the agreement between the counselor and the student.
+
+APPOINTMENT
+Your sessions are scheduled and agreed upon by you and your counselors. When you need to cancel or reschedule an appointment, please give us at least 24-hours notice.
+
+COUNSELING and ASSESSMENT
+Counseling is an opportunity to identify and build on current strengths, learn problem-solving strategies, develop or enhance coping skills, learn more effective ways to communicate with others, and receive support and feedback. Assessment is crucial in facilitating the counselor’s understanding of the client. The counseling relationship is designed to be one that will promote change and growth. The counselor and client both have active roles. A record of the counseling and assessment services provided to each client is maintained.
+
+The goal of the counselor is to provide a comfortable and supportive environment conducive to insight, healing, and personal growth. Your role, as the client, will be to identify goals you would like to achieve during the course of counseling and be willing to examine any potential obstacles and strengths that will either hinder or help you achieve your desired goals.
+
+RISKS
+Counseling and assessment can have benefits and risks and it is important to consider both when making any treatment decisions. Since counseling involves discussing unpleasant aspects of your life, there is a risk that you may experience temporary uncomfortable feelings like sadness, guilt, anger, frustration, loneliness, and helplessness. Disclosing personal information during an assessment may likewise feel uncomfortable and might make you feel vulnerable.
+
+COUNSELOR CONTACT INFORMATION
+The primary way to get in touch with us is by contacting your counselor through Canvas or email. If you are in a crisis and need immediate assistance, please go to your nearest emergency room.
+                    [behavior] => next-page
+                    [questions] => Array
+                        (
+                        )
+
+                )
+
+            [3] => Array
+                (
+                    [title] => CONFIDENTIALITY and RELEASE of INFORMATION
+                    [description] => Protecting your privacy is very important. The information in your record is confidential and will not be disclosed to anyone without your written consent unless required by law.
+
+The exceptions to confidentiality include:
+If you tell your counselor that you are going to harm or kill yourself or someone else, we are required by law to do whatever we can do to prevent that from happening and to ensure your safety and the safety of others. This may require notifying family members, parents, legal guardians, legal authorities, and/or potential victims.
+
+If you tell us about incidents of abuse, we are required to report this to proper authorities.
+
+We are required to release your records if they are subpoenaed by a court of law.
+
+In addition to the above, there are several other situations where confidentiality cannot be insured, including:
+
+If you provide us with a request to release your records
+
+If you are in family counseling, we cannot guarantee confidentiality will be maintained by other family members.
+
+If you are a child/minor or unable to voluntarily consent, a guardian must give written consent and can access your records.
+                    [behavior] => same-page
+                    [questions] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [question] => I understand the nature and limits of confidentiality stated above and accept them as part of the benefits and conditions of participating in counseling. In the event that my counselor reasonably believes that there is evidence of clear and imminent danger of harm to myself and/or others, physically or emotionally, I give consent to my counselor to contact the following persons, in addition to the school and medical personnel.
+                                    [type] => multiple
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Agree
+                                            [1] => Disagree
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [1] => Array
+                                (
+                                    [question] => Name of Father/Mother or Legal Guardian
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [2] => Array
+                                (
+                                    [question] => Contact number of parent/guardian
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                        )
+
+                )
+
+            [4] => Array
+                (
+                    [title] => USE of CLIENT INFORMATION on OUTCOME RESEARCH
+                    [description] => 
+                    [behavior] => same-page
+                    [questions] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [question] => When client information is utilized on outcome research purposes, client names are not disclosed.
+                                    [type] => multiple
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => I allow the College Guidance and Counseling Center to use the data from my record for outcome research given that my identity is protected.
+                                            [1] => I do not allow the College Guidance and Counseling Center to use the data from my record for outcome research.
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [1] => Array
+                                (
+                                    [question] => Counseling Guidelines Please review the Counseling Guidelines through this link: https://bit.ly/counselingguide By accomplishing this form you understand and agree to the guidelines set by CGCC. This document has provided the information required to address expectations about counseling. I have read and fully understand this document. All questions that I had have been answered to my satisfaction. By filling out this form, I voluntarily agree to accept counseling.
+                                    [type] => checkbox
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Yes
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                        )
+
+                )
+
+        )
+
+)
+
+--------------------------------------------------------------------------------
+
+[2025-05-31 03:04:35] Received Form Data:
+Array
+(
+    [form_index] => 1
+    [form_name] => STUDENT INDIVIDUAL INVENTORY (SII) & CLIENT CONSENT FORM AY 2024-2025
+    [description] => This form would only take 15- 20 minutes of your time.
+Every person's life is a developing story. The person you are today is a result of your upbringing and experiences, joys and sorrows, desires, and dreams. While we know that it's tempting to rush at times, please take some time to reflect on your life.
+    [sections] => Array
+        (
+            [0] => Array
+                (
+                    [title] => Consent
+                    [description] => This section outlines the terms and conditions regarding the collection, processing, and storage of personal information by the College Guidance and Counseling Center (CGCC) at De La Salle Lipa (DLSL).
+                    [behavior] => same-page
+                    [questions] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [question] => I understand that this form is considered an official record of De La Salle Lipa and that College Guidance and Counseling Center (CGCC) is required to keep my personal information and records until such time that these documents are due for disposal based on the DLSL data privacy retention policy. Some of the services of CGCC that would utilize this data are Counseling, Referral, and Research and Development. This form shall only be accessed by the CGCC team. CGCC shall retain the data in accordance with Document Retention Period and will be deleted upon disposal. By answering this form, you are giving CGCC consent to process and store this information. Please answer carefully and truthfully.
+                                    [type] => checkbox
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Yes
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [1] => Array
+                                (
+                                    [question] => Number
+                                    [type] => short
+                                    [subtype] => number
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                        )
+
+                )
+
+            [1] => Array
+                (
+                    [title] => DETAILED CONCERNS
+                    [description] => The items below describe some of the concerns that students your age might experience. Please check your top five concerns in which the guidance counselor can help you with.
+                    [behavior] => same-page
+                    [questions] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [question] => SOCIAL/EMOTIONAL CONCERNS
+                                    [type] => checkbox
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Adjusting to change
+                                            [1] => Experiencing Bullying/Discrimination
+                                            [2] => Struggling with Relationship Problems
+                                            [3] => Issues with self-image
+                                            [4] => Concerns about sexuality/gender identity
+                                            [5] => Finding it difficult to express one's thoughts/feelings
+                                            [6] => Struggling in getting along with others/making friends
+                                            [7] => Spiritual/Religious issues
+                                            [8] => Lack of decision making skills
+                                            [9] => Lack of social support
+                                            [10] => Lacking of self-confidence
+                                            [11] => Lacks effective communication skills
+                                            [12] => Need to develop leadership skills
+                                            [13] => Need to have better self-concept
+                                            [14] => Experiencing harassment
+                                            [15] => Trust issue
+                                            [16] => Feeling very strong emotions
+                                            [17] => No social/emotional concern
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [1] => Array
+                                (
+                                    [question] => FAMILY & HOME CONCERNS
+                                    [type] => checkbox
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Absence of father/mother
+                                            [1] => Dealing with a loss
+                                            [2] => Feeling of being unloved
+                                            [3] => Financial difficulties
+                                            [4] => Struggling with parents’ marital conflicts/separationz
+                                            [5] => Health of a family member
+                                            [6] => Home environment is not conducive to study
+                                            [7] => Homesickness/Living away from home
+                                            [8] => Lacking parents' appreciation
+                                            [9] => Not getting along well with a family member/relative
+                                            [10] => Feeling pressured by high expectations from parents/family
+                                            [11] => Feeling invalidated by family members
+                                            [12] => Concerned about the health of a family member
+                                            [13] => Too many responsibilities at home
+                                            [14] => No Family/Home Concern
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [2] => Array
+                                (
+                                    [question] => MENTAL/PHYSICAL HEALTH CONCERNS
+                                    [type] => checkbox
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Struggling with addiction (substance use, internet, gaming, gambling, shopping)
+                                            [1] => Difficulty in managing emotions
+                                            [2] => Feeling burned out
+                                            [3] => Feeling tired/fatigued most of the time (physically/emotionally)
+                                            [4] => Having a physical illness that needs medical attention
+                                            [5] => Racing thoughts
+                                            [6] => Overthinking / Anxiety
+                                            [7] => Having panic attacks
+                                            [8] => Experiencing stress
+                                            [9] => Difficulty coping with stress
+                                            [10] => Deep feelings of sadness
+                                            [11] => Self-harm behavior (cutting, scratching, burning, etc.)
+                                            [12] => Erratic sleeping patterns
+                                            [13] => Suicidal thoughts
+                                            [14] => Suicide attempt
+                                            [15] => Difficulty concentrating/being more forgetful
+                                            [16] => Avoiding people, situations, or responsibilities
+                                            [17] => Unable to enjoy/loss of interest in activities
+                                            [18] => Feeling empty/Not feeling anything
+                                            [19] => Increased irritability
+                                            [20] => Crying spells
+                                            [21] => Changes in appetite (eating more or less)
+                                            [22] => No Mental/Physical Health Concerns
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [3] => Array
+                                (
+                                    [question] => ACADEMIC CONCERNS
+                                    [type] => checkbox
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Difficulty in adjusting to learning modality
+                                            [1] => Difficulty in meeting academic requirements
+                                            [2] => Difficulty working independently
+                                            [3] => Difficulty working in a group/pair
+                                            [4] => Dissatisfaction with academic performance/grades
+                                            [5] => Lacking effective study habits (note-taking, time management)
+                                            [6] => Difficulty overcoming distractions
+                                            [7] => Lacking motivation
+                                            [8] => Struggling with procrastination
+                                            [9] => Struggling to balance academics with extracurricular/non-academic activities
+                                            [10] => Test anxiety
+                                            [11] => No Academic concern
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [4] => Array
+                                (
+                                    [question] => PROFESSOR ISSUE CONCERNS
+                                    [type] => checkbox
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Favoritism/ unfair treatment
+                                            [1] => Inadequate background knowledge about the subjects
+                                            [2] => Unavailable most of the time
+                                            [3] => Difficult to reach or communicate with
+                                            [4] => Unethical/unprofessional behavior
+                                            [5] => Does not provide timely feedback
+                                            [6] => No Professor issues/concerns
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [5] => Array
+                                (
+                                    [question] => CAREER CONCERNS
+                                    [type] => checkbox
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Uncertainty about career choice/ wanting to shift to another program
+                                            [1] => Career choice is limited by financial resources
+                                            [2] => Unaware of strengths, abilities, or interests
+                                            [3] => Feeling lost and overwhelmed about making a career decision
+                                            [4] => Feeling pressured by peers/family to succeed
+                                            [5] => Need help with career planning
+                                            [6] => Dissatisfied with the present college program
+                                            [7] => Anxious about the future/world of work
+                                            [8] => No Career concern
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [6] => Array
+                                (
+                                    [question] => I have other concerns/questions that I want to directly consult or discuss with my counselor.
+                                    [type] => multiple
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Yes
+                                            [1] => No
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [7] => Array
+                                (
+                                    [question] => We appreciate your feedback. Please let us know how we can best improve our CGCC Student Individual Inventory (SII) Form. If you have comments/suggestions, please indicate them below:
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [8] => Array
+                                (
+                                    [question] => By submitting this form, I certify that the above information are true and correct. FALSIFICATION of any information will be subjected to DISCIPLINARY ACTION.
+                                    [type] => checkbox
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => I Certify
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [title] => CLIENT CONSENT FORM
+                    [description] => This form is a document provided by the CGCC to students in order to properly acquire consent for Counseling. The form contains information about the counseling service and the agreement between the counselor and the student.
+
+APPOINTMENT
+Your sessions are scheduled and agreed upon by you and your counselors. When you need to cancel or reschedule an appointment, please give us at least 24-hours notice.
+
+COUNSELING and ASSESSMENT
+Counseling is an opportunity to identify and build on current strengths, learn problem-solving strategies, develop or enhance coping skills, learn more effective ways to communicate with others, and receive support and feedback. Assessment is crucial in facilitating the counselor’s understanding of the client. The counseling relationship is designed to be one that will promote change and growth. The counselor and client both have active roles. A record of the counseling and assessment services provided to each client is maintained.
+
+The goal of the counselor is to provide a comfortable and supportive environment conducive to insight, healing, and personal growth. Your role, as the client, will be to identify goals you would like to achieve during the course of counseling and be willing to examine any potential obstacles and strengths that will either hinder or help you achieve your desired goals.
+
+RISKS
+Counseling and assessment can have benefits and risks and it is important to consider both when making any treatment decisions. Since counseling involves discussing unpleasant aspects of your life, there is a risk that you may experience temporary uncomfortable feelings like sadness, guilt, anger, frustration, loneliness, and helplessness. Disclosing personal information during an assessment may likewise feel uncomfortable and might make you feel vulnerable.
+
+COUNSELOR CONTACT INFORMATION
+The primary way to get in touch with us is by contacting your counselor through Canvas or email. If you are in a crisis and need immediate assistance, please go to your nearest emergency room.
+                    [behavior] => next-page
+                    [questions] => Array
+                        (
+                        )
+
+                )
+
+            [3] => Array
+                (
+                    [title] => CONFIDENTIALITY and RELEASE of INFORMATION
+                    [description] => Protecting your privacy is very important. The information in your record is confidential and will not be disclosed to anyone without your written consent unless required by law.
+
+The exceptions to confidentiality include:
+If you tell your counselor that you are going to harm or kill yourself or someone else, we are required by law to do whatever we can do to prevent that from happening and to ensure your safety and the safety of others. This may require notifying family members, parents, legal guardians, legal authorities, and/or potential victims.
+
+If you tell us about incidents of abuse, we are required to report this to proper authorities.
+
+We are required to release your records if they are subpoenaed by a court of law.
+
+In addition to the above, there are several other situations where confidentiality cannot be insured, including:
+
+If you provide us with a request to release your records
+
+If you are in family counseling, we cannot guarantee confidentiality will be maintained by other family members.
+
+If you are a child/minor or unable to voluntarily consent, a guardian must give written consent and can access your records.
+                    [behavior] => same-page
+                    [questions] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [question] => I understand the nature and limits of confidentiality stated above and accept them as part of the benefits and conditions of participating in counseling. In the event that my counselor reasonably believes that there is evidence of clear and imminent danger of harm to myself and/or others, physically or emotionally, I give consent to my counselor to contact the following persons, in addition to the school and medical personnel.
+                                    [type] => multiple
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Agree
+                                            [1] => Disagree
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [1] => Array
+                                (
+                                    [question] => Name of Father/Mother or Legal Guardian
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [2] => Array
+                                (
+                                    [question] => Contact number of parent/guardian
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                        )
+
+                )
+
+            [4] => Array
+                (
+                    [title] => USE of CLIENT INFORMATION on OUTCOME RESEARCH
+                    [description] => 
+                    [behavior] => same-page
+                    [questions] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [question] => When client information is utilized on outcome research purposes, client names are not disclosed.
+                                    [type] => multiple
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => I allow the College Guidance and Counseling Center to use the data from my record for outcome research given that my identity is protected.
+                                            [1] => I do not allow the College Guidance and Counseling Center to use the data from my record for outcome research.
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [1] => Array
+                                (
+                                    [question] => Counseling Guidelines Please review the Counseling Guidelines through this link: https://bit.ly/counselingguide By accomplishing this form you understand and agree to the guidelines set by CGCC. This document has provided the information required to address expectations about counseling. I have read and fully understand this document. All questions that I had have been answered to my satisfaction. By filling out this form, I voluntarily agree to accept counseling.
+                                    [type] => checkbox
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Yes
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                        )
+
+                )
+
+        )
+
+)
+
+--------------------------------------------------------------------------------
+

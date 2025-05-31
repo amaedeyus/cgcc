@@ -79,6 +79,20 @@
           <span id="dropdownStatusText" class="status-text"></span>
         </div>
       </div>
+      <div class="form-setting">
+        <div class="status-label">
+          <label>Required for Counseling</label>
+          <span class="info-icon"
+            title="When enabled, students must complete this form before scheduling counseling sessions">ⓘ</span>
+        </div>
+        <div class="status-controls">
+          <label class="toggle-switch">
+            <input type="checkbox" id="dropdownRequiredToggle" />
+            <span class="slider"></span>
+          </label>
+          <span id="dropdownRequiredText" class="status-text"></span>
+        </div>
+      </div>
       <div class="dropdown-footer">
         <button id="dropdownSaveBtn" class="save-btn">Save Changes</button>
         <button id="dropdownArchiveBtn" class="delete-btn">Archive</button>
@@ -91,6 +105,7 @@
     let currentFormId = null;
     let currentMenuElement = null;
     let currentFormStatus = null;
+    let currentFormRequired = null;
 
     document.getElementById("user-name").innerText = userName;
     const greetingElements = document.querySelectorAll(".user-name");
@@ -103,6 +118,12 @@
       '1': { text: 'Published', class: 'published-status' },
       '0': { text: 'Unpublished', class: 'unpublished-status' },
       '-1': { text: 'Archived', class: 'archived-status' }
+    };
+
+    // Required mapping
+    const requiredMap = {
+      '1': { text: 'Required', class: 'required-status' },
+      '0': { text: 'Optional', class: 'optional-status' }
     };
 
     // Fetch and display forms
@@ -136,6 +157,10 @@
           const statusInfo = statusMap[form.is_active] || statusMap['0'];
           const statusClass = `status-indicator ${statusInfo.class}`;
 
+          // Add required indicator if form is required
+          const requiredInfo = form.is_required === '1' ? 
+            '<div class="required-indicator" title="Required for counseling">★</div>' : '';
+
           let description = form.description || "No description";
           const truncatedDescription =
             description.length > 100
@@ -143,7 +168,8 @@
               : description;
 
           card.innerHTML = `
-            <div class="form-card-menu" onclick="openSettingsMenu(${form.form_index}, '${form.is_active}', event)">⋮</div>
+            <div class="form-card-menu" onclick="openSettingsMenu(${form.form_index}, '${form.is_active}', '${form.is_required}', event)">⋮</div>
+            ${requiredInfo}
             <div class="${statusClass}"></div>
             <h3>${form.form_name}</h3>
             <p class="form-description">${truncatedDescription.replace(/\n/g, " ")}</p>
@@ -160,7 +186,7 @@
     }
 
     // Dropdown menu functions
-    function openSettingsMenu(formId, status, event) {
+    function openSettingsMenu(formId, status, isRequired, event) {
       event.stopPropagation();
       const dropdown = document.getElementById("dropdownMenu");
 
@@ -175,6 +201,7 @@
 
       currentFormId = formId;
       currentFormStatus = status;
+      currentFormRequired = isRequired;
       currentMenuElement = event.target;
 
       // Position the dropdown near the clicked button
@@ -185,29 +212,36 @@
       dropdown.style.left = `${buttonRect.right + window.scrollX - 280}px`;
 
       // Load form data
-      loadFormSettings(formId, status);
+      loadFormSettings(formId, status, isRequired);
     }
 
     function closeSettingsMenu() {
       document.getElementById("dropdownMenu").style.display = "none";
       currentMenuElement = null;
       currentFormStatus = null;
+      currentFormRequired = null;
     }
 
-    function loadFormSettings(formId, status) {
-      const toggle = document.getElementById("dropdownStatusToggle");
+    function loadFormSettings(formId, status, isRequired) {
+      const statusToggle = document.getElementById("dropdownStatusToggle");
       const statusText = document.getElementById("dropdownStatusText");
+      const requiredToggle = document.getElementById("dropdownRequiredToggle");
+      const requiredText = document.getElementById("dropdownRequiredText");
       const archiveBtn = document.getElementById("dropdownArchiveBtn");
 
-      // Update UI based on status
+      // Update status UI
       const statusInfo = statusMap[status] || statusMap['0'];
-
       statusText.textContent = statusInfo.text;
       statusText.className = `status-text ${statusInfo.class}`;
+      statusToggle.checked = status === '1';
+      statusToggle.disabled = status === '-1';
 
-      // Set toggle state (only for published/unpublished, not archived)
-      toggle.checked = status === '1';
-      toggle.disabled = status === '-1';
+      // Update required UI
+      const requiredInfo = requiredMap[isRequired] || requiredMap['0'];
+      requiredText.textContent = requiredInfo.text;
+      requiredText.className = `status-text ${requiredInfo.class}`;
+      requiredToggle.checked = isRequired === '1';
+      requiredToggle.disabled = status === '-1';
 
       // Update archive button text and visibility
       if (status === '-1') {
@@ -221,112 +255,141 @@
 
     // Event listeners
     document.addEventListener("DOMContentLoaded", () => {
-      // Load forms
-      loadForms();
+        // Load forms
+        loadForms();
 
-      // Close menu when clicking outside
-      document.addEventListener("click", (event) => {
-        if (!event.target.closest('.dropdown-menu') && !event.target.closest('.form-card-menu')) {
-          closeSettingsMenu();
-        }
-      });
-
-      // Status toggle handler
-      document.getElementById("dropdownSaveBtn").addEventListener("click", async function () {
-        try {
-          const isActive = document.getElementById("dropdownStatusToggle").checked ? '1' : '0';
-
-          const response = await fetch(
-            "http://localhost/cgcc/backend/forms/form.php",
-            {
-              method: "POST",
-              credentials: "include",
-              headers: {
-                "Content-Type": "application/json",
-                "X-Requested-With": "XMLHttpRequest" // Add this header
-              },
-              body: JSON.stringify({
-                form_id: currentFormId,
-                is_active: isActive
-              }),
+        // Close menu when clicking outside
+        document.addEventListener("click", (event) => {
+            if (!event.target.closest('.dropdown-menu') && !event.target.closest('.form-card-menu')) {
+                closeSettingsMenu();
             }
-          );
+        });
 
-          const result = await response.json();
-
-          if (!response.ok) {
-            throw new Error(result.message || "Failed to update form status");
-          }
-
-          if (result.success) {
-            closeSettingsMenu();
-            loadForms();
-            showStatusMessage(`Form status updated to ${isActive === '1' ? "published" : "unpublished"}`, 'success');
-          } else {
-            throw new Error(result.message || "Update failed");
-          }
-        } catch (error) {
-          console.error("Error:", error);
-          showStatusMessage("Failed to save settings: " + error.message, 'error');
-        }
-      });
-
-      // Updated Archive button handler
-      document.getElementById("dropdownArchiveBtn").addEventListener("click", async function () {
-        const action = currentFormStatus === '-1' ? "unarchive" : "archive";
-        const confirmAction = confirm(`Are you sure you want to ${action} this form?`);
-
-        if (!confirmAction) return;
-
-        try {
-          const newStatus = currentFormStatus === '-1' ? '0' : '-1';
-
-          const response = await fetch(
-            "http://localhost/cgcc/backend/forms/form.php",
-            {
-              method: "POST",
-              credentials: "include",
-              headers: {
-                "Content-Type": "application/json",
-                "X-Requested-With": "XMLHttpRequest" // Add this header
-              },
-              body: JSON.stringify({
-                form_id: currentFormId,
-                is_active: newStatus
-              }),
+        // Toggle status text when status toggle is clicked
+        document.getElementById("dropdownStatusToggle").addEventListener("change", function() {
+            const isChecked = this.checked;
+            const statusText = document.getElementById("dropdownStatusText");
+            if (isChecked) {
+                statusText.textContent = "Published";
+                statusText.className = "status-text published-status";
+            } else {
+                statusText.textContent = "Unpublished";
+                statusText.className = "status-text unpublished-status";
             }
-          );
+        });
 
-          const result = await response.json();
+        // Toggle required text when required toggle is clicked
+        document.getElementById("dropdownRequiredToggle").addEventListener("change", function() {
+            const isChecked = this.checked;
+            const requiredText = document.getElementById("dropdownRequiredText");
+            if (isChecked) {
+                requiredText.textContent = "Required";
+                requiredText.className = "status-text required-status";
+            } else {
+                requiredText.textContent = "Optional";
+                requiredText.className = "status-text optional-status";
+            }
+        });
 
-          if (!response.ok) {
-            throw new Error(result.message || "Failed to update form status");
-          }
+        // Save button handler
+        document.getElementById("dropdownSaveBtn").addEventListener("click", async function () {
+            try {
+                const isActive = document.getElementById("dropdownStatusToggle").checked ? '1' : '0';
+                const isRequired = document.getElementById("dropdownRequiredToggle").checked ? '1' : '0';
 
-          if (result.success) {
-            closeSettingsMenu();
-            loadForms();
-            showStatusMessage(`Form ${newStatus === '-1' ? "archived" : "unarchived"} successfully`, 'success');
-          } else {
-            throw new Error(result.message || "Update failed");
-          }
-        } catch (error) {
-          console.error("Error:", error);
-          showStatusMessage("Failed to archive form: " + error.message, 'error');
+                const response = await fetch(
+                    "http://localhost/cgcc/backend/forms/form.php",
+                    {
+                        method: "POST",
+                        credentials: "include",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-Requested-With": "XMLHttpRequest"
+                        },
+                        body: JSON.stringify({
+                            form_id: currentFormId,
+                            is_active: isActive,
+                            is_required: isRequired
+                        }),
+                    }
+                );
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || "Failed to update form settings");
+                }
+
+                if (result.success) {
+                    closeSettingsMenu();
+                    loadForms();
+                    showStatusMessage(`Form settings updated successfully`, 'success');
+                } else {
+                    throw new Error(result.message || "Update failed");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                showStatusMessage("Failed to save settings: " + error.message, 'error');
+            }
+        });
+
+        // Archive button handler
+        document.getElementById("dropdownArchiveBtn").addEventListener("click", async function () {
+            const action = currentFormStatus === '-1' ? "unarchive" : "archive";
+            const confirmAction = confirm(`Are you sure you want to ${action} this form?`);
+
+            if (!confirmAction) return;
+
+            try {
+                const newStatus = currentFormStatus === '-1' ? '0' : '-1';
+
+                const response = await fetch(
+                    "http://localhost/cgcc/backend/forms/form.php",
+                    {
+                        method: "POST",
+                        credentials: "include",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-Requested-With": "XMLHttpRequest"
+                        },
+                        body: JSON.stringify({
+                            form_id: currentFormId,
+                            is_active: newStatus,
+                            is_required: currentFormRequired // Keep the same required status
+                        }),
+                    }
+                );
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || "Failed to update form status");
+                }
+
+                if (result.success) {
+                    closeSettingsMenu();
+                    loadForms();
+                    showStatusMessage(`Form ${newStatus === '-1' ? "archived" : "unarchived"} successfully`, 'success');
+                } else {
+                    throw new Error(result.message || "Update failed");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                showStatusMessage("Failed to archive form: " + error.message, 'error');
+            }
+        });
+
+        // Helper function to show status messages
+        function showStatusMessage(message, type) {
+            const statusElement = document.createElement('div');
+            statusElement.className = `autosave-status show ${type}`;
+            statusElement.textContent = message;
+            document.body.appendChild(statusElement);
+
+            setTimeout(() => {
+                statusElement.remove();
+            }, 3000);
         }
-      });
-
-      // Helper function to show status messages
-      function showStatusMessage(message, type) {
-        const statusElement = document.createElement('div');
-        statusElement.className = `autosave-status show ${type}`;
-        statusElement.textContent = message;
-        document.body.appendChild(statusElement);
-
-        setTimeout(() => {
-          statusElement.remove();
-        }, 3000);
-      }
     });
   </script>
 </body>

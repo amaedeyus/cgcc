@@ -582,6 +582,50 @@ input:checked + .slider:before {
     background-color: #ff9800;
 }
 
+/* Add these styles to your existing CSS */
+.required-indicator {
+    position: absolute;
+    top: 10px;
+    right: 40px;
+    color: gold;
+    font-size: 18px;
+    cursor: help;
+}
+
+.required-status {
+    color: #4fbd9c;
+    font-weight: normal;
+}
+
+.optional-status {
+    color: #666;
+}
+
+.form-setting {
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.form-setting:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.status-label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.info-icon {
+    margin-left: 5px;
+    cursor: help;
+    color: #666;
+    font-size: 14px;
+}
+
 /* Responsive Styles */
 @media (max-width: 1024px) {
     .form-card {
