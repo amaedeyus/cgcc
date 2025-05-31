@@ -1,54 +1,40 @@
 <?php
 session_start();
-require_once '../connect3.php'; // ✅ Move this here
 
-
-if (!isset($_SESSION['user_index'])) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Unauthorized']);
-    exit;
-}
-
-// Fetch student_index from students table
-$stmtStudent = $conn->prepare("SELECT student_index FROM students WHERE user_index = ?");
-$stmtStudent->bind_param("i", $userIndex);
-$stmtStudent->execute();
-$stmtStudent->store_result();
-
-$userType = $_SESSION['user_type'] ?? 'unknown';
-error_log("User type: " . $userType);
-
-
-// Enable CORS and set headers
-header("Access-Control-Allow-Methods: GET, OPTIONS");
-header("Access-Control-Allow-Credentials: true");
-header("Content-Type: application/json");
-
-// CORS Handling - Development settings (adjust for production)
-if (isset($_SERVER['HTTP_ORIGIN'])) {
-    header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
-    header('Access-Control-Allow-Credentials: true');
-    header('Access-Control-Max-Age: 86400');    // cache for 1 day
-}
-
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD']))
-        header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
-    
-    if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']))
-        header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
-    
-    exit(0);
-}
-
-// Error reporting for debugging (disable in production)
+// Enable error reporting for debugging
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+// Check if student is logged in
+if (!isset($_SESSION['user_index']) || $_SESSION['user_type'] !== 'student') {
+    http_response_code(401);
+    echo json_encode(['error' => 'Unauthorized - Please log in as a student']);
+    exit;
+}
+
+// Enable CORS and set headers
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type");
+header("Content-Type: application/json");
+
+// CORS preflight handling
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
+
 // Database connection
+require_once '../connect3.php';
+
+// Check database connection
+if ($conn->connect_error) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Database connection failed: ' . $conn->connect_error]);
+    exit;
+}
+
 try {
-    // Adjust this path according to your actual file structure
-    
     // Validate input
     $formId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
     
@@ -58,99 +44,145 @@ try {
         exit;
     }
 
-    // Fetch form details
-    $query = "SELECT form_index, form_name, description FROM forms WHERE form_index = ?";
-    $stmt = $conn->prepare($query);
-    if (!$stmt) {
-        throw new Exception("Prepare failed: " . $conn->error);
+    // 1. Check if form exists and is active
+    $statusCheck = $conn->prepare("SELECT is_active FROM forms WHERE form_index = ?");
+    if (!$statusCheck) {
+        throw new Exception("Prepare failed for form check: " . $conn->error);
     }
     
-    $stmt->bind_param("i", $formId);
-    if (!$stmt->execute()) {
-        throw new Exception("Execute failed: " . $stmt->error);
+    $statusCheck->bind_param("i", $formId);
+    if (!$statusCheck->execute()) {
+        throw new Exception("Execute failed for form check: " . $statusCheck->error);
     }
     
-    $formResult = $stmt->get_result();
-    if ($formResult->num_rows === 0) {
+    $statusResult = $statusCheck->get_result();
+    if ($statusResult->num_rows === 0) {
         http_response_code(404);
         echo json_encode(['error' => 'Form not found']);
         exit;
     }
 
-    $form = $formResult->fetch_assoc();
-    $stmt->close();
+    $status = $statusResult->fetch_assoc();
+    $statusCheck->close();
 
-    // Fetch sections
-    // Fetch sections - corrected column name from section_behavior to behavior
-    $query = "SELECT form_section_index, section_title, section_description, section_order, 
+    if ($status['is_active'] !== '1') {
+        http_response_code(403);
+        echo json_encode(['error' => 'This form is not currently available for responses']);
+        exit;
+    }
+
+    // 2. Check if student has already submitted this form
+    $submissionCheck = $conn->prepare("SELECT response_index FROM responses WHERE form_index = ? AND student_index = ?");
+    if (!$submissionCheck) {
+        throw new Exception("Prepare failed for submission check: " . $conn->error);
+    }
+    
+    $submissionCheck->bind_param("ii", $formId, $_SESSION['user_index']);
+    if (!$submissionCheck->execute()) {
+        throw new Exception("Execute failed for submission check: " . $submissionCheck->error);
+    }
+    
+    $submissionResult = $submissionCheck->get_result();
+    
+    if ($submissionResult->num_rows > 0) {
+        http_response_code(403);
+        echo json_encode(['error' => 'You have already submitted this form']);
+        exit;
+    }
+    $submissionCheck->close();
+
+    // 3. Fetch form details
+    $formQuery = "SELECT form_index, form_name, description FROM forms WHERE form_index = ?";
+    $formStmt = $conn->prepare($formQuery);
+    if (!$formStmt) {
+        throw new Exception("Prepare failed for form details: " . $conn->error);
+    }
+    
+    $formStmt->bind_param("i", $formId);
+    if (!$formStmt->execute()) {
+        throw new Exception("Execute failed for form details: " . $formStmt->error);
+    }
+    
+    $formResult = $formStmt->get_result();
+    $form = $formResult->fetch_assoc();
+    $formStmt->close();
+
+    // 4. Fetch sections
+    $sectionQuery = "SELECT form_section_index, section_title, section_description, section_order, 
                     IFNULL(behavior, 'same-page') AS behavior 
-            FROM form_sections 
-            WHERE form_index = ? 
-            ORDER BY section_order";
-    $stmt = $conn->prepare($query);
-    if (!$stmt) {
-        throw new Exception("Prepare failed: " . $conn->error);
+                    FROM form_sections 
+                    WHERE form_index = ? 
+                    ORDER BY section_order";
+    $sectionStmt = $conn->prepare($sectionQuery);
+    if (!$sectionStmt) {
+        throw new Exception("Prepare failed for sections: " . $conn->error);
     }
     
-    $stmt->bind_param("i", $formId);
-    if (!$stmt->execute()) {
-        throw new Exception("Execute failed: " . $stmt->error);
+    $sectionStmt->bind_param("i", $formId);
+    if (!$sectionStmt->execute()) {
+        throw new Exception("Execute failed for sections: " . $sectionStmt->error);
     }
     
-    $sectionsResult = $stmt->get_result();
+    $sectionsResult = $sectionStmt->get_result();
     $sections = [];
     $allQuestions = [];
     
     while ($section = $sectionsResult->fetch_assoc()) {
         // Fetch questions for this section
-        $query = "SELECT mq.main_question_index, mq.main_question_text, mq.is_required,
-                         qt.type_name, IFNULL(mq.include_other, 0) AS include_other
-                  FROM main_questions mq
-                  JOIN question_types qt ON mq.type_index = qt.type_index 
-                  WHERE mq.form_section_index = ?
-                  ORDER BY mq.main_question_index";
-        $stmt2 = $conn->prepare($query);
-        if (!$stmt2) {
-            throw new Exception("Prepare failed: " . $conn->error);
+        $questionQuery = "SELECT mq.main_question_index, mq.main_question_text, mq.is_required,
+                        qt.type_name, mq.subtype
+                        FROM main_questions mq
+                        JOIN question_types qt ON mq.type_index = qt.type_index 
+                        WHERE mq.form_section_index = ?
+                        ORDER BY mq.main_question_index";
+        $questionStmt = $conn->prepare($questionQuery);
+        if (!$questionStmt) {
+            throw new Exception("Prepare failed for questions: " . $conn->error);
         }
         
-        $stmt2->bind_param("i", $section['form_section_index']);
-        if (!$stmt2->execute()) {
-            throw new Exception("Execute failed: " . $stmt2->error);
+        $questionStmt->bind_param("i", $section['form_section_index']);
+        if (!$questionStmt->execute()) {
+            throw new Exception("Execute failed for questions: " . $questionStmt->error);
         }
         
-        $questionsResult = $stmt2->get_result();
+        $questionsResult = $questionStmt->get_result();
         $questions = [];
 
         while ($q = $questionsResult->fetch_assoc()) {
             // Get options
             $options = [];
-            $stmt3 = $conn->prepare("SELECT choice_index, choice_text FROM choices WHERE main_question_index = ? ORDER BY choice_index");
-            if ($stmt3) {
-                $stmt3->bind_param("i", $q['main_question_index']);
-                $stmt3->execute();
-                $choicesResult = $stmt3->get_result();
+            $optionStmt = $conn->prepare("SELECT choice_index, choice_text FROM choices WHERE main_question_index = ? ORDER BY choice_index");
+            if ($optionStmt) {
+                $optionStmt->bind_param("i", $q['main_question_index']);
+                if (!$optionStmt->execute()) {
+                    throw new Exception("Execute failed for options: " . $optionStmt->error);
+                }
+                $choicesResult = $optionStmt->get_result();
                 while ($choice = $choicesResult->fetch_assoc()) {
                     $options[] = [
                         'choice_index' => $choice['choice_index'],
                         'choice_text' => $choice['choice_text']
                     ];
-
                 }
-                $stmt3->close();
+                $optionStmt->close();
             }
 
             // Get sub-questions (rows)
             $rows = [];
-            $stmt4 = $conn->prepare("SELECT sub_question_text FROM sub_questions WHERE main_question_index = ? ORDER BY sub_question_index");
-            if ($stmt4) {
-                $stmt4->bind_param("i", $q['main_question_index']);
-                $stmt4->execute();
-                $subQResult = $stmt4->get_result();
-                while ($subQ = $subQResult->fetch_assoc()) {
-                    $rows[] = $subQ['sub_question_text'];
+            $rowStmt = $conn->prepare("SELECT sub_question_index, sub_question_text FROM sub_questions WHERE main_question_index = ? ORDER BY sub_question_index");
+            if ($rowStmt) {
+                $rowStmt->bind_param("i", $q['main_question_index']);
+                if (!$rowStmt->execute()) {
+                    throw new Exception("Execute failed for sub-questions: " . $rowStmt->error);
                 }
-                $stmt4->close();
+                $subQResult = $rowStmt->get_result();
+                while ($subQ = $subQResult->fetch_assoc()) {
+                    $rows[] = [
+                        'sub_question_index' => $subQ['sub_question_index'],
+                        'sub_question_text' => $subQ['sub_question_text']
+                    ];
+                }
+                $rowStmt->close();
             }
 
             $questions[] = [
@@ -158,12 +190,12 @@ try {
                 'question' => $q['main_question_text'],
                 'type' => $q['type_name'],
                 'required' => (bool)$q['is_required'],
-                'includeOther' => (bool)$q['include_other'],
+                'subtype' => $q['subtype'] ?? null,
                 'options' => $options,
                 'rows' => $rows
             ];
         }
-        $stmt2->close();
+        $questionStmt->close();
 
         $sections[] = [
             'id' => (string)$section['form_section_index'],
@@ -175,7 +207,7 @@ try {
         ];
         $allQuestions = array_merge($allQuestions, $questions);
     }
-    $stmt->close();
+    $sectionStmt->close();
 
     // If no sections found, create default section
     if (empty($sections)) {
@@ -195,16 +227,16 @@ try {
         'form_name' => $form['form_name'],
         'description' => $form['description'],
         'sections' => $sections,
-        'questions' => $allQuestions
+        'questions' => $allQuestions,
+        'student_index' => $_SESSION['user_index']
     ], JSON_NUMERIC_CHECK);
 
 } catch (Exception $e) {
     http_response_code(500);
-    $errorResponse = [
-        'error' => 'An error occurred',
-        'message' => $e->getMessage(),
-        'trace' => $e->getTraceAsString() // Only for debugging
-    ];
-    error_log(json_encode($errorResponse));
-    echo json_encode(['error' => 'An error occurred while processing your request']);
+    error_log("Error in get_form_student.php: " . $e->getMessage());
+    echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
+} finally {
+    if (isset($conn)) {
+        $conn->close();
+    }
 }

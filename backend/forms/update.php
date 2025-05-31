@@ -18,6 +18,11 @@ if ($userType !== 'admin') {
     exit;
 }
 
+function logFormData($data, $filename = 'form_debug.log') {
+    $timestamp = date('Y-m-d H:i:s');
+    $logEntry = "[$timestamp] Received Form Data:\n" . print_r($data, true) . "\n" . str_repeat('-', 80) . "\n\n";
+    file_put_contents($filename, $logEntry, FILE_APPEND);
+}
 // Optional: Log user type
 error_log("User type: " . $userType);
 
@@ -46,6 +51,8 @@ if (!isset($data['form_index'])) {
     exit;
 }
 
+logFormData($data);
+
 $formId = (int)$data['form_index'];
 
 try {
@@ -63,18 +70,13 @@ try {
         $stmt->close();
     }
 
-    // 2. Delete existing sections and questions
-    $stmt = $conn->prepare("DELETE FROM form_sections WHERE form_index = ?");
+    // First delete dependent tables
+    $stmt = $conn->prepare("DELETE FROM choices WHERE main_question_index IN (SELECT main_question_index FROM main_questions WHERE form_index = ?)");
     $stmt->bind_param("i", $formId);
     $stmt->execute();
     $stmt->close();
 
-    $stmt = $conn->prepare("DELETE mq FROM main_questions mq INNER JOIN choices c ON mq.main_question_index = c.main_question_index WHERE mq.form_index = ?");
-    $stmt->bind_param("i", $formId);
-    $stmt->execute();
-    $stmt->close();
-
-    $stmt = $conn->prepare("DELETE mq FROM main_questions mq INNER JOIN sub_questions sq ON mq.main_question_index = sq.main_question_index WHERE mq.form_index = ?");
+    $stmt = $conn->prepare("DELETE FROM sub_questions WHERE main_question_index IN (SELECT main_question_index FROM main_questions WHERE form_index = ?)");
     $stmt->bind_param("i", $formId);
     $stmt->execute();
     $stmt->close();
@@ -84,9 +86,14 @@ try {
     $stmt->execute();
     $stmt->close();
 
+    $stmt = $conn->prepare("DELETE FROM form_sections WHERE form_index = ?");
+    $stmt->bind_param("i", $formId);
+    $stmt->execute();
+    $stmt->close();
+
     // 3. Insert updated sections and questions
     $sectionInsert = $conn->prepare("INSERT INTO form_sections (form_index, section_title, section_description, section_order, behavior) VALUES (?, ?, ?, ?, ?)");
-    $questionInsert = $conn->prepare("INSERT INTO main_questions (form_index, form_section_index, main_question_text, type_index, is_required, include_other) VALUES (?, ?, ?, (SELECT type_index FROM question_types WHERE type_name = ?), ?, ?)");
+    $questionInsert = $conn->prepare("INSERT INTO main_questions (form_index, form_section_index, main_question_text, type_index, subtype, is_required) VALUES (?, ?, ?, (SELECT type_index FROM question_types WHERE type_name = ?), ?, ?)");
     $choiceInsert = $conn->prepare("INSERT INTO choices (main_question_index, choice_text) VALUES (?, ?)");
     $subQuestionInsert = $conn->prepare("INSERT INTO sub_questions (main_question_index, sub_question_text) VALUES (?, ?)");
 
@@ -106,17 +113,17 @@ try {
             foreach ($section['questions'] as $question) {
                 $type = $question['type'] ?? 'short';
                 $required = $question['required'] ? 1 : 0;
-                $includeOther = isset($question['includeOther']) ? (int)$question['includeOther'] : 0;
+                $subtype = ($type === 'short') ? ($question['subtype'] ?? 'text') : null;
 
-                // Insert question
+                // Update the bind_param call:
                 $questionInsert->bind_param(
-                    "iissii",
+                    "iisssi", // Changed to 6 parameters
                     $formId,
                     $sectionIndex,
                     $question['question'],
                     $type,
-                    $required,
-                    $includeOther
+                    $subtype, // New subtype parameter
+                    $required
                 );
                 $questionInsert->execute();
                 $questionIndex = $conn->insert_id;
@@ -149,34 +156,35 @@ try {
 
     // Now take snapshot with updated indexes
     try {
+        
         $stmt = $conn->prepare("
-            SELECT 
-                f.form_index,
-                f.form_name,
-                f.description,
-                fs.form_section_index,
-                fs.section_title,
-                fs.section_description,
-                fs.section_order,
-                IFNULL(fs.behavior, 'same-page') as behavior,
-                q.main_question_index,
-                q.main_question_text,
-                qt.type_name AS type_name,
-                q.is_required,
-                IFNULL(q.include_other, 0) AS include_other,
-                c.choice_index,
-                c.choice_text,
-                sq.sub_question_index,
-                sq.sub_question_text
-            FROM forms f
-            LEFT JOIN form_sections fs ON f.form_index = fs.form_index
-            LEFT JOIN main_questions q ON fs.form_section_index = q.form_section_index
-            LEFT JOIN question_types qt ON q.type_index = qt.type_index
-            LEFT JOIN choices c ON q.main_question_index = c.main_question_index
-            LEFT JOIN sub_questions sq ON q.main_question_index = sq.main_question_index
-            WHERE f.form_index = ?
-            ORDER BY fs.section_order, q.main_question_index, c.choice_index, sq.sub_question_index
-        ");
+        SELECT 
+            f.form_index,
+            f.form_name,
+            f.description,
+            fs.form_section_index,
+            fs.section_title,
+            fs.section_description,
+            fs.section_order,
+            IFNULL(fs.behavior, 'same-page') as behavior,
+            q.main_question_index,
+            q.main_question_text,
+            qt.type_name AS type_name,
+            q.subtype, -- Add this line
+            q.is_required,
+            c.choice_index,
+            c.choice_text,
+            sq.sub_question_index,
+            sq.sub_question_text
+        FROM forms f
+        LEFT JOIN form_sections fs ON f.form_index = fs.form_index
+        LEFT JOIN main_questions q ON fs.form_section_index = q.form_section_index
+        LEFT JOIN question_types qt ON q.type_index = qt.type_index
+        LEFT JOIN choices c ON q.main_question_index = c.main_question_index
+        LEFT JOIN sub_questions sq ON q.main_question_index = sq.main_question_index
+        WHERE f.form_index = ?
+        ORDER BY fs.section_order, q.main_question_index, c.choice_index, sq.sub_question_index
+    ");
         $stmt->bind_param("i", $formId);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -216,15 +224,15 @@ try {
             $questionId = $row['main_question_index'];
             if ($questionId && !isset($questionMap[$questionId])) {
                 $questionMap[$questionId] = [
-                    'id' => (string)$questionId,
-                    'question' => $row['main_question_text'],
-                    'type' => $row['type_name'],
-                    'required' => (bool)$row['is_required'],
-                    'includeOther' => (bool)$row['include_other'],
-                    'options' => [],
-                    'rows' => [],
-                    'form_section_index' => $sectionId
-                ];
+                'id' => (string)$questionId,
+                'question' => $row['main_question_text'],
+                'type' => $row['type_name'],
+                'subtype' => $row['subtype'],
+                'required' => (bool)$row['is_required'],
+                'options' => [],
+                'rows' => [],
+                'form_section_index' => $sectionId
+            ];
             }
 
             if ($row['choice_index'] !== null && $row['choice_text'] !== null) {

@@ -2,7 +2,7 @@
 session_start();
 
 // Include your database configuration
-require_once '../../config/db.php'; // Adjust this path as needed
+require_once '../connect3.php'; // This gives us $conn from connect3.php
 
 // Ensure the user is authenticated (example assumes student login)
 if (!isset($_SESSION['user_index'])) {
@@ -21,12 +21,12 @@ if (!$form_index) {
 }
 
 try {
-    $pdo = getPDO(); // Your function to get PDO connection
-
     // Get student index based on user
-    $stmt = $pdo->prepare("SELECT student_index FROM students WHERE user_index = ?");
-    $stmt->execute([$user_index]);
-    $student = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stmt = $conn->prepare("SELECT student_index FROM students WHERE user_index = ?");
+    $stmt->bind_param("i", $user_index);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $student = $result->fetch_assoc();
 
     if (!$student) {
         http_response_code(404);
@@ -37,14 +37,16 @@ try {
     $student_index = $student['student_index'];
 
     // Get the latest saved response for this form and student
-    $stmt = $pdo->prepare("
+    $stmt = $conn->prepare("
         SELECT response_index 
         FROM responses 
         WHERE form_index = ? AND student_index = ? 
         ORDER BY updated_at DESC LIMIT 1
     ");
-    $stmt->execute([$form_index, $student_index]);
-    $response = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stmt->bind_param("ii", $form_index, $student_index);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $response = $result->fetch_assoc();
 
     if (!$response) {
         // No saved response found
@@ -57,70 +59,68 @@ try {
     // Prepare final data object
     $savedData = ['formId' => $form_index];
 
-    // Load main question types to detect include_other status
-    $stmt = $pdo->prepare("
-        SELECT main_question_index, include_other 
+    // Load main question types
+    $stmt = $conn->prepare("
+        SELECT main_question_index
         FROM main_questions 
         WHERE form_index = ?
     ");
-    $stmt->execute([$form_index]);
+    $stmt->bind_param("i", $form_index);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
     $questionTypes = [];
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $questionTypes[$row['main_question_index']] = $row['include_other'];
+    while ($row = $result->fetch_assoc()) {
+        $questionTypes[$row['main_question_index']] = true;
     }
 
     // Load regular answers
-    $stmt = $pdo->prepare("
-        SELECT main_question_index, choice_index, text_answer, is_other 
+    $stmt = $conn->prepare("
+        SELECT main_question_index, choice_index, text_answer 
         FROM answers 
         WHERE response_index = ?
     ");
-    $stmt->execute([$response_index]);
+    $stmt->bind_param("i", $response_index);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    // In get_saved_response.php, modify the answer processing section:
+    while ($row = $result->fetch_assoc()) {
         $questionId = $row['main_question_index'];
         $choice = $row['choice_index'];
         $text = $row['text_answer'];
-        $isOtherFlag = $row['is_other'];
 
         if (!isset($savedData[$questionId])) {
             $savedData[$questionId] = [
-                'type' => 'unknown',
                 'value' => []
             ];
         }
 
-        $includeOther = !empty($questionTypes[$questionId]);
-
-        // Handle checkbox/radio/dropdown with "Other" option
-        if ($isOtherFlag && $includeOther && $text !== null && $text !== '') {
-            // Store Other value as a string
-            $savedData[$questionId]['type'] = 'checkbox'; // or match actual type
-            $savedData[$questionId]['is_other'] = true;
-            $savedData[$questionId]['otherText'] = $text;
-        } elseif ($choice !== null) {
-            // Normal choice selected
-            $savedData[$questionId]['type'] = 'checkbox';
-            $savedData[$questionId]['value'][] = $choice;
+        if ($choice !== null) {
+            // This is a choice-based answer (checkbox, radio, or dropdown)
+            $savedData[$questionId]['type'] = 'choice';
+            $savedData[$questionId]['value'][] = (string)$choice;
         } elseif ($text !== null && $text !== '') {
-            // Text input (non-grid)
+            // This is a text-based answer (short, paragraph, or date)
             $savedData[$questionId]['type'] = 'text';
             $savedData[$questionId]['value'] = $text;
         }
     }
 
     // Load grid answers
-    $stmt = $pdo->prepare("
+    $stmt = $conn->prepare("
         SELECT main_question_index, sub_question_index, choice_index 
         FROM grid_answers 
         WHERE response_index = ?
     ");
-    $stmt->execute([$response_index]);
+    $stmt->bind_param("i", $response_index);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    while ($row = $result->fetch_assoc()) {
         $questionId = $row['main_question_index'];
-        $subIndex = $row['sub_question_index'];
-        $choice = $row['choice_index'];
+        $subIndex = (string)$row['sub_question_index']; // cast to string
+        $choice = (string)$row['choice_index']; // cast to string
 
         if (!isset($savedData[$questionId])) {
             $savedData[$questionId] = [
@@ -137,7 +137,7 @@ try {
 
     echo json_encode($savedData);
 
-} catch (PDOException $e) {
+} catch (Exception $e) {
     http_response_code(500);
     echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
 }

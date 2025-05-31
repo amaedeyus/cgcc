@@ -1,4 +1,4 @@
-/* Inherit base styles */
+/* Main Grid Layout */
 .grid-body {
     display: grid;
     grid-template-columns: .3fr 1fr;
@@ -7,7 +7,8 @@
     grid-row-gap: 0px;
 }
 
-.page-left{
+/* Left Sidebar Styles */
+.page-left {
     grid-column: 1;
     display: flex;
     flex-direction: column;
@@ -22,7 +23,7 @@
     justify-content: flex-start;
 }
 
-.page-left::before{
+.page-left::before {
     content: "";
     background-image: url("../Media/lasalle.png");
     background-size: cover;
@@ -36,31 +37,8 @@
     z-index: -1;
 }
 
-
-.logout-wrapper {
-    display:flex;
-    justify-content: center;
-    margin-top: 300px;
-    padding-top: 1rem;
-}
-
-.logout-btn {
-    width: 100%;
-    background-color: #4fbd9c;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: background-color 0.3s;
-}
-
-.logout-btn:hover {
-    background-color: rgb(36, 154, 118);
-}
-
-.profile{
+/* Profile Section */
+.profile {
     display: flex;
     align-items: center;
     flex-direction: column;
@@ -69,7 +47,7 @@
     gap: 5px;
 }
 
-.profile-picture{
+.profile-picture {
     background-image: url("../Media/user.jpg");
     background-size: cover;
     background-position: center;
@@ -93,7 +71,8 @@
     color: rgb(36, 154, 118);
 }
 
-.sidebar-nav{
+/* Sidebar Navigation */
+.sidebar-nav {
     display: flex;
     flex-direction: column;
     margin-left: 25px;
@@ -101,55 +80,52 @@
     margin-top: 2rem;
 }
 
-.sidebar-nav a{
+.sidebar-nav a {
     text-decoration: none;
     color: rgb(2, 55, 2);
 }
 
-.sidebar-nav a.active{
+.sidebar-nav a.active {
     font-weight: bold;
     color: rgb(36, 154, 118); 
 }
 
-
-.sidebar-nav a:hover{
+.sidebar-nav a:hover {
     color: rgb(36, 154, 118);
     cursor: pointer;
 }
 
-.sidebar-nav .nav-link.active{
+.sidebar-nav .nav-link.active {
     font-weight: bold;
     color: rgb(36, 154, 118);
 }
 
-.autosave-status {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    padding: 10px 15px;
-    border-radius: 4px;
-    opacity: 0;
-    transition: opacity 0.3s;
-    z-index: 1000;
-}
-.autosave-status.show {
-    opacity: 1;
-}
-.autosave-status.saving {
-    background-color: #fff3cd;
-    color: #856404;
-}
-.autosave-status.saved {
-    background-color: #d4edda;
-    color: #155724;
-}
-.autosave-status.error {
-    background-color: #f8d7da;
-    color: #721c24;
+/* Logout Button */
+.logout-wrapper {
+    display:flex;
+    justify-content: center;
+    margin-top: 300px;
+    padding-top: 1rem;
 }
 
+.logout-btn {
+    width: 100%;
+    background-color: #4fbd9c;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s;
+}
 
-.page-right{
+.logout-btn:hover {
+    background-color: rgb(36, 154, 118);
+}
+
+/* Right Content Area */
+.page-right {
     padding: 70px;
     display:flex;
     flex-direction: column;
@@ -184,21 +160,20 @@
     color: rgb(41, 51, 41);
 }
 
+/* Form Cards Section */
 .cards-grid {
     display: flex;
-    flex-wrap: wrap; /* Allow wrapping */
-    gap: 40px; /* Spacing between cards */
+    flex-wrap: wrap;
+    gap: 40px;
     padding: 10px 0;
 }
 
-/* Form Cards Section */
 .form-cards-section {
     display: flex;
-    flex-direction: row;         /* Start with row layout */
-    flex-wrap: wrap;             /* Allow wrapping when needed */
-    gap: 1rem;                   /* Optional spacing between cards */
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
-
 
 .section-title {
     font-size: 2vh;
@@ -215,7 +190,7 @@
 }
 
 .form-card {
-    position: relative; /* Add this */
+    position: relative;
     background-color: rgb(237, 253, 243);
     border-radius: 15px;
     padding: 40px;
@@ -264,14 +239,27 @@
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-/* Create Form Button */
+.no-forms {
+    text-align: center;
+    padding: 30px;
+    color: rgb(2, 55, 2);
+    font-size: 1.8vh;
+    background-color: rgb(237, 253, 243);
+    border-radius: 15px;
+    box-shadow: 0 3px 10px rgba(2, 61, 2, 0.2);
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Buttons */
 .create-form-btn {
-    margin-top: auto; /* Pushes button to the bottom */
+    margin-top: auto;
     padding-bottom: 30px;
     display: flex;
     justify-content: center;
 }
-
 
 .button-class {
     border-radius: 20px;
@@ -294,7 +282,6 @@
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
-/* Floating Action Button - Rectangular Version */
 .floating-btn {
     position: fixed;
     bottom: 30px;
@@ -313,11 +300,11 @@
     cursor: pointer;
     transition: all 0.3s ease;
 }
+
 .floating-btn:hover {
     background-color: rgb(36, 154, 118);
     transform: scale(1.02);
 }
-
 
 .action-btns {
     display: flex;
@@ -333,22 +320,7 @@
     transition: all 0.3s;
 }
 
-/* No Forms Message */
-.no-forms {
-    text-align: center;
-    padding: 30px;
-    color: rgb(2, 55, 2);
-    font-size: 1.8vh;
-    background-color: rgb(237, 253, 243);
-    border-radius: 15px;
-    box-shadow: 0 3px 10px rgba(2, 61, 2, 0.2);
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Three-dot menu styles */
+/* Form Card Menu & Dropdown */
 .form-card-menu {
     position: absolute;
     top: 15px;
@@ -364,6 +336,7 @@
     align-items: center;
     justify-content: center;
     transition: all 0.3s;
+    z-index: 1002;
 }
 
 .form-card-menu:hover {
@@ -371,55 +344,95 @@
     color: rgb(36, 154, 118);
 }
 
-/* Modal styles */
-.modal {
+.dropdown-menu {
     display: none;
-    position: fixed;
-    z-index: 1001;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.4);
-}
-
-.modal-content {
-    background-color: rgb(243, 255, 243);
-    margin: 5% auto;
-    padding: 25px;
-    border-radius: 15px;
-    width: 50%;
-    max-width: 500px;
-    box-shadow: 0 5px 15px rgba(2, 61, 2, 0.3);
-    position: relative;
-}
-
-.close-modal {
     position: absolute;
-    top: 15px;
-    right: 25px;
-    color: rgb(2, 55, 2);
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
+    z-index: 1001;
+    right: 15px;
+    top: 40px;
 }
 
-.close-modal:hover {
-    color: rgb(36, 154, 118);
+.dropdown-content {
+    background-color: rgb(243, 255, 243);
+    border-radius: 15px;
+    padding: 15px;
+    width: 280px;
+    box-shadow: 0 5px 15px rgba(2, 61, 2, 0.3);
 }
 
-.modal-body {
-    margin-top: 20px;
+.dropdown-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 15px;
+    margin-top: 15px;
+    border-top: 1px solid #e0e0e0;
 }
 
-/* Form Settings Styles */
+/* Form Settings */
 .form-setting {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
     margin-bottom: 20px;
+}
+
+.status-header {
     display: flex;
     align-items: center;
-    gap: 15px;
+    justify-content: space-between;
+    width: 100%;
 }
 
+.status-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-label-text {
+    font-weight: bold;
+    color: rgb(2, 55, 2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.info-icon {
+    cursor: help;
+    color: rgb(79, 189, 156);
+    font-size: 14px;
+    width: 16px;
+    height: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s;
+}
+
+.info-icon:hover {
+    color: rgb(36, 154, 118);
+    background-color: rgba(79, 189, 156, 0.2);
+}
+
+.status-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.status-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.status-text {
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+/* Toggle Switch */
 .toggle-switch {
     position: relative;
     display: inline-block;
@@ -465,17 +478,22 @@ input:checked + .slider:before {
     transform: translateX(26px);
 }
 
-.status-text {
-    font-size: 14px;
-    font-weight: bold;
-}
-
-.active-status {
+.published-status {
     color: #4CAF50;
 }
 
-.inactive-status {
+.unpublished-status {
     color: #f44336;
+}
+
+
+/* Modal Footer */
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+    margin-top: 20px;
 }
 
 .save-btn {
@@ -507,14 +525,62 @@ input:checked + .slider:before {
     background-color: #d32f2f;
 }
 
-@media (max-width: 768px) {
-    .modal-content {
-        width: 80%;
-        margin: 15% auto;
-    }
+/* Autosave Status */
+.autosave-status {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px 15px;
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 1000;
 }
 
+.autosave-status.show {
+    opacity: 1;
+}
 
+.autosave-status.saving {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.autosave-status.saved {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.autosave-status.error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Add to manage-forms.css */
+.archived-status {
+    color: #ff9800;
+}
+
+.status-indicator {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.status-indicator.published-status {
+    background-color: #4CAF50;
+}
+
+.status-indicator.unpublished-status {
+    background-color: #f44336;
+}
+
+.status-indicator.archived-status {
+    background-color: #ff9800;
+}
 
 /* Responsive Styles */
 @media (max-width: 1024px) {
@@ -524,6 +590,11 @@ input:checked + .slider:before {
 }
 
 @media (max-width: 768px) {
+    .modal-content {
+        width: 80%;
+        margin: 15% auto;
+    }
+    
     .grid-body {
         flex-direction: column;
     }

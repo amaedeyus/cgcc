@@ -9,541 +9,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        .header {
-            background-color: #4fbc9c;
-            color: #e9f5e9;
-            margin-bottom: 20px;
-        }
+    <link rel="stylesheet" href="../css/formbuilder.css">
 
-        .header h1 {
-            font-weight: 700;
-        }
-
-        .instructions .card {
-            border-left: 5px solid #4fbc9c;
-        }
-
-        .instructions ol {
-            padding-left: 20px;
-        }
-
-        .instructions li {
-            margin-bottom: 8px;
-        }
-
-        /* Main background and typography - from form builder */
-        body {
-            background-color: #e8f5e9;
-            /* Light green background from form builder */
-            color: #212529;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            min-height: 100vh;
-            padding: 20px 0;
-        }
-
-        /* Form container - from form submission */
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: #ffffff;
-            /* White container */
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        /* For the form title/description card */
-        .form-title-card {
-            border-left: 5px solid #4fbc9c;
-        }
-
-        /* Section cards - from form builder with improvements */
-        .section-card {
-            background-color: #ffffff;
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 20px;
-            border: 1px solid #C8E6C9;
-            /* Green border from form builder */
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-            border-left: 5px solid #4fbc9c;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .section-card:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            transform: translateY(-2px);
-        }
-
-        #sections-container {
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-        }
-
-        /* Section header - from form builder */
-        .section-header-card {
-            margin-bottom: 1.5rem;
-            background-color: transparent;
-            border: none;
-        }
-
-        /* Section title input - from form builder */
-        .section-title-input {
-            border: none;
-            background: transparent;
-            font-size: 1.5rem;
-            font-weight: bold;
-            padding: 0;
-            width: 100%;
-            resize: none;
-            overflow: hidden;
-            min-height: 1.5em;
-            line-height: 1.5;
-            color: #1B5E20;
-        }
-
-        .section-title-input:focus {
-            outline: none;
-            box-shadow: none;
-            border-bottom: 2px solid #4fbc9c;
-        }
-
-        /* Section description input - from form builder */
-        .section-description-input {
-            border: none;
-            background: transparent;
-            padding: 0;
-            width: 100%;
-            resize: none;
-            overflow: hidden;
-            min-height: 1.5em;
-            line-height: 1.5;
-            color: #2E7D32;
-        }
-
-        .section-description-input:focus {
-            outline: none;
-            box-shadow: none;
-            border-bottom: 2px solid #81C784;
-        }
-
-        /* Question cards - combined styles */
-        .question-card {
-            background-color: #f8f9fa;
-            /* Light gray from form builder */
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 25px;
-            border: 1px solid #C8E6C9;
-            color: #2E7D32;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-        }
-
-        .question-card:hover {
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-            transform: translateY(-2px);
-            /* Added from form submission */
-        }
-
-        /* Drag handle - from form builder */
-        .drag-handle {
-            cursor: grab;
-            color: #4fbc9c;
-        }
-
-        .drag-handle:active {
-            cursor: grabbing;
-        }
-
-        .dragging {
-            opacity: 0.5;
-            background: #f8f9fa;
-        }
-
-        /* Question text - from form builder */
-        .question-text {
-            border: none;
-            background: transparent;
-            padding: 0;
-            width: 100%;
-            resize: none;
-            overflow: hidden;
-            min-height: 1.5em;
-            line-height: 1.5;
-            font-size: 1.2rem;
-            color: #1B5E20;
-        }
-
-        .question-text:focus {
-            outline: none;
-            box-shadow: none;
-            border-bottom: 2px solid #4fbc9c;
-        }
-
-        /* Form elements - combined styles */
-        .form-check {
-            padding: 8px 0;
-            padding-left: 2.2em;
-            margin-bottom: 10px;
-            background-color: #f8f9fa;
-            /* Light gray background for options */
-            border-radius: 4px;
-            transition: background-color 0.2s;
-        }
-
-        .form-check:hover {
-            background-color: #e8f5e9;
-            /* Light green on hover */
-        }
-
-        .form-check-input {
-            width: 1.3em;
-            height: 1.3em;
-            margin-top: 0.15em;
-            margin-left: -1.8em;
-            border: 1px solid #81C784;
-        }
-
-        .form-check-label {
-            font-size: 1rem;
-            padding-left: 0.5em;
-            vertical-align: middle;
-            cursor: pointer;
-            display: inline-block;
-            width: calc(100% - 2em);
-            color: #2E7D32;
-        }
-
-        .required-label::after {
-            content: " *";
-            color: #d32f2f;
-            font-weight: bold;
-        }
-
-        /* Option rows - from form builder */
-        .option-row {
-            margin-bottom: 0.5rem;
-        }
-
-        /* Section behavior - from form builder */
-        .section-behavior-container {
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid #C8E6C9;
-        }
-
-        /* Questions container - from form builder */
-        .questions-container {
-            margin-top: 1.5rem;
-        }
-
-        /* Auto-expand - from form builder */
-        .auto-expand {
-            resize: none;
-            overflow: hidden;
-        }
-
-        /* Display text - from form builder */
-        .display-text {
-            padding: 0.5rem;
-            background-color: #f8f9fa;
-            border-radius: 0.25rem;
-        }
-
-        /* Grid table - combined styles */
-        .grid-table {
-            width: 100%;
-            margin-bottom: 1rem;
-            border-collapse: collapse;
-        }
-
-        .grid-table th {
-            text-align: center;
-            background-color: #C8E6C9;
-            color: #1B5E20;
-            padding: 12px;
-            border: 1px solid #E8F5E9;
-            font-weight: 600;
-        }
-
-        .grid-table td {
-            padding: 12px;
-            border: 1px solid #e0e0e0;
-            background-color: #ffffff;
-            text-align: center;
-        }
-
-        .grid-table label {
-            display: block;
-            width: 100%;
-            height: 100%;
-            margin: -12px;
-            padding: 12px;
-        }
-
-        .grid-table label:hover {
-            background-color: rgba(0, 0, 0, 0.03);
-        }
-
-        /* Buttons - combined styles */
-        .btn-outline-primary {
-            border-color: #4fbc9c;
-            color: #4fbc9c;
-            padding: 8px 20px;
-            font-weight: 500;
-        }
-
-        .btn-outline-primary:hover {
-            background-color: #4fbc9c;
-            color: #ffffff;
-        }
-
-        .btn-outline-danger {
-            border-color: #d32f2f;
-            color: #d32f2f;
-            padding: 8px 20px;
-            font-weight: 500;
-        }
-
-        .btn-outline-danger:hover {
-            background-color: #d32f2f;
-            color: #ffffff;
-        }
-
-        .btn-primary {
-            background-color: #4fbc9c;
-            border-color: #4fbc9c;
-            padding: 8px 20px;
-            font-weight: 500;
-        }
-
-        .btn-primary:hover {
-            background-color: #3d8b40;
-            border-color: #3d8b40;
-        }
-
-        /* Focus states - combined */
-        .form-control:focus,
-        .form-select:focus,
-        textarea.form-control:focus {
-            border-color: #81C784;
-            box-shadow: 0 0 0 0.25rem rgba(76, 175, 80, 0.25);
-            outline: none;
-        }
-
-        .form-check-input:focus {
-            box-shadow: 0 0 0 0.25rem rgba(76, 175, 80, 0.25);
-        }
-
-        /* Section navigation - combined */
-        .section-navigation {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 25px;
-            padding-top: 20px;
-            border-top: 1px solid #e0e0e0;
-        }
-
-        /* Hidden - from form builder */
-        .hidden {
-            display: none !important;
-        }
-
-        /* Progress bar - from form submission */
-        .progress-container {
-            margin-bottom: 20px;
-        }
-
-        .progress {
-            background-color: #E9ECEF;
-            height: 10px;
-            border-radius: 5px;
-        }
-
-        .progress-bar {
-            background-color: #4fbc9c;
-        }
-
-        #progress-text {
-            margin-top: 6px;
-            display: block;
-            text-align: right;
-            font-size: 14px;
-            color: #6c757d;
-        }
-
-        /* Save feedback - combined */
-        .save-feedback {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
-            padding: 12px 20px;
-            background-color: #4fbc9c;
-            color: white;
-            border-radius: 6px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            animation: fadeInOut 3s ease-in-out;
-            opacity: 0;
-        }
-
-        @keyframes fadeInOut {
-            0% {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            20% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-
-            80% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-
-            100% {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-        }
-
-        /* Preview mode - from form builder */
-        .preview-mode .edit-only {
-            display: none;
-        }
-
-        .edit-mode .preview-only {
-            display: none;
-        }
-
-        .preview-question-text {
-            color: #1B5E20;
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-        }
-
-        .preview-required-text {
-            color: #d32f2f;
-        }
-
-        /* Toggle preview button - from form builder */
-        .toggle-preview {
-            transition: all 0.3s ease;
-        }
-
-
-        #form-title:focus {
-            border-bottom-color: #4fbc9c;
-            box-shadow: none;
-        }
-
-        /* Label Styling */
-        .form-title-card .form-label {
-            font-weight: 600;
-            color: #1B5E20;
-            margin-bottom: 8px;
-        }
-
-        /* Card Header Effect */
-        .form-title-card .card-body {
-            border-radius: 8px;
-            background-color: #f8f9fa;
-        }
-
-        .floating-buttons {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            z-index: 1050;
-        }
-
-        /* Floating Button Styles */
-        .floating-btn {
-            padding: 12px 20px;
-            border-radius: 50px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            white-space: nowrap;
-        }
-
-        .floating-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-        }
-
-        .floating-back-btn {
-            background-color: #6c757d;
-            border-color: #6c757d;
-            color: white;
-        }
-
-        .floating-back-btn:hover {
-            background-color: #5a6268;
-            border-color: #545b62;
-            color: white;
-        }
-
-        .floating-save-btn {
-            background-color: #4fbc9c;
-            border-color: #4fbc9c;
-            color: white;
-        }
-
-        .floating-save-btn:hover {
-            background-color: #3d8b40;
-            border-color: #3d8b40;
-            color: white;
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .floating-buttons {
-                bottom: 20px;
-                right: 20px;
-            }
-
-            .floating-btn {
-                padding: 10px 16px;
-                font-size: 14px;
-            }
-        }
-
-        /* Responsive adjustments - combined */
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-            }
-
-            .section-card {
-                padding: 15px;
-            }
-
-            .question-card {
-                padding: 15px;
-            }
-
-            .question-text {
-                font-size: 1.1rem;
-            }
-
-            .section-title-input {
-                font-size: 1.3rem;
-            }
-        }
-    </style>
 </head>
 
 <body>
@@ -656,9 +123,16 @@
                                                 </div>
                                             </div>
 
-                                            <div class="short-answer">
-                                                <input type="text" class="form-control" placeholder="Short answer text"
-                                                    disabled>
+                                            <div class="row mb-3 short-subtype-row">
+                                                <label class="col-sm-2 col-form-label">Subtype</label>
+                                                <div class="col-sm-10">
+                                                    <select class="form-select question-subtype">
+                                                        <option value="text" selected>Text</option>
+                                                        <option value="number">Number</option>
+                                                        <option value="phone">Phone</option>
+                                                        <option value="email">Email</option>
+                                                    </select>
+                                                </div>
                                             </div>
 
                                             <div class="options-container">
@@ -750,8 +224,28 @@
             let previewHtml = '';
 
             switch (questionType) {
+                // In the updatePreview function:
                 case 'short':
-                    previewHtml = '<input type="text" class="form-control" placeholder="Your answer">';
+                    const subtype = questionCard.find('.question-subtype').val() || 'text';
+                    let inputType = 'text';
+                    let placeholder = 'Your answer';
+                    
+                    switch(subtype) {
+                        case 'email':
+                            inputType = 'email';
+                            placeholder = 'example@domain.com';
+                            break;
+                        case 'phone':
+                            inputType = 'phone';
+                            placeholder = '09xxxxxxxxxx';
+                            break;
+                        case 'number':
+                            inputType = 'number';
+                            placeholder = '123';
+                            break;
+                    }
+                    
+                    previewHtml = `<input type="${inputType}" class="form-control" placeholder="${placeholder}">`;
                     break;
                 case 'paragraph':
                     previewHtml = '<textarea class="form-control" rows="3" placeholder="Your answer"></textarea>';
@@ -990,33 +484,33 @@
                     sections: []
                 };
 
-                $('.section-card').each(function () {
+                $('.section-card').each(function() {
                     const section = {
                         id: $(this).data('section-id'),
-                        title: $(this).find('.section-title-input').val(),
-                        description: $(this).find('.section-description-input').val(),
-                        behavior: $(this).find('.section-behavior').val(),
+                        title: $(this).find('.section-title').val(),
+                        description: $(this).find('.section-description').val(),
+                        behavior: $(this).find('.section-behavior').val() || 'same-page',
                         questions: []
                     };
 
-                    $(this).find('.question-card').each(function () {
+                    $(this).find('.question-card').each(function() {
                         const question = {
                             id: $(this).data('question-id'),
                             text: $(this).find('.question-text').val(),
                             type: $(this).find('.question-type').val(),
+                            subtype: $(this).find('.question-subtype').val() || 'text', // Ensure subtype is captured
                             required: $(this).find('.required-switch').is(':checked'),
-                            includeOther: $(this).find('.include-other').is(':checked'),
                             options: [],
                             rows: []
                         };
 
                         // Store options
-                        $(this).find('.option-input').each(function () {
+                        $(this).find('.option-input').each(function() {
                             question.options.push($(this).val());
                         });
 
                         // Store rows (for grid questions)
-                        $(this).find('.grid-row-input').each(function () {
+                        $(this).find('.grid-row-input').each(function() {
                             question.rows.push($(this).val());
                         });
 
@@ -1130,8 +624,17 @@
                                     </div>
                                 </div>
 
-                                <div class="short-answer ${questionData.type !== 'short' ? 'd-none' : ''}">
-                                    <input type="text" class="form-control" placeholder="Short answer text" disabled>
+                                <!-- Subtype selector (only for short answer) -->
+                                <div class="row mb-3 short-subtype-row ${questionData.type !== 'short' ? 'd-none' : ''}">
+                                    <label class="col-sm-2 col-form-label">Subtype</label>
+                                    <div class="col-sm-10">
+                                        <select class="form-select question-subtype">
+                                            <option value="text" ${questionData.subtype === 'text' ? 'selected' : ''}>Text</option>
+                                            <option value="number" ${questionData.subtype === 'number' ? 'selected' : ''}>Number</option>
+                                            <option value="phone" ${questionData.subtype === 'phone' ? 'selected' : ''}>Phone</option>
+                                            <option value="email" ${questionData.subtype === 'email' ? 'selected' : ''}>Email</option>
+                                        </select>
+                                    </div>
                                 </div>
 
                                 <div class="paragraph-answer ${questionData.type !== 'paragraph' ? 'd-none' : ''}">
@@ -1206,12 +709,6 @@
                                     <i class="fas fa-plus me-1"></i>
                                     Add Option
                                 </button>
-                                <div class="form-check mt-3">
-                                    <input class="form-check-input include-other" type="checkbox" id="include-other-${questionId}" ${questionData.includeOther ? 'checked' : ''}>
-                                    <label class="form-check-label" for="include-other-${questionId}">
-                                        Include "Other" option with text input
-                                    </label>
-                                </div>
                             `);
                         }
 
@@ -1293,9 +790,10 @@
                     saveState();
                 });
 
-                questionCard.find('.required-switch, .include-other').on('change', function () {
+                questionCard.find('.question-subtype').on('change', function() {
                     saveState();
                 });
+
 
                 questionCard.find('.toggle-preview').on('click', function (e) {
                     e.stopPropagation();
@@ -1397,8 +895,17 @@
                                             </div>
                                         </div>
 
-                                        <div class="short-answer">
+                                        <div class="short-answer d-none>
                                             <input type="text" class="form-control" placeholder="Short answer text" disabled>
+                                            <div class="subtype-selection mt-2">
+                                                <label class="form-label">Answer Format:</label>
+                                                <select class="form-select question-subtype">
+                                                    <option value="text" selected>Text</option>
+                                                    <option value="email" selected>Email</option>
+                                                    <option value="phone" selected>Phone Number</option>
+                                                    <option value="number" selected>Number</option>
+                                                </select>
+                                            </div>
                                         </div>
 
                                         <div class="paragraph-answer d-none">
@@ -1519,9 +1026,6 @@
                         saveState();
                     });
 
-                    questionCard.find('.required-switch, .include-other').on('change', function () {
-                        saveState();
-                    });
 
                     questionCard.find('.toggle-preview').on('click', function (e) {
                         e.stopPropagation();
@@ -1564,8 +1068,40 @@
 
             // Function to update question type UI
             function updateQuestionType(questionCard) {
+                const questionType = questionCard.find('.question-type').val();
+                const currentSubtype = questionCard.find('.question-subtype').val() || 'text';
 
-                const questionType = questionCard.find('.question-type').val(); // get type
+                // Toggle subtype visibility
+                if (questionType === 'short') {
+                    questionCard.find('.short-subtype-row').removeClass('d-none');
+
+                    // Always re-render the subtype dropdown to ensure it's there
+                    questionCard.find('.short-answer').html(`
+                        <input type="text" class="form-control" placeholder="Short answer text" disabled>
+                        <div class="subtype-selection mt-2">
+                            <label class="form-label">Answer Format:</label>
+                            <select class="form-select question-subtype">
+                                <option value="text" ${currentSubtype === 'text' ? 'selected' : ''}>Text</option>
+                                <option value="email" ${currentSubtype === 'email' ? 'selected' : ''}>Email</option>
+                                <option value="phone" ${currentSubtype === 'phone' ? 'selected' : ''}>Phone Number</option>
+                                <option value="number" ${currentSubtype === 'number' ? 'selected' : ''}>Number</option>
+                            </select>
+                        </div>
+                    `);
+
+                    
+
+                    // Reattach event listener for subtype change
+                    questionCard.find('.question-subtype').on('change', function () {
+                        saveState();
+                        if ($(this).closest('.preview-mode').hasClass('d-none')) {
+                            updatePreview($(this).closest('.question-card'));
+                        }
+                    });
+                } else {
+                    questionCard.find('.short-subtype-row').addClass('d-none');
+                }
+
                 const questionData = {
                     type: questionType,
                     options: [],
@@ -1577,10 +1113,22 @@
                 questionCard.find('.short-answer, .paragraph-answer, .options-container, .grid-rows-container, .display-text, .date-answer').empty();
 
                 switch (questionType) {
+                    // In the updateQuestionType function:
                     case 'short':
-                        questionCard.find('.short-answer').removeClass('d-none').html('<input type="text" class="form-control" placeholder="Short answer text">');
+                        questionCard.find('.short-answer').removeClass('d-none').html(`
+                            <input type="text" class="form-control" placeholder="Short answer text" disabled>
+                            <div class="subtype-selection mt-2">
+                                <label class="form-label">Answer Format:</label>
+                                <select class="form-select question-subtype">
+                                    <option value="text" ${questionData.subtype === 'text' ? 'selected' : ''}>Text (default)</option>
+                                    <option value="email" ${questionData.subtype === 'email' ? 'selected' : ''}>Email</option>
+                                    <option value="phone" ${questionData.subtype === 'phone' ? 'selected' : ''}>Phone Number</option>
+                                    <option value="number" ${questionData.subtype === 'number' ? 'selected' : ''}>Number</option>
+                                </select>
+                            </div>
+                        `);
                         break;
-                    case 'paragraph':
+                                        case 'paragraph':
                         questionCard.find('.paragraph-answer').removeClass('d-none').html('<textarea class="form-control" rows="3" placeholder="Longer paragraph text"></textarea>');
                         break;
                     case 'multiple':
@@ -1631,11 +1179,31 @@
                     questionCard.find('.required-switch').closest('.form-check').removeClass('d-none');
                 }
 
+                $(document).on('change', '.question-subtype', function() {
+                    const questionCard = $(this).closest('.question-card');
+                    if (questionCard.find('.toggle-preview').text() === 'Edit') {
+                        updatePreview(questionCard);
+                    }
+                    saveState();
+                });
+
                 // Show appropriate answer type and initialize if needed
                 switch (questionType) {
+                    // In the updateQuestionType function:
                     case 'short':
-                        questionCard.find('.short-answer').removeClass('d-none').html('<input type="text" class="form-control" placeholder="Short answer text" disabled>');
-                        break;
+                    questionCard.find('.short-answer').removeClass('d-none').html(`
+                        <input type="text" class="form-control" placeholder="Short answer text" disabled>
+                        <div class="subtype-selection mt-2">
+                            <label class="form-label">Answer Format:</label>
+                            <select class="form-select question-subtype">
+                                <option value="text" ${questionData.subtype === 'text' ? 'selected' : ''}>Text (default)</option>
+                                <option value="email" ${questionData.subtype === 'email' ? 'selected' : ''}>Email</option>
+                                <option value="phone" ${questionData.subtype === 'phone' ? 'selected' : ''}>Phone Number</option>
+                                <option value="number" ${questionData.subtype === 'number' ? 'selected' : ''}>Number</option>
+                            </select>
+                        </div>
+                    `);
+                    break;
                     case 'paragraph':
                         questionCard.find('.paragraph-answer').removeClass('d-none').html('<textarea class="form-control" rows="3" placeholder="Long answer text" disabled></textarea>');
                         break;
@@ -1664,12 +1232,6 @@
                                 <i class="fas fa-plus me-1"></i>
                                 Add Option
                             </button>
-                            <div class="form-check mt-3">
-                                <input class="form-check-input include-other" type="checkbox" id="include-other-${questionCard.data('question-id')}">
-                                <label class="form-check-label" for="include-other-${questionCard.data('question-id')}">
-                                    Include "Other" option with text input
-                                </label>
-                            </div>
                         `);
                         break;
                     case 'grid':
@@ -1875,6 +1437,15 @@
 
                                     <div class="short-answer ${questionData.type !== 'short' ? 'd-none' : ''}">
                                         <input type="text" class="form-control" placeholder="Short answer text" disabled>
+                                        <div class="subtype-selection mt-2">
+                                            <label class="form-label">Answer Format:</label>
+                                            <select class="form-select question-subtype">
+                                                <option value="text" ${questionData.subtype === 'text' || !questionData.subtype ? 'selected' : ''}>Text</option>
+                                                <option value="email" ${questionData.subtype === 'email' ? 'selected' : ''}>Email</option>
+                                                <option value="phone" ${questionData.subtype === 'phone' ? 'selected' : ''}>Phone Number</option>
+                                                <option value="number" ${questionData.subtype === 'number' ? 'selected' : ''}>Number</option>
+                                            </select>
+                                        </div>
                                     </div>
 
                                     <div class="paragraph-answer ${questionData.type !== 'paragraph' ? 'd-none' : ''}">
@@ -1945,12 +1516,6 @@
                             <i class="fas fa-plus me-1"></i>
                             Add Option
                         </button>
-                        <div class="form-check mt-3">
-                            <input class="form-check-input include-other" type="checkbox" id="include-other-${questionId}" ${questionData.includeOther ? 'checked' : ''}>
-                            <label class="form-check-label" for="include-other-${questionId}">
-                                Include "Other" option with text input
-                            </label>
-                        </div>
                     `);
                 }
 
@@ -2007,6 +1572,7 @@
                     description: $('#form-description').val().trim(),
                     sections: []
                 };
+                
 
                 $('.section-card').each(function () {
                     const $section = $(this);
@@ -2023,8 +1589,8 @@
                         const questionData = {
                             question: $question.find('.question-text').val().trim(),
                             type: type,
+                            subtype: type === 'short' ? $question.find('.question-subtype').val() : null, // Only include subtype for short answers
                             required: $question.find('.required-switch').is(':checked'),
-                            includeOther: $question.find('.include-other').is(':checked'),
                             options: [],
                             rows: []
                         };
@@ -2062,7 +1628,9 @@
                         },
                         body: JSON.stringify(formData),
                         credentials: 'include'
+                        
                     });
+                    console.log("Sending form data to backend:", JSON.parse(JSON.stringify(formData)));
 
                     if (!response.ok) {
                         throw new Error(`Failed to ${method === 'POST' ? 'create' : 'update'} form`);
@@ -2112,8 +1680,9 @@
             if (formId) {
                 loadForm(formId);
             } else {
-                // Save initial state for new forms
-                saveState();
+                history.push(getFormState());
+                historyIndex = 0;
+                updateUndoRedoButtons();
             }
 
             // Add new section
@@ -2200,10 +1769,19 @@
                 }
             });
 
+            $('body').on('click', '.add-question', function () {
+                console.log('Add Question clicked');
+                const sectionCard = $(this).closest('.section-card');
+                const questionsContainer = sectionCard.find('.questions-container');
+                addNewQuestion(questionsContainer);
+            });
+
+
             // Add question to section
             $(document).on('click', '.add-question', function () {
                 const section = $(this).closest('.section-card');
                 const sectionId = section.data('section-id');
+                const questionsContainer = section.find('.questions-container'); // ✅ Define container
                 const questionId = nextQuestionId++;
 
                 const questionHtml = `
@@ -2247,10 +1825,18 @@
                                             </div>
                                         </div>
 
-                                        <div class="short-answer">
+                                        <div class="short-answer d-none>
                                             <input type="text" class="form-control" placeholder="Short answer text" disabled>
+                                            <div class="subtype-selection mt-2">
+                                                <label class="form-label">Answer Format:</label>
+                                                <select class="form-select question-subtype">
+                                                    <option value="text" selected>Text</option>
+                                                    <option value="email" selected>Email</option>
+                                                    <option value="phone" selected>Phone Number</option>
+                                                    <option value="number" selected>Number</option>
+                                                </select>
+                                            </div>
                                         </div>
-
                                         <div class="paragraph-answer d-none">
                                             <textarea class="form-control" placeholder="Long answer text" disabled rows="3"></textarea>
                                         </div>
@@ -2422,11 +2008,6 @@
                     return;
                 }
                 $(this).closest('.grid-row').remove();
-                saveState();
-            });
-
-            // Include other checkbox change
-            $(document).on('change', '.include-other', function () {
                 saveState();
             });
 

@@ -37,8 +37,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
             if ($result->num_rows > 0) {
                 $form = $result->fetch_assoc();
-                // Convert is_active to boolean
-                $form['is_active'] = (bool)$form['is_active'];
+                // Return raw enum value
+                $form['is_active'] = $form['is_active'];
                 echo json_encode($form);
             } else {
                 http_response_code(404);
@@ -53,8 +53,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             if ($result) {
                 $forms = [];
                 while ($row = $result->fetch_assoc()) {
-                    // Convert is_active to boolean
-                    $row['is_active'] = (bool)$row['is_active'];
+                    // Return raw enum value
+                    $row['is_active'] = $row['is_active'];
                     $forms[] = $row;
                 }
                 echo json_encode($forms);
@@ -74,7 +74,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 // POST Request: Update form status
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
-        $data = json_decode(file_get_contents('php://input'), true);
+        // Get raw POST data
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new Exception("Invalid JSON data");
+        }
 
         if (!isset($data['form_id']) || !isset($data['is_active'])) {
             http_response_code(400);
@@ -83,19 +89,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $formId = intval($data['form_id']);
-        $isActive = $data['is_active'] ? 1 : 0;
+        $isActive = $data['is_active'];
+
+        // Validate enum value
+        if (!in_array($isActive, ['0', '1', '-1'], true)) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Invalid status value. Must be one of: 0, 1, -1']);
+            exit;
+        }
 
         $stmt = $conn->prepare("UPDATE forms SET is_active = ? WHERE form_index = ?");
         if (!$stmt) {
             throw new Exception("Prepare failed: " . $conn->error);
         }
 
-        $stmt->bind_param("ii", $isActive, $formId);
+        $stmt->bind_param("si", $isActive, $formId);
         if ($stmt->execute()) {
             if ($stmt->affected_rows > 0) {
-                echo json_encode(['success' => true, 'message' => 'Status updated successfully']);
+                echo json_encode([
+                    'success' => true, 
+                    'message' => 'Status updated successfully',
+                    'new_status' => $isActive
+                ]);
             } else {
-                echo json_encode(['success' => false, 'message' => 'No changes made']);
+                // No rows affected - form might not exist or no change
+                $checkStmt = $conn->prepare("SELECT form_index FROM forms WHERE form_index = ?");
+                $checkStmt->bind_param("i", $formId);
+                $checkStmt->execute();
+                $checkStmt->store_result();
+                
+                if ($checkStmt->num_rows === 0) {
+                    http_response_code(404);
+                    echo json_encode(['error' => 'Form not found']);
+                } else {
+                    echo json_encode([
+                        'success' => true, 
+                        'message' => 'No changes made (status already set)',
+                        'new_status' => $isActive
+                    ]);
+                }
+                $checkStmt->close();
             }
         } else {
             throw new Exception('Execution failed: ' . $stmt->error);

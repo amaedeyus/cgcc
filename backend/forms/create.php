@@ -58,8 +58,7 @@ try {
         $sectionInsert = $conn->prepare("INSERT INTO form_sections (form_index, section_title, section_description, section_order, behavior) VALUES (?, ?, ?, ?, ?)");
         if (!$sectionInsert) throw new Exception("Prepare form_sections failed: " . $conn->error);
 
-        $questionInsert = $conn->prepare("INSERT INTO main_questions (form_index, form_section_index, main_question_text, type_index, is_required, include_other) VALUES (?, ?, ?, (SELECT type_index FROM question_types WHERE type_name = ?), ?, ?)");
-        if (!$questionInsert) throw new Exception("Prepare main_questions failed: " . $conn->error);
+        $questionInsert = $conn->prepare("INSERT INTO main_questions (form_index, form_section_index, main_question_text, type_index, subtype, is_required) VALUES (?, ?, ?, (SELECT type_index FROM question_types WHERE type_name = ?), ?, ?)");
 
         $choiceInsert = $conn->prepare("INSERT INTO choices (main_question_index, choice_text) VALUES (?, ?)");
         if (!$choiceInsert) throw new Exception("Prepare choices failed: " . $conn->error);
@@ -84,20 +83,19 @@ try {
                 foreach ($section['questions'] as $question) {
                     $type = $question['type'] ?? 'short';
                     $required = $question['required'] ? 1 : 0;
-                    $includeOther = isset($question['includeOther']) ? (int)$question['includeOther'] : 0;
 
-                    $questionText = $question['question'] ?? '';
-                    $questionType = $type;
+                    // Add this after $required:
+                    $subtype = ($type === 'short') ? ($question['subtype'] ?? 'text') : null;
 
-                    // Insert question
+                    // Update the bind_param call:
                     $questionInsert->bind_param(
-                        "iissii",
+                        "iissis", // Changed to 6 parameters
                         $formId,
                         $sectionIndex,
-                        $questionText,
-                        $questionType,
-                        $required,
-                        $includeOther
+                        $question['question'],  // Use actual question text
+                        $type,                   // Use question type
+                        $subtype,
+                        $required
                     );
 
                     if (!$questionInsert->execute()) {
@@ -141,33 +139,33 @@ try {
     try {
         // Fetch complete form structure with proper IDs
         $stmt = $conn->prepare("
-            SELECT 
-                f.form_index,
-                f.form_name,
-                f.description,
-                fs.form_section_index,
-                fs.section_title,
-                fs.section_description,
-                fs.section_order,
-                IFNULL(fs.behavior, 'next-page') as behavior,
-                q.main_question_index,
-                q.main_question_text,
-                qt.type_name AS type_name,
-                q.is_required,
-                IFNULL(q.include_other, 0) AS include_other,
-                c.choice_index,
-                c.choice_text,
-                sq.sub_question_index,
-                sq.sub_question_text
-            FROM forms f
-            LEFT JOIN form_sections fs ON f.form_index = fs.form_index
-            LEFT JOIN main_questions q ON fs.form_section_index = q.form_section_index
-            LEFT JOIN question_types qt ON q.type_index = qt.type_index
-            LEFT JOIN choices c ON q.main_question_index = c.main_question_index
-            LEFT JOIN sub_questions sq ON q.main_question_index = sq.main_question_index
-            WHERE f.form_index = ?
-            ORDER BY fs.section_order, q.main_question_index, c.choice_index, sq.sub_question_index
-        ");
+        SELECT 
+            f.form_index,
+            f.form_name,
+            f.description,
+            fs.form_section_index,
+            fs.section_title,
+            fs.section_description,
+            fs.section_order,
+            IFNULL(fs.behavior, 'next-page') as behavior,
+            q.main_question_index,
+            q.main_question_text,
+            qt.type_name AS type_name,
+            q.subtype, -- Add this line
+            q.is_required,
+            c.choice_index,
+            c.choice_text,
+            sq.sub_question_index,
+            sq.sub_question_text
+        FROM forms f
+        LEFT JOIN form_sections fs ON f.form_index = fs.form_index
+        LEFT JOIN main_questions q ON fs.form_section_index = q.form_section_index
+        LEFT JOIN question_types qt ON q.type_index = qt.type_index
+        LEFT JOIN choices c ON q.main_question_index = c.main_question_index
+        LEFT JOIN sub_questions sq ON q.main_question_index = sq.main_question_index
+        WHERE f.form_index = ?
+        ORDER BY fs.section_order, q.main_question_index, c.choice_index, sq.sub_question_index
+    ");
         $stmt->bind_param("i", $formId);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -202,8 +200,8 @@ try {
                     'main_question_index' => $row['main_question_index'],
                     'main_question_text' => $row['main_question_text'],
                     'type' => $row['type_name'],
+                    'subtype' => $row['subtype'],
                     'is_required' => (bool)$row['is_required'],
-                    'include_other' => (bool)$row['include_other'],
                     'options' => [],
                     'rows' => [],
                     'form_section_index' => $row['form_section_index']
