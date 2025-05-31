@@ -43,11 +43,12 @@ try {
     // 1. Insert the form
     $formName = $data['form_name'];
     $description = $data['description'] ?? '';
+    $academicYear = $data['academic_year'] ?? '';
     
-    $stmt = $conn->prepare("INSERT INTO forms (form_name, description) VALUES (?, ?)");
+    $stmt = $conn->prepare("INSERT INTO forms (form_name, description, academic_year) VALUES (?, ?, ?)");
     if (!$stmt) throw new Exception("Insert form prepare failed: " . $conn->error);
 
-    $stmt->bind_param("ss", $formName, $description);
+    $stmt->bind_param("sss", $formName, $description, $academicYear);
     if (!$stmt->execute()) throw new Exception("Insert form execute failed: " . $stmt->error);
 
     $formId = $conn->insert_id;
@@ -136,36 +137,38 @@ try {
     }
 
     // 3. Create snapshot with proper format
+    // In create.php, modify the snapshot creation section:
+
     try {
         // Fetch complete form structure with proper IDs
         $stmt = $conn->prepare("
-        SELECT 
-            f.form_index,
-            f.form_name,
-            f.description,
-            fs.form_section_index,
-            fs.section_title,
-            fs.section_description,
-            fs.section_order,
-            IFNULL(fs.behavior, 'next-page') as behavior,
-            q.main_question_index,
-            q.main_question_text,
-            qt.type_name AS type_name,
-            q.subtype, -- Add this line
-            q.is_required,
-            c.choice_index,
-            c.choice_text,
-            sq.sub_question_index,
-            sq.sub_question_text
-        FROM forms f
-        LEFT JOIN form_sections fs ON f.form_index = fs.form_index
-        LEFT JOIN main_questions q ON fs.form_section_index = q.form_section_index
-        LEFT JOIN question_types qt ON q.type_index = qt.type_index
-        LEFT JOIN choices c ON q.main_question_index = c.main_question_index
-        LEFT JOIN sub_questions sq ON q.main_question_index = sq.main_question_index
-        WHERE f.form_index = ?
-        ORDER BY fs.section_order, q.main_question_index, c.choice_index, sq.sub_question_index
-    ");
+            SELECT 
+                f.form_index,
+                f.form_name,
+                f.description,
+                fs.form_section_index,
+                fs.section_title,
+                fs.section_description,
+                fs.section_order,
+                IFNULL(fs.behavior, 'next-page') as behavior,
+                q.main_question_index,
+                q.main_question_text,
+                qt.type_name AS type_name,
+                q.subtype,
+                q.is_required,
+                c.choice_index,
+                c.choice_text,
+                sq.sub_question_index,
+                sq.sub_question_text
+            FROM forms f
+            LEFT JOIN form_sections fs ON f.form_index = fs.form_index
+            LEFT JOIN main_questions q ON fs.form_section_index = q.form_section_index
+            LEFT JOIN question_types qt ON q.type_index = qt.type_index
+            LEFT JOIN choices c ON q.main_question_index = c.main_question_index
+            LEFT JOIN sub_questions sq ON q.main_question_index = sq.main_question_index
+            WHERE f.form_index = ?
+            ORDER BY fs.section_order, q.main_question_index, c.choice_index, sq.sub_question_index
+        ");
         $stmt->bind_param("i", $formId);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -174,6 +177,7 @@ try {
             'form_index' => $formId,
             'form_name' => $formName,
             'description' => $description,
+            'academic_year' => $academicYear, // Add this line
             'sections' => [],
             'questions' => [],
             'timestamp' => date('c')
@@ -181,59 +185,69 @@ try {
 
         $sectionMap = [];
         $questionMap = [];
+        $uniqueChoices = []; // Track unique choices per question
 
         while ($row = $result->fetch_assoc()) {
             // Build sections structure
             if (!isset($sectionMap[$row['form_section_index']])) {
                 $sectionMap[$row['form_section_index']] = [
-                    'form_section_index' => $row['form_section_index'],
-                    'section_title' => $row['section_title'],
-                    'section_description' => $row['section_description'],
-                    'section_order' => $row['section_order'],
-                    'behavior' => $row['behavior']
+                    'id' => (string)$row['form_section_index'],
+                    'title' => $row['section_title'],
+                    'description' => $row['section_description'] ?? '',
+                    'order' => $row['section_order'],
+                    'behavior' => $row['behavior'],
+                    'questions' => []
                 ];
             }
 
             // Build questions structure
             if ($row['main_question_index'] && !isset($questionMap[$row['main_question_index']])) {
                 $questionMap[$row['main_question_index']] = [
-                    'main_question_index' => $row['main_question_index'],
-                    'main_question_text' => $row['main_question_text'],
+                    'id' => (string)$row['main_question_index'],
+                    'question' => $row['main_question_text'],
                     'type' => $row['type_name'],
                     'subtype' => $row['subtype'],
-                    'is_required' => (bool)$row['is_required'],
+                    'required' => (bool)$row['is_required'],
                     'options' => [],
                     'rows' => [],
                     'form_section_index' => $row['form_section_index']
                 ];
+                $uniqueChoices[$row['main_question_index']] = []; // Initialize for this question
             }
 
-            // Add choices if they exist
+            // Add unique choices if they exist
             if ($row['choice_index'] && $row['choice_text']) {
-                $questionMap[$row['main_question_index']]['options'][] = [
-                    'choice_index' => $row['choice_index'],
-                    'choice_text' => $row['choice_text']
-                ];
+                $choiceKey = $row['choice_index'].'_'.$row['choice_text'];
+                if (!in_array($choiceKey, $uniqueChoices[$row['main_question_index']])) {
+                    $questionMap[$row['main_question_index']]['options'][] = [
+                        'choice_index' => $row['choice_index'],
+                        'choice_text' => $row['choice_text']
+                    ];
+                    $uniqueChoices[$row['main_question_index']][] = $choiceKey;
+                }
             }
 
-            // Add subquestions if they exist
+            // Add subquestions with their indexes if they exist
             if ($row['sub_question_index'] && $row['sub_question_text']) {
-                $questionMap[$row['main_question_index']]['rows'][] = $row['sub_question_text'];
+                $questionMap[$row['main_question_index']]['rows'][] = [
+                    'sub_question_index' => $row['sub_question_index'],
+                    'sub_question_text' => $row['sub_question_text']
+                ];
             }
         }
 
         // Organize questions by section
-        foreach ($questionMap as $question) {
+        foreach ($questionMap as $questionId => $question) {
             $formData['questions'][] = $question;
-            if (!isset($sectionMap[$question['form_section_index']]['questions'])) {
-                $sectionMap[$question['form_section_index']]['questions'] = [];
+            if (isset($sectionMap[$question['form_section_index']])) {
+                $sectionMap[$question['form_section_index']]['questions'][] = $questionId;
             }
-            $sectionMap[$question['form_section_index']]['questions'][] = $question['main_question_index'];
         }
 
+        // Convert section map to indexed array
         $formData['sections'] = array_values($sectionMap);
 
-        $snapshotData = json_encode($formData, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        $snapshotData = json_encode($formData, JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
         if ($snapshotData === false) {
             throw new Exception("Failed to encode snapshot: " . json_last_error_msg());
         }

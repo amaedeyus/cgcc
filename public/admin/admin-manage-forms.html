@@ -25,12 +25,10 @@
       <div class="profile">
         <div class="profile-picture"></div>
         <span id="user-name"></span>
-        <div class="edit">
-          <a href="#">✎Edit Profile</a>
-        </div>
+
       </div>
       <div class="sidebar-nav">
-        <a href="admin-manage-forms.html" class="nav-link">Manage Forms</a>
+        <a href="admin-manage-forms.html" class="nav-link active">Manage Forms</a>
         <a href="admin-manage-counselor.html" class="nav-link">Manage Counselors</a>
         <a href="admin-manage-program.html" class="nav-link">Manage Programs</a>
         <a href="admin-archived-forms.html" class="nav-link">Archived Forms</a>
@@ -92,6 +90,19 @@
           </label>
           <span id="dropdownRequiredText" class="status-text"></span>
         </div>
+      </div>
+      <!-- Add this inside the dropdown-content div, after the required toggle section -->
+      <div class="form-setting">
+          <div class="status-label">
+              <label>Academic Year</label>
+              <span class="info-icon" title="The academic year this form applies to (format: YYYY-YYYY)">ⓘ</span>
+          </div>
+          <div class="status-controls">
+              <input type="text" id="dropdownAcademicYear" 
+                    placeholder="YYYY-YYYY" 
+                    pattern="[0-9]{4}-[0-9]{4}"
+                    title="Enter academic year in YYYY-YYYY format">
+          </div>
       </div>
       <div class="dropdown-footer">
         <button id="dropdownSaveBtn" class="save-btn">Save Changes</button>
@@ -173,8 +184,9 @@
             <div class="${statusClass}"></div>
             <h3>${form.form_name}</h3>
             <p class="form-description">${truncatedDescription.replace(/\n/g, " ")}</p>
+            <p class="academic-year">Academic Year: ${form.academic_year || 'Not set'}</p>
             <a href="http://localhost/cgcc/public/admin/formbuilder.html?id=${form.form_index}">Open Form</a>
-          `;
+        `;
 
           container.appendChild(card);
         });
@@ -227,31 +239,46 @@
       const statusText = document.getElementById("dropdownStatusText");
       const requiredToggle = document.getElementById("dropdownRequiredToggle");
       const requiredText = document.getElementById("dropdownRequiredText");
+      const academicYearInput = document.getElementById("dropdownAcademicYear");
       const archiveBtn = document.getElementById("dropdownArchiveBtn");
 
-      // Update status UI
-      const statusInfo = statusMap[status] || statusMap['0'];
-      statusText.textContent = statusInfo.text;
-      statusText.className = `status-text ${statusInfo.class}`;
-      statusToggle.checked = status === '1';
-      statusToggle.disabled = status === '-1';
+      // First fetch the full form data to get academic year
+      fetch(`http://localhost/cgcc/backend/forms/form.php?form_index=${formId}`, {
+          credentials: "include"
+      })
+      .then(response => response.json())
+      .then(form => {
+          // Update status UI
+          const statusInfo = statusMap[status] || statusMap['0'];
+          statusText.textContent = statusInfo.text;
+          statusText.className = `status-text ${statusInfo.class}`;
+          statusToggle.checked = status === '1';
+          statusToggle.disabled = status === '-1';
 
-      // Update required UI
-      const requiredInfo = requiredMap[isRequired] || requiredMap['0'];
-      requiredText.textContent = requiredInfo.text;
-      requiredText.className = `status-text ${requiredInfo.class}`;
-      requiredToggle.checked = isRequired === '1';
-      requiredToggle.disabled = status === '-1';
+          // Update required UI
+          const requiredInfo = requiredMap[isRequired] || requiredMap['0'];
+          requiredText.textContent = requiredInfo.text;
+          requiredText.className = `status-text ${requiredInfo.class}`;
+          requiredToggle.checked = isRequired === '1';
+          requiredToggle.disabled = status === '-1';
 
-      // Update archive button text and visibility
-      if (status === '-1') {
-        archiveBtn.textContent = "Unarchive";
-        archiveBtn.style.backgroundColor = "#4fbd9c";
-      } else {
-        archiveBtn.textContent = "Archive";
-        archiveBtn.style.backgroundColor = "#f44336";
-      }
-    }
+          // Update academic year
+          academicYearInput.value = form.academic_year || '';
+          academicYearInput.disabled = status === '-1';
+
+          // Update archive button text and visibility
+          if (status === '-1') {
+              archiveBtn.textContent = "Unarchive";
+              archiveBtn.style.backgroundColor = "#4fbd9c";
+          } else {
+              archiveBtn.textContent = "Archive";
+              archiveBtn.style.backgroundColor = "#f44336";
+          }
+      })
+      .catch(error => {
+          console.error("Error fetching form details:", error);
+      });
+  }
 
     // Event listeners
     document.addEventListener("DOMContentLoaded", () => {
@@ -293,45 +320,53 @@
 
         // Save button handler
         document.getElementById("dropdownSaveBtn").addEventListener("click", async function () {
-            try {
-                const isActive = document.getElementById("dropdownStatusToggle").checked ? '1' : '0';
-                const isRequired = document.getElementById("dropdownRequiredToggle").checked ? '1' : '0';
+          try {
+              const isActive = document.getElementById("dropdownStatusToggle").checked ? '1' : '0';
+              const isRequired = document.getElementById("dropdownRequiredToggle").checked ? '1' : '0';
+              const academicYear = document.getElementById("dropdownAcademicYear").value;
 
-                const response = await fetch(
-                    "http://localhost/cgcc/backend/forms/form.php",
-                    {
-                        method: "POST",
-                        credentials: "include",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-Requested-With": "XMLHttpRequest"
-                        },
-                        body: JSON.stringify({
-                            form_id: currentFormId,
-                            is_active: isActive,
-                            is_required: isRequired
-                        }),
-                    }
-                );
+              // Validate academic year format
+              if (academicYear && !/^[0-9]{4}-[0-9]{4}$/.test(academicYear)) {
+                  showStatusMessage("Academic year must be in YYYY-YYYY format", 'error');
+                  return;
+              }
 
-                const result = await response.json();
+              const response = await fetch(
+                  "http://localhost/cgcc/backend/forms/form.php",
+                  {
+                      method: "POST",
+                      credentials: "include",
+                      headers: {
+                          "Content-Type": "application/json",
+                          "X-Requested-With": "XMLHttpRequest"
+                      },
+                      body: JSON.stringify({
+                          form_id: currentFormId,
+                          is_active: isActive,
+                          is_required: isRequired,
+                          academic_year: academicYear
+                      }),
+                  }
+              );
 
-                if (!response.ok) {
-                    throw new Error(result.message || "Failed to update form settings");
-                }
+              const result = await response.json();
 
-                if (result.success) {
-                    closeSettingsMenu();
-                    loadForms();
-                    showStatusMessage(`Form settings updated successfully`, 'success');
-                } else {
-                    throw new Error(result.message || "Update failed");
-                }
-            } catch (error) {
-                console.error("Error:", error);
-                showStatusMessage("Failed to save settings: " + error.message, 'error');
-            }
-        });
+              if (!response.ok) {
+                  throw new Error(result.message || "Failed to update form settings");
+              }
+
+              if (result.success) {
+                  closeSettingsMenu();
+                  loadForms();
+                  showStatusMessage(`Form settings updated successfully`, 'success');
+              } else {
+                  throw new Error(result.message || "Update failed");
+              }
+          } catch (error) {
+              console.error("Error:", error);
+              showStatusMessage("Failed to save settings: " + error.message, 'error');
+          }
+      });
 
         // Archive button handler
         document.getElementById("dropdownArchiveBtn").addEventListener("click", async function () {

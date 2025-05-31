@@ -6,68 +6,6 @@
     <title>Student Form Response</title>
     <link rel="stylesheet" href="css/student-form.css">
 </head>
-<style>
-    .progress-container {
-        position: relative;
-        width: 100%;
-        background-color: #e8f5e9; /* Match body background */
-        border-radius: 6px;
-        margin: 30px 0;
-        height: 12px;
-        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-
-    .progress-bar {
-        height: 100%;
-        border-radius: 6px;
-        background-color: #4fbc9c; /* Primary green from buttons and headers */
-        width: 0%;
-        transition: width 0.3s ease;
-    }
-
-    .progress-text {
-        position: absolute;
-        bottom: -25px;
-        right: 0;
-        font-size: 0.875rem; /* ~14px */
-        font-weight: 600;
-        color: #2E7D32; /* Dark green from section titles and labels */
-        white-space: nowrap;
-    }
-    
-    .error-message {
-        color: #e74c3c;
-        font-size: 0.875rem;
-        margin-top: 5px;
-        display: none;
-    }
-    
-    .error-message.show {
-        display: block;
-    }
-    
-    .section-error {
-        color: #e74c3c;
-        font-weight: normal;
-        margin-top: 15px;
-        display: none;
-    }
-    
-    .section-error.show {
-        display: block;
-    }
-    
-    /* Subtype specific styles */
-    input[type="number"] {
-        -moz-appearance: textfield;
-    }
-    
-    input[type="number"]::-webkit-outer-spin-button,
-    input[type="number"]::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
-</style>
 <body>
     <div class="form-container">
         <div class="form-header">
@@ -714,7 +652,7 @@
             
             // Add pattern for phone numbers if needed
             if (question.subtype === 'phone') {
-                input.pattern = '[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}';
+                input.pattern = '09[0-9]{9}';
                 input.title = 'Please enter a valid phone number';
             }
             
@@ -765,7 +703,6 @@
             container.appendChild(input);
         }
 
-        // Create grid (matrix) input
         function createGridInput(container, question) {
             const gridDiv = document.createElement('div');
             gridDiv.className = 'grid-question';
@@ -780,7 +717,7 @@
 
             question.options.forEach(option => {
                 const th = document.createElement('th');
-                th.textContent = option.choice_text; // Display the choice text
+                th.textContent = option.choice_text;
                 headerRow.appendChild(th);
             });
 
@@ -789,6 +726,7 @@
             // Create rows with radio buttons
             question.rows.forEach((row, rowIndex) => {
                 const tr = document.createElement('tr');
+                tr.dataset.subQuestionIndex = row.sub_question_index; // Store actual sub_question_index
 
                 const rowHeader = document.createElement('td');
                 rowHeader.textContent = row.sub_question_text;
@@ -796,15 +734,35 @@
 
                 question.options.forEach((option, optionIndex) => {
                     const td = document.createElement('td');
+                    td.className = 'grid-cell';
+                    td.style.cursor = 'pointer';
 
+                    // Create radio button
                     const radio = document.createElement('input');
                     radio.type = 'radio';
-                    radio.name = `${question.id}_${rowIndex}`;
-                    radio.value = option.choice_index; // Store the choice ID
+                    radio.name = `${question.id}_${rowIndex}`; // Still use rowIndex for name
+                    radio.value = option.choice_index;
                     radio.dataset.questionId = question.id;
                     radio.dataset.rowIndex = rowIndex;
+                    radio.dataset.subQuestionIndex = row.sub_question_index; // Store actual sub_question_index
+                    radio.style.display = 'none';
+
+                    // Create visual indicator
+                    const radioVisual = document.createElement('div');
+                    radioVisual.className = 'radio-visual';
+
+                    // Add click handler
+                    td.addEventListener('click', (e) => {
+                        if (e.target !== radio) {
+                            radio.checked = true;
+                            updateRadioVisuals(tr);
+                            const event = new Event('change');
+                            radio.dispatchEvent(event);
+                        }
+                    });
 
                     td.appendChild(radio);
+                    td.appendChild(radioVisual);
                     tr.appendChild(td);
                 });
 
@@ -813,6 +771,71 @@
 
             gridDiv.appendChild(table);
             container.appendChild(gridDiv);
+
+            // Add CSS for the grid (same as before)
+            const style = document.createElement('style');
+            style.textContent = `
+                .grid-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin: 15px 0;
+                }
+                .grid-table th, .grid-table td {
+                    padding: 12px;
+                    text-align: center;
+                    border: 1px solid #e0e0e0;
+                }
+                .grid-table th {
+                    background-color: #f5f5f5;
+                    font-weight: 600;
+                }
+                .grid-cell {
+                    position: relative;
+                    transition: background-color 0.2s;
+                }
+                .grid-cell:hover {
+                    background-color: #f9f9f9;
+                }
+                .radio-visual {
+                    width: 16px;
+                    height: 16px;
+                    border-radius: 50%;
+                    border: 2px solid #ccc;
+                    margin: 0 auto;
+                    position: relative;
+                    transition: all 0.2s;
+                }
+                input[type="radio"]:checked + .radio-visual {
+                    border-color: #4fbc9c;
+                    background-color: #4fbc9c;
+                }
+                input[type="radio"]:checked + .radio-visual::after {
+                    content: '';
+                    position: absolute;
+                    top: 3px;
+                    left: 3px;
+                    width: 6px;
+                    height: 6px;
+                    border-radius: 50%;
+                    background: white;
+                }
+            `;
+            container.appendChild(style);
+        }
+
+        function updateRadioVisuals(row) {
+            const cells = row.querySelectorAll('.grid-cell');
+            cells.forEach(cell => {
+                const radioVisual = cell.querySelector('.radio-visual');
+                if (radioVisual) {
+                    radioVisual.classList.remove('checked');
+                }
+            });
+            
+            const checkedRadio = row.querySelector('input[type="radio"]:checked');
+            if (checkedRadio && checkedRadio.nextElementSibling) {
+                checkedRadio.nextElementSibling.classList.add('checked');
+            }
         }
         
         // Apply saved responses to the form
@@ -832,11 +855,14 @@
                     // Handle grid answers
                     if (Array.isArray(responseData.value)) {
                         responseData.value.forEach(gridAnswer => {
-                            const radio = document.querySelector(
-                                `input[name="${questionId}_${gridAnswer.rowIndex}"][value="${gridAnswer.optionIndex}"]`
-                            );
-                            if (radio) {
-                                radio.checked = true;
+                            // Find the row with matching sub_question_index
+                            const row = document.querySelector(`tr[data-sub-question-index="${gridAnswer.rowIndex}"]`);
+                            if (row) {
+                                const radio = row.querySelector(`input[value="${gridAnswer.optionIndex}"]`);
+                                if (radio) {
+                                    radio.checked = true;
+                                    updateRadioVisuals(row);
+                                }
                             }
                         });
                     }
@@ -1077,16 +1103,19 @@
                                 );
                                 
                                 if (checkedRadio) {
+                                    // Get the actual sub_question_index from the data attribute
+                                    const subQuestionIndex = parseInt(checkedRadio.dataset.subQuestionIndex);
+                                    
                                     formDataToSubmit.grid_answers.push({
                                         main_question_index: parseInt(question.id),
-                                        sub_question_index: parseInt(rowIndex),
+                                        sub_question_index: subQuestionIndex, // Use actual sub_question_index
                                         choice_index: parseInt(checkedRadio.value)
                                     });
                                 }
                             });
                             break;
                     }
-                });
+                }); 
             });
             
             return formDataToSubmit;

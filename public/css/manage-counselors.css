@@ -1,13 +1,15 @@
-/* Inherit base styles */
+/* Main Grid Layout */
 .grid-body {
     display: grid;
     grid-template-columns: .3fr 1fr;
     grid-template-rows: 1fr;
     grid-column-gap: 0px;
     grid-row-gap: 0px;
+    font-size: 1rem; /* Base font size */
 }
 
-.page-left{
+/* Left Sidebar Styles */
+.page-left {
     grid-column: 1;
     display: flex;
     flex-direction: column;
@@ -16,13 +18,14 @@
     height: 100vh;
     font-family: 'Poppins', sans-serif;
     color: rgb(2, 55, 2);
-    box-shadow: 10px -15px 15px -10px rgba(2, 55, 2, 0.313);
+    box-shadow: 0.625rem -0.9375rem 0.9375rem -0.625rem rgba(2, 55, 2, 0.313);
     user-select: none;
     padding: 2rem 1rem;
     justify-content: flex-start;
+    font-size: 1rem;
 }
 
-.page-left::before{
+.page-left::before {
     content: "";
     background-image: url("../Media/lasalle.png");
     background-size: cover;
@@ -36,51 +39,28 @@
     z-index: -1;
 }
 
-
-.logout-wrapper {
-    display:flex;
-    justify-content: center;
-    margin-top: 300px;
-    padding-top: 1rem;
-}
-
-.logout-btn {
-    width: 100%;
-    background-color: #4fbd9c;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: background-color 0.3s;
-}
-
-.logout-btn:hover {
-    background-color: rgb(36, 154, 118);
-}
-
-.profile{
+/* Profile Section */
+.profile {
     display: flex;
     align-items: center;
     flex-direction: column;
-    font-size: 2vh;
+    font-size: 1.25rem;
     color: rgb(2, 55, 2);
-    gap: 5px;
+    gap: 0.3125rem;
 }
 
-.profile-picture{
+.profile-picture {
     background-image: url("../Media/user.jpg");
     background-size: cover;
     background-position: center;
-    width: 7vw;
-    height: 7vw;
+    width: 5rem;
+    height: 5rem;
     border-radius: 50%;
 }
 
 .edit {
-    margin-left: -6.25px;
-    font-size: 1.5vh;
+    margin-left: -0.3906rem;
+    font-size: 0.875rem;
 }
 
 .edit a {
@@ -93,41 +73,68 @@
     color: rgb(36, 154, 118);
 }
 
-.sidebar-nav{
+/* Sidebar Navigation */
+.sidebar-nav {
     display: flex;
     flex-direction: column;
-    margin-left: 25px;
-    gap: 25px;
+    margin-left: 1.5625rem;
+    gap: 1.5625rem;
     margin-top: 2rem;
+    font-size: 1rem;
 }
 
-.sidebar-nav a{
+.sidebar-nav a {
     text-decoration: none;
     color: rgb(2, 55, 2);
+    font-size: 1rem;
 }
 
-.sidebar-nav a.active{
+.sidebar-nav a.active {
     font-weight: bold;
     color: rgb(36, 154, 118); 
 }
 
-
-.sidebar-nav a:hover{
+.sidebar-nav a:hover {
     color: rgb(36, 154, 118);
     cursor: pointer;
 }
 
-.sidebar-nav .nav-link.active{
+.sidebar-nav .nav-link.active {
     font-weight: bold;
     color: rgb(36, 154, 118);
 }
 
+/* Logout Button */
+.logout-wrapper {
+    display:flex;
+    justify-content: center;
+    margin-top: 18.75rem;
+    padding-top: 1rem;
+}
 
-.page-right{
-    padding: 70px;
+.logout-btn {
+    width: 100%;
+    background-color: #4fbd9c;
+    color: white;
+    border: none;
+    padding: 0.5rem 0.9375rem;
+    border-radius: 0.3125rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s;
+}
+
+.logout-btn:hover {
+    background-color: rgb(36, 154, 118);
+}
+
+/* Right Content Area */
+.page-right {
+    padding: 4.375rem;
     display:flex;
     flex-direction: column;
     justify-content: flex-start;
+    font-size: 1rem;
 }
 
 

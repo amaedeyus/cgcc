@@ -93,6 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $formId = intval($data['form_id']);
         $isActive = $data['is_active'] ?? null;
         $isRequired = $data['is_required'] ?? null;
+        $academicYear = $data['academic_year'] ?? null;
 
         // Validate parameters
         if ($isActive !== null && !in_array($isActive, ['0', '1', '-1'], true)) {
@@ -104,6 +105,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($isRequired !== null && !in_array($isRequired, ['0', '1'], true)) {
             http_response_code(400);
             echo json_encode(['error' => 'Invalid is_required value. Must be one of: 0, 1']);
+            exit;
+        }
+
+        if ($academicYear !== null && !preg_match('/^[0-9]{4}-[0-9]{4}$/', $academicYear)) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Invalid academic year format. Must be YYYY-YYYY']);
             exit;
         }
 
@@ -121,6 +128,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($isRequired !== null) {
             $updates[] = "is_required = ?";
             $params[] = $isRequired;
+            $types .= 's';
+        }
+
+        if ($academicYear !== null) {
+            $updates[] = "academic_year = ?";
+            $params[] = $academicYear;
             $types .= 's';
         }
 
@@ -147,7 +160,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'message' => 'Form updated successfully',
                     'updates' => [
                         'is_active' => $isActive,
-                        'is_required' => $isRequired
+                        'is_required' => $isRequired,
+                        'academic_year' => $academicYear
                     ]
                 ]);
             } else {
@@ -166,7 +180,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         'message' => 'No changes made (values already set)',
                         'updates' => [
                             'is_active' => $isActive,
-                            'is_required' => $isRequired
+                            'is_required' => $isRequired,
+                            'academic_year' => $academicYear
                         ]
                     ]);
                 }

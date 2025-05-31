@@ -55,7 +55,7 @@ try {
     }
 
     // Fetch form details
-    $query = "SELECT form_index, form_name, description FROM forms WHERE form_index = ?";
+    $query = "SELECT form_index, form_name, description, academic_year FROM forms WHERE form_index = ?";
     $stmt = $conn->prepare($query);
     if (!$stmt) {
         throw new Exception("Prepare failed: " . $conn->error);
@@ -186,6 +186,7 @@ try {
         'form_index' => $form['form_index'],
         'form_name' => $form['form_name'],
         'description' => $form['description'],
+        'academic_year' => $form['academic_year'] ?? null, // Add this line
         'sections' => $sections,
         'questions' => $allQuestions
     ], JSON_NUMERIC_CHECK);
