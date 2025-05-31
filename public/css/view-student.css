@@ -2,16 +2,104 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: 1fr;
-    grid-column-gap: 0px;
+    grid-column-gap: 20px;
     grid-row-gap: 0px;
-    }
+}
 
 .page-left {
     display: flex;
     grid-column: 1;
     box-shadow: 10px -15px 15px -10px rgba(2, 55, 2, 0.313);
-    height: 100vh;
+    height: 100%;
+    padding-top: 20px;
+    padding-left: 40px;
+    padding-right: 40px;
+    padding-bottom: 50px;
+    flex-direction: column;
+}
+
+.form-container {
+    align-self: center;
+    margin: 0 auto;
+    background-color: rgb(237, 253, 243);
     padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 3px 10px rgba(0, 71, 0, 0.2);
+    width: 95%;
+    height: 550px;
+}
+
+input[type="text"][readonly] {
+    outline-color: #316b50;
+    padding: 12px 15px;
+    border: none;
+    border-radius: 30px;
+    background-color: #fff;
+    font-size: 1em;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
+    color: #383d38; 
+    cursor: default;
+}
+
+.form-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 30px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group-one {
+    grid-column: 2;
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 20px auto;
+    width: fit-content;
+    text-align: center;
+}
+
+.profile-picture {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #ddd;
+    background-color: #f5f5f5;
+    margin-bottom: 10px;
+}
+
+.back {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 8px 15px;
+    background-color: rgb(79, 189, 156);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    width: 100px;
+    text-align: center;
+}
+
+.back:hover {
+    background: rgb(36, 154, 118);
+}
+
+.profile-title {
+    font-weight: bold;
+    margin-bottom: 5px;
 }
 
 .page-right {
@@ -19,4 +107,131 @@
     grid-column: 2;
     height: 100vh;
     padding: 40px;
+    flex-direction: column;
+}
+
+.responses-container {
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    height: calc(100% - 40px);
+    overflow-y: auto;
+}
+
+.responses-title {
+    font-size: 1.5em;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+/* New styles for form grouping */
+.form-container-group {
+    background-color: white;
+    border-radius: 10px;
+    padding: 0;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.form-header {
+    background-color: #316b50;
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.form-name {
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.response-count {
+    background-color: rgba(255,255,255,0.2);
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.9em;
+}
+
+.form-responses {
+    padding: 15px;
+}
+
+.response-card {
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-left: 4px solid #316b50;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.response-card:hover {
+    background-color: #e8f5ee;
+    transform: translateX(5px);
+}
+
+.response-card:last-child {
+    margin-bottom: 0;
+}
+
+.response-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.response-date {
+    color: #316b50;
+    font-weight: 500;
+    font-size: 0.95em;
+}
+
+.response-answers {
+    color: #7f8c8d;
+    font-size: 0.85em;
+}
+
+.response-details {
+    color: #555;
+    font-size: 0.9em;
+}
+
+.no-responses {
+    text-align: center;
+    color: #7f8c8d;
+    padding: 20px;
+    font-style: italic;
+}
+
+/* Animation for loading */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.form-container-group {
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+    .grid-body {
+        grid-template-columns: 1fr;
+    }
+    
+    .page-left, .page-right {
+        grid-column: 1;
+        height: auto;
+    }
+    
+    .page-right {
+        margin-top: 30px;
+    }
 }

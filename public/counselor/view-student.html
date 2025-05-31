@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="cgcc2.png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/view-student.css">
+    <title>CGCC - View Student</title>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="../Media/cgcc.png" alt="cgcc-logo" class="logo-img">
+            College Guidance and Counseling Center
+        </div>
+    </header>
+
+    <div class="grid-body">
+        <div class="page-left">
+            <h1 class="form-title">Student Information</h1>
+            
+            <div class="profile-section">
+                <div class="profile-title">Profile Picture</div>
+                <img src="../Media/user.jpg" alt="Profile Picture" class="profile-picture" id="profile-picture">
+            </div>
+
+            <div class="form-container">
+                <div class="form-columns">
+                    <div class="form-group">
+                        <label for="student-number">Student Number</label>
+                        <input readonly type="text" id="student-number" placeholder="Loading...">
+                        
+                        <label for="first-name">First Name</label>
+                        <input readonly type="text" id="first-name" placeholder="Loading...">
+                        
+                        <label for="last-name">Last Name</label>
+                        <input readonly type="text" id="last-name" placeholder="Loading...">
+                    
+                        <label for="year-level">Year Level</label>
+                        <input readonly type="text" id="year-level" placeholder="Loading...">
+                        
+                        <label for="section">Section</label>
+                        <input readonly type="text" id="section" placeholder="Loading...">
+                        
+                        <label for="department">Department</label>
+                        <input readonly type="text" id="department" placeholder="Loading...">
+                        
+                        <label for="program">Program</label>
+                        <input readonly type="text" id="program" placeholder="Loading...">
+                    </div>
+
+                    <div class="form-group-one">
+                        <label for="email">Email</label>
+                        <input readonly type="text" id="email" placeholder="Loading...">
+                        
+                        <label for="contact-number">Contact Number</label>
+                        <input readonly type="text" id="contact-number" placeholder="Loading...">
+                        
+                        <br>
+                        <label for="guardian">Guardian</label>
+                        <input readonly type="text" id="guardian" placeholder="Loading...">
+                        
+                        <label for="guardian-contact">Guardian Contact No.:</label>
+                        <input readonly type="text" id="guardian-contact" placeholder="Loading...">
+                    </div>
+                </div>
+            </div>
+
+            <button class="back" onclick="javascript:history.back()">Back</button>
+        </div>
+        
+        <div class="page-right">
+            <div class="responses-container">
+                <h2 class="responses-title">Form Responses</h2>
+                <div id="responses-list">
+                    <div class="no-responses">Loading responses...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get student ID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const studentId = urlParams.get('id');
+            
+            if (!studentId) {
+                alert('Student ID not provided');
+                return;
+            }
+
+            // Fetch student data
+            fetch(`../../backend/users/students.php?id=${studentId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    
+                    // Update the page with student data
+                    const student = data.student;
+
+                    // Existing code that assigns guardian info
+                    let guardianName = student.guardian_fullname;
+                    let guardianContact = student.guardian_contact;
+                    let studentEmail = student.student_email;
+
+                    // If guardian info is empty or missing, assign default values
+                    if (!guardianName || guardianName.trim() === '') {
+                        guardianName = `Jane ${student.last_name || ''}`.trim();
+                    }
+                    if (!guardianContact || guardianContact.trim() === '') {
+                        guardianContact = '0912345678';
+                    }
+                    if (!studentEmail || studentEmail.trim() === '') {
+                        studentEmail = `${student.last_name || ''}_${student.last_name || ''}@dlsl.edu.ph`.trim();
+                    }
+                    // Set the values in the input fields
+                    document.getElementById('guardian').value = guardianName;
+                    document.getElementById('guardian-contact').value = guardianContact;
+                    document.getElementById('guardian-contact').value = studentEmail;
+                    document.getElementById('profile-picture').src = student.image_path;
+                    document.getElementById('student-number').value = student.student_number;
+                    document.getElementById('first-name').value = student.first_name;
+                    document.getElementById('last-name').value = student.last_name;
+                    document.getElementById('year-level').value = student.year_level;
+                    document.getElementById('section').value = student.section_name;
+                    document.getElementById('department').value = student.dept_code;
+                    document.getElementById('program').value = student.program_code;
+                    document.getElementById('email').value = student.student_email;
+                    document.getElementById('contact-number').value = student.contact_number;
+                    document.getElementById('guardian').value = student.guardian_fullname;
+                    document.getElementById('guardian-contact').value = student.guardian_contact;
+
+                    // Update responses
+                    const responsesList = document.getElementById('responses-list');
+                    if (data.responses && data.responses.length > 0) {
+                        responsesList.innerHTML = '';
+                        
+                        data.responses.forEach(response => {
+                            const date = new Date(response.created_at);
+                            const formattedDate = date.toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            });
+
+                            const responseCard = document.createElement('div');
+                            responseCard.className = 'response-card';
+                            responseCard.innerHTML = `
+                                <div class="response-header">
+                                    <span class="response-form-name">${response.form_name}</span>
+                                    <span class="response-date">${formattedDate}</span>
+                                </div>
+                                <div class="response-details">
+                                    <span>Academic Year: ${response.academic_year || 'N/A'}</span>
+                                    <span>Answers: ${response.answer_count}</span>
+                                </div>
+                            `;
+                            responsesList.appendChild(responseCard);
+                        });
+                    } else {
+                        responsesList.innerHTML = '<div class="no-responses">No form responses found</div>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error loading student data: ' + error.message);
+                });
+        });
+    </script>
+</body>
+</html>
