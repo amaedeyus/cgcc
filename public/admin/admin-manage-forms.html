@@ -25,12 +25,9 @@
       <div class="profile">
         <div class="profile-picture"></div>
         <span id="user-name"></span>
-        <div class="edit">
-          <a href="#">✎Edit Profile</a>
-        </div>
       </div>
       <div class="sidebar-nav">
-        <a href="admin-manage-forms.html" class="nav-link">Manage Forms</a>
+        <a href="admin-manage-forms.html" class="nav-link active">Manage Forms</a>
         <a href="admin-manage-counselor.html" class="nav-link">Manage Counselors</a>
         <a href="admin-manage-program.html" class="nav-link">Manage Programs</a>
         <a href="admin-archived-forms.html" class="nav-link">Archived Forms</a>
@@ -79,6 +76,31 @@
           <span id="dropdownStatusText" class="status-text"></span>
         </div>
       </div>
+      <div class="form-setting">
+        <div class="status-label">
+          <label>Required for Counseling</label>
+          <span class="info-icon"
+            title="When enabled, students must complete this form before scheduling counseling sessions">ⓘ</span>
+        </div>
+        <div class="status-controls">
+          <label class="toggle-switch">
+            <input type="checkbox" id="dropdownRequiredToggle" />
+            <span class="slider"></span>
+          </label>
+          <span id="dropdownRequiredText" class="status-text"></span>
+        </div>
+      </div>
+      <!-- Add this inside the dropdown-content div, after the required toggle section -->
+      <div class="form-setting">
+        <div class="status-label">
+          <label>Academic Year</label>
+          <span class="info-icon" title="The academic year this form applies to (format: YYYY-YYYY)">ⓘ</span>
+        </div>
+        <div class="status-controls">
+          <input type="text" id="dropdownAcademicYear" placeholder="YYYY-YYYY" pattern="[0-9]{4}-[0-9]{4}"
+            title="Enter academic year in YYYY-YYYY format" />
+        </div>
+      </div>
       <div class="dropdown-footer">
         <button id="dropdownSaveBtn" class="save-btn">Save Changes</button>
         <button id="dropdownArchiveBtn" class="delete-btn">Archive</button>
@@ -91,6 +113,7 @@
     let currentFormId = null;
     let currentMenuElement = null;
     let currentFormStatus = null;
+    let currentFormRequired = null;
 
     document.getElementById("user-name").innerText = userName;
     const greetingElements = document.querySelectorAll(".user-name");
@@ -100,9 +123,15 @@
 
     // Status mapping
     const statusMap = {
-      '1': { text: 'Published', class: 'published-status' },
-      '0': { text: 'Unpublished', class: 'unpublished-status' },
-      '-1': { text: 'Archived', class: 'archived-status' }
+      1: { text: "Published", class: "published-status" },
+      0: { text: "Unpublished", class: "unpublished-status" },
+      "-1": { text: "Archived", class: "archived-status" },
+    };
+
+    // Required mapping
+    const requiredMap = {
+      1: { text: "Required", class: "required-status" },
+      0: { text: "Optional", class: "optional-status" },
     };
 
     // Fetch and display forms
@@ -122,19 +151,26 @@
         container.innerHTML = "";
 
         if (!data || !Array.isArray(data) || data.length === 0) {
-          container.innerHTML = '<div class="no-forms">No forms available at the moment.</div>';
+          container.innerHTML =
+            '<div class="no-forms">No forms available at the moment.</div>';
           return;
         }
 
         data.forEach((form) => {
           // Skip archived forms in the main view
-          if (form.is_active === '-1') return;
+          if (form.is_active === "-1") return;
 
           const card = document.createElement("div");
           card.classList.add("form-card");
 
-          const statusInfo = statusMap[form.is_active] || statusMap['0'];
+          const statusInfo = statusMap[form.is_active] || statusMap["0"];
           const statusClass = `status-indicator ${statusInfo.class}`;
+
+          // Add required indicator if form is required
+          const requiredInfo =
+            form.is_required === "1"
+              ? '<div class="required-indicator" title="Required for counseling">★</div>'
+              : "";
 
           let description = form.description || "No description";
           const truncatedDescription =
@@ -143,12 +179,20 @@
               : description;
 
           card.innerHTML = `
-            <div class="form-card-menu" onclick="openSettingsMenu(${form.form_index}, '${form.is_active}', event)">⋮</div>
+            <div class="form-card-menu" onclick="openSettingsMenu(${form.form_index
+            }, '${form.is_active}', '${form.is_required}', event)">⋮</div>
+            ${requiredInfo}
             <div class="${statusClass}"></div>
             <h3>${form.form_name}</h3>
-            <p class="form-description">${truncatedDescription.replace(/\n/g, " ")}</p>
-            <a href="http://localhost/cgcc/public/admin/formbuilder.html?id=${form.form_index}">Open Form</a>
-          `;
+            <p class="form-description">${truncatedDescription.replace(
+              /\n/g,
+              " "
+            )}</p>
+            <p class="academic-year">Academic Year: ${form.academic_year || "Not set"
+            }</p>
+            <a href="http://localhost/cgcc/public/admin/formbuilder.html?id=${form.form_index
+            }">Open Form</a>
+        `;
 
           container.appendChild(card);
         });
@@ -160,12 +204,15 @@
     }
 
     // Dropdown menu functions
-    function openSettingsMenu(formId, status, event) {
+    function openSettingsMenu(formId, status, isRequired, event) {
       event.stopPropagation();
       const dropdown = document.getElementById("dropdownMenu");
 
       // Close if clicking the same menu
-      if (currentMenuElement === event.target && dropdown.style.display === "block") {
+      if (
+        currentMenuElement === event.target &&
+        dropdown.style.display === "block"
+      ) {
         closeSettingsMenu();
         return;
       }
@@ -175,6 +222,7 @@
 
       currentFormId = formId;
       currentFormStatus = status;
+      currentFormRequired = isRequired;
       currentMenuElement = event.target;
 
       // Position the dropdown near the clicked button
@@ -185,38 +233,67 @@
       dropdown.style.left = `${buttonRect.right + window.scrollX - 280}px`;
 
       // Load form data
-      loadFormSettings(formId, status);
+      loadFormSettings(formId, status, isRequired);
     }
 
     function closeSettingsMenu() {
       document.getElementById("dropdownMenu").style.display = "none";
       currentMenuElement = null;
       currentFormStatus = null;
+      currentFormRequired = null;
     }
 
-    function loadFormSettings(formId, status) {
-      const toggle = document.getElementById("dropdownStatusToggle");
+    function loadFormSettings(formId, status, isRequired) {
+      const statusToggle = document.getElementById("dropdownStatusToggle");
       const statusText = document.getElementById("dropdownStatusText");
+      const requiredToggle = document.getElementById(
+        "dropdownRequiredToggle"
+      );
+      const requiredText = document.getElementById("dropdownRequiredText");
+      const academicYearInput = document.getElementById(
+        "dropdownAcademicYear"
+      );
       const archiveBtn = document.getElementById("dropdownArchiveBtn");
 
-      // Update UI based on status
-      const statusInfo = statusMap[status] || statusMap['0'];
+      // First fetch the full form data to get academic year
+      fetch(
+        `http://localhost/cgcc/backend/forms/form.php?form_index=${formId}`,
+        {
+          credentials: "include",
+        }
+      )
+        .then((response) => response.json())
+        .then((form) => {
+          // Update status UI
+          const statusInfo = statusMap[status] || statusMap["0"];
+          statusText.textContent = statusInfo.text;
+          statusText.className = `status-text ${statusInfo.class}`;
+          statusToggle.checked = status === "1";
+          statusToggle.disabled = status === "-1";
 
-      statusText.textContent = statusInfo.text;
-      statusText.className = `status-text ${statusInfo.class}`;
+          // Update required UI
+          const requiredInfo = requiredMap[isRequired] || requiredMap["0"];
+          requiredText.textContent = requiredInfo.text;
+          requiredText.className = `status-text ${requiredInfo.class}`;
+          requiredToggle.checked = isRequired === "1";
+          requiredToggle.disabled = status === "-1";
 
-      // Set toggle state (only for published/unpublished, not archived)
-      toggle.checked = status === '1';
-      toggle.disabled = status === '-1';
+          // Update academic year
+          academicYearInput.value = form.academic_year || "";
+          academicYearInput.disabled = status === "-1";
 
-      // Update archive button text and visibility
-      if (status === '-1') {
-        archiveBtn.textContent = "Unarchive";
-        archiveBtn.style.backgroundColor = "#4fbd9c";
-      } else {
-        archiveBtn.textContent = "Archive";
-        archiveBtn.style.backgroundColor = "#f44336";
-      }
+          // Update archive button text and visibility
+          if (status === "-1") {
+            archiveBtn.textContent = "Unarchive";
+            archiveBtn.style.backgroundColor = "#4fbd9c";
+          } else {
+            archiveBtn.textContent = "Archive";
+            archiveBtn.style.backgroundColor = "#f44336";
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching form details:", error);
+        });
     }
 
     // Event listeners
@@ -226,99 +303,180 @@
 
       // Close menu when clicking outside
       document.addEventListener("click", (event) => {
-        if (!event.target.closest('.dropdown-menu') && !event.target.closest('.form-card-menu')) {
+        if (
+          !event.target.closest(".dropdown-menu") &&
+          !event.target.closest(".form-card-menu")
+        ) {
           closeSettingsMenu();
         }
       });
 
-      // Status toggle handler
-      document.getElementById("dropdownSaveBtn").addEventListener("click", async function () {
-        try {
-          const isActive = document.getElementById("dropdownStatusToggle").checked ? '1' : '0';
+      // Toggle status text when status toggle is clicked
+      document
+        .getElementById("dropdownStatusToggle")
+        .addEventListener("change", function () {
+          const isChecked = this.checked;
+          const statusText = document.getElementById("dropdownStatusText");
+          if (isChecked) {
+            statusText.textContent = "Published";
+            statusText.className = "status-text published-status";
+          } else {
+            statusText.textContent = "Unpublished";
+            statusText.className = "status-text unpublished-status";
+          }
+        });
 
-          const response = await fetch(
-            "http://localhost/cgcc/backend/forms/form.php",
-            {
-              method: "POST",
-              credentials: "include",
-              headers: {
-                "Content-Type": "application/json",
-                "X-Requested-With": "XMLHttpRequest" // Add this header
-              },
-              body: JSON.stringify({
-                form_id: currentFormId,
-                is_active: isActive
-              }),
+      // Toggle required text when required toggle is clicked
+      document
+        .getElementById("dropdownRequiredToggle")
+        .addEventListener("change", function () {
+          const isChecked = this.checked;
+          const requiredText = document.getElementById(
+            "dropdownRequiredText"
+          );
+          if (isChecked) {
+            requiredText.textContent = "Required";
+            requiredText.className = "status-text required-status";
+          } else {
+            requiredText.textContent = "Optional";
+            requiredText.className = "status-text optional-status";
+          }
+        });
+
+      // Save button handler
+      document
+        .getElementById("dropdownSaveBtn")
+        .addEventListener("click", async function () {
+          try {
+            const isActive = document.getElementById("dropdownStatusToggle")
+              .checked
+              ? "1"
+              : "0";
+            const isRequired = document.getElementById(
+              "dropdownRequiredToggle"
+            ).checked
+              ? "1"
+              : "0";
+            const academicYear = document.getElementById(
+              "dropdownAcademicYear"
+            ).value;
+
+            // Validate academic year format
+            if (academicYear && !/^[0-9]{4}-[0-9]{4}$/.test(academicYear)) {
+              showStatusMessage(
+                "Academic year must be in YYYY-YYYY format",
+                "error"
+              );
+              return;
             }
+
+            const response = await fetch(
+              "http://localhost/cgcc/backend/forms/form.php",
+              {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                  "Content-Type": "application/json",
+                  "X-Requested-With": "XMLHttpRequest",
+                },
+                body: JSON.stringify({
+                  form_id: currentFormId,
+                  is_active: isActive,
+                  is_required: isRequired,
+                  academic_year: academicYear,
+                }),
+              }
+            );
+
+            const result = await response.json();
+
+            if (!response.ok) {
+              throw new Error(
+                result.message || "Failed to update form settings"
+              );
+            }
+
+            if (result.success) {
+              closeSettingsMenu();
+              loadForms();
+              showStatusMessage(
+                `Form settings updated successfully`,
+                "success"
+              );
+            } else {
+              throw new Error(result.message || "Update failed");
+            }
+          } catch (error) {
+            console.error("Error:", error);
+            showStatusMessage(
+              "Failed to save settings: " + error.message,
+              "error"
+            );
+          }
+        });
+
+      // Archive button handler
+      document
+        .getElementById("dropdownArchiveBtn")
+        .addEventListener("click", async function () {
+          const action = currentFormStatus === "-1" ? "unarchive" : "archive";
+          const confirmAction = confirm(
+            `Are you sure you want to ${action} this form?`
           );
 
-          const result = await response.json();
+          if (!confirmAction) return;
 
-          if (!response.ok) {
-            throw new Error(result.message || "Failed to update form status");
-          }
+          try {
+            const newStatus = currentFormStatus === "-1" ? "0" : "-1";
 
-          if (result.success) {
-            closeSettingsMenu();
-            loadForms();
-            showStatusMessage(`Form status updated to ${isActive === '1' ? "published" : "unpublished"}`, 'success');
-          } else {
-            throw new Error(result.message || "Update failed");
-          }
-        } catch (error) {
-          console.error("Error:", error);
-          showStatusMessage("Failed to save settings: " + error.message, 'error');
-        }
-      });
+            const response = await fetch(
+              "http://localhost/cgcc/backend/forms/form.php",
+              {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                  "Content-Type": "application/json",
+                  "X-Requested-With": "XMLHttpRequest",
+                },
+                body: JSON.stringify({
+                  form_id: currentFormId,
+                  is_active: newStatus,
+                  is_required: currentFormRequired, // Keep the same required status
+                }),
+              }
+            );
 
-      // Updated Archive button handler
-      document.getElementById("dropdownArchiveBtn").addEventListener("click", async function () {
-        const action = currentFormStatus === '-1' ? "unarchive" : "archive";
-        const confirmAction = confirm(`Are you sure you want to ${action} this form?`);
+            const result = await response.json();
 
-        if (!confirmAction) return;
-
-        try {
-          const newStatus = currentFormStatus === '-1' ? '0' : '-1';
-
-          const response = await fetch(
-            "http://localhost/cgcc/backend/forms/form.php",
-            {
-              method: "POST",
-              credentials: "include",
-              headers: {
-                "Content-Type": "application/json",
-                "X-Requested-With": "XMLHttpRequest" // Add this header
-              },
-              body: JSON.stringify({
-                form_id: currentFormId,
-                is_active: newStatus
-              }),
+            if (!response.ok) {
+              throw new Error(
+                result.message || "Failed to update form status"
+              );
             }
-          );
 
-          const result = await response.json();
-
-          if (!response.ok) {
-            throw new Error(result.message || "Failed to update form status");
+            if (result.success) {
+              closeSettingsMenu();
+              loadForms();
+              showStatusMessage(
+                `Form ${newStatus === "-1" ? "archived" : "unarchived"
+                } successfully`,
+                "success"
+              );
+            } else {
+              throw new Error(result.message || "Update failed");
+            }
+          } catch (error) {
+            console.error("Error:", error);
+            showStatusMessage(
+              "Failed to archive form: " + error.message,
+              "error"
+            );
           }
-
-          if (result.success) {
-            closeSettingsMenu();
-            loadForms();
-            showStatusMessage(`Form ${newStatus === '-1' ? "archived" : "unarchived"} successfully`, 'success');
-          } else {
-            throw new Error(result.message || "Update failed");
-          }
-        } catch (error) {
-          console.error("Error:", error);
-          showStatusMessage("Failed to archive form: " + error.message, 'error');
-        }
-      });
+        });
 
       // Helper function to show status messages
       function showStatusMessage(message, type) {
-        const statusElement = document.createElement('div');
+        const statusElement = document.createElement("div");
         statusElement.className = `autosave-status show ${type}`;
         statusElement.textContent = message;
         document.body.appendChild(statusElement);

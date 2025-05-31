@@ -57,7 +57,25 @@ $isAutoSave = isset($data['is_autosave']) ? (bool)$data['is_autosave'] : false;
 try {
     $conn->begin_transaction();
 
-    // 1. Get active snapshot for this form
+    // 1. Get form details including academic year
+    $formStmt = $conn->prepare("
+        SELECT academic_year 
+        FROM forms 
+        WHERE form_index = ?
+    ");
+    $formStmt->bind_param("i", $formId);
+    $formStmt->execute();
+    $formResult = $formStmt->get_result();
+
+    if ($formResult->num_rows === 0) {
+        throw new Exception("Form not found");
+    }
+    
+    $formRow = $formResult->fetch_assoc();
+    $academicYear = $formRow['academic_year'];
+    $formStmt->close();
+
+    // 2. Get active snapshot for this form
     $snapshotIndex = null;
     $snapshotStmt = $conn->prepare("
         SELECT snapshot_index 
@@ -76,7 +94,7 @@ try {
     }
     $snapshotStmt->close();
 
-    // 2. Handle auto-save updates or create new response
+    // 3. Handle auto-save updates or create new response
     $responseId = null;
     if ($isAutoSave) {
         // Check for existing auto-save response
@@ -97,10 +115,10 @@ try {
             // Update existing auto-save response
             $updateStmt = $conn->prepare("
                 UPDATE responses 
-                SET snapshot_index = ?, updated_at = NOW()
+                SET snapshot_index = ?, academic_year = ?, updated_at = NOW()
                 WHERE response_index = ?
             ");
-            $updateStmt->bind_param("ii", $snapshotIndex, $responseId);
+            $updateStmt->bind_param("isi", $snapshotIndex, $academicYear, $responseId);
             $updateStmt->execute();
             $updateStmt->close();
             
@@ -121,11 +139,11 @@ try {
     if (!$responseId) {
         $stmt = $conn->prepare("
             INSERT INTO responses 
-            (form_index, student_index, created_at, snapshot_index, is_autosave) 
-            VALUES (?, ?, NOW(), ?, ?)
+            (form_index, student_index, created_at, snapshot_index, is_autosave, academic_year) 
+            VALUES (?, ?, NOW(), ?, ?, ?)
         ");
         $isAutoSaveInt = $isAutoSave ? 1 : 0;
-        $stmt->bind_param("iiii", $formId, $studentId, $snapshotIndex, $isAutoSaveInt);
+        $stmt->bind_param("iiiis", $formId, $studentId, $snapshotIndex, $isAutoSaveInt, $academicYear);
         
         if (!$stmt->execute()) {
             throw new Exception("Failed to create response: " . $stmt->error);
@@ -134,7 +152,7 @@ try {
         $stmt->close();
     }
 
-    // 3. Process regular answers (choice-based and text answers)
+    // 4. Process regular answers (choice-based and text answers)
     if (isset($data['answers']) && is_array($data['answers'])) {
         $answerStmt = $conn->prepare("
             INSERT INTO answers 
@@ -186,7 +204,7 @@ try {
         $answerStmt->close();
     }
 
-    // 4. Process grid answers (matrix questions)
+    // 5. Process grid answers (matrix questions)
     if (isset($data['grid_answers']) && is_array($data['grid_answers'])) {
         $gridStmt = $conn->prepare("
             INSERT INTO grid_answers 
@@ -250,6 +268,7 @@ try {
         'message' => $isAutoSave ? 'Response auto-saved successfully' : 'Response submitted successfully',
         'response_index' => $responseId,
         'snapshot_index' => $snapshotIndex,
+        'academic_year' => $academicYear,
         'is_autosave' => $isAutoSave
     ]);
 

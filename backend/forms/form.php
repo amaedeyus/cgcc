@@ -37,8 +37,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
             if ($result->num_rows > 0) {
                 $form = $result->fetch_assoc();
-                // Return raw enum value
+                // Return raw enum values
                 $form['is_active'] = $form['is_active'];
+                $form['is_required'] = $form['is_required'];
                 echo json_encode($form);
             } else {
                 http_response_code(404);
@@ -53,8 +54,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             if ($result) {
                 $forms = [];
                 while ($row = $result->fetch_assoc()) {
-                    // Return raw enum value
+                    // Return raw enum values
                     $row['is_active'] = $row['is_active'];
+                    $row['is_required'] = $row['is_required'];
                     $forms[] = $row;
                 }
                 echo json_encode($forms);
@@ -71,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     exit;
 }
 
-// POST Request: Update form status
+// POST Request: Update form status and required setting
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         // Get raw POST data
@@ -82,34 +84,85 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception("Invalid JSON data");
         }
 
-        if (!isset($data['form_id']) || !isset($data['is_active'])) {
+        if (!isset($data['form_id'])) {
             http_response_code(400);
-            echo json_encode(['error' => 'Missing required parameters']);
+            echo json_encode(['error' => 'Missing form_id parameter']);
             exit;
         }
 
         $formId = intval($data['form_id']);
-        $isActive = $data['is_active'];
+        $isActive = $data['is_active'] ?? null;
+        $isRequired = $data['is_required'] ?? null;
+        $academicYear = $data['academic_year'] ?? null;
 
-        // Validate enum value
-        if (!in_array($isActive, ['0', '1', '-1'], true)) {
+        // Validate parameters
+        if ($isActive !== null && !in_array($isActive, ['0', '1', '-1'], true)) {
             http_response_code(400);
-            echo json_encode(['error' => 'Invalid status value. Must be one of: 0, 1, -1']);
+            echo json_encode(['error' => 'Invalid is_active value. Must be one of: 0, 1, -1']);
             exit;
         }
 
-        $stmt = $conn->prepare("UPDATE forms SET is_active = ? WHERE form_index = ?");
+        if ($isRequired !== null && !in_array($isRequired, ['0', '1'], true)) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Invalid is_required value. Must be one of: 0, 1']);
+            exit;
+        }
+
+        if ($academicYear !== null && !preg_match('/^[0-9]{4}-[0-9]{4}$/', $academicYear)) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Invalid academic year format. Must be YYYY-YYYY']);
+            exit;
+        }
+
+        // Build the update query based on provided parameters
+        $updates = [];
+        $params = [];
+        $types = '';
+
+        if ($isActive !== null) {
+            $updates[] = "is_active = ?";
+            $params[] = $isActive;
+            $types .= 's';
+        }
+
+        if ($isRequired !== null) {
+            $updates[] = "is_required = ?";
+            $params[] = $isRequired;
+            $types .= 's';
+        }
+
+        if ($academicYear !== null) {
+            $updates[] = "academic_year = ?";
+            $params[] = $academicYear;
+            $types .= 's';
+        }
+
+        if (empty($updates)) {
+            http_response_code(400);
+            echo json_encode(['error' => 'No valid parameters provided for update']);
+            exit;
+        }
+
+        $params[] = $formId;
+        $types .= 'i';
+
+        $query = "UPDATE forms SET " . implode(', ', $updates) . " WHERE form_index = ?";
+        $stmt = $conn->prepare($query);
         if (!$stmt) {
             throw new Exception("Prepare failed: " . $conn->error);
         }
 
-        $stmt->bind_param("si", $isActive, $formId);
+        $stmt->bind_param($types, ...$params);
         if ($stmt->execute()) {
             if ($stmt->affected_rows > 0) {
                 echo json_encode([
                     'success' => true, 
-                    'message' => 'Status updated successfully',
-                    'new_status' => $isActive
+                    'message' => 'Form updated successfully',
+                    'updates' => [
+                        'is_active' => $isActive,
+                        'is_required' => $isRequired,
+                        'academic_year' => $academicYear
+                    ]
                 ]);
             } else {
                 // No rows affected - form might not exist or no change
@@ -124,8 +177,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 } else {
                     echo json_encode([
                         'success' => true, 
-                        'message' => 'No changes made (status already set)',
-                        'new_status' => $isActive
+                        'message' => 'No changes made (values already set)',
+                        'updates' => [
+                            'is_active' => $isActive,
+                            'is_required' => $isRequired,
+                            'academic_year' => $academicYear
+                        ]
                     ]);
                 }
                 $checkStmt->close();

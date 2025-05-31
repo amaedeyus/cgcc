@@ -46,6 +46,15 @@
                         <textarea class="form-control auto-expand" id="form-description"
                             placeholder="Enter form description"></textarea>
                     </div>
+
+                    <!-- Add this inside the form-title-card div, after the form description -->
+                    <div class="mb-3">
+                        <label class="form-label">Academic Year</label>
+                        <input type="text" class="form-control" id="academic-year" 
+                            placeholder="YYYY-YYYY" pattern="\d{4}-\d{4}" 
+                            title="Please enter academic year in YYYY-YYYY format">
+                        <small class="text-muted">Format: YYYY-YYYY (e.g., 2023-2024)</small>
+                    </div>
                 </div>
             </div>
 
@@ -468,6 +477,17 @@
                 });
             }
 
+            // Add this to the document ready function
+            $('#academic-year').on('input', function() {
+                const value = $(this).val();
+                if (/^\d{4}-\d{4}$/.test(value)) {
+                    $(this).removeClass('is-invalid').addClass('is-valid');
+                } else {
+                    $(this).removeClass('is-valid').addClass('is-invalid');
+                }
+                saveState();
+            });
+
 
             function bindInputSaveState() {
                 $('body').on('input', '.question-text, .section-title-input, .section-description-input, .option-input, .grid-row-input', function () {
@@ -481,6 +501,7 @@
                 const state = {
                     formTitle: $('#form-title').val(),
                     formDescription: $('#form-description').val(),
+                    academicYear: $('#academic-year').val(), // Add this line
                     sections: []
                 };
 
@@ -523,15 +544,14 @@
                 return state;
             }
 
-            // Replace restoreState() with this version
             // Updated restoreState function
             function restoreState(state) {
                 // Clear existing sections
                 $('#sections-container').empty();
 
-                // Restore form title and description
                 $('#form-title').val(state.formTitle || '');
                 $('#form-description').val(state.formDescription || '');
+                $('#academic-year').val(state.academicYear || ''); // Add this line
 
                 // Restore sections
                 state.sections.forEach(section => {
@@ -1302,6 +1322,7 @@
                         // Populate form data
                         $('#form-title').val(response.form_name);
                         $('#form-description').val(response.description);
+                        $('#academic-year').val(response.academic_year);
 
                         // Clear existing sections
                         $('#sections-container').empty();
@@ -1570,6 +1591,7 @@
                     form_index: formId ? parseInt(formId) : null,
                     form_name: $('#form-title').val().trim(),
                     description: $('#form-description').val().trim(),
+                    academic_year: $('#academic-year').val().trim(), // Add this line
                     sections: []
                 };
                 
@@ -1658,8 +1680,14 @@
                     return false;
                 }
 
+                const academicYear = $('#academic-year').val().trim();
+                if (!academicYear || !/^\d{4}-\d{4}$/.test(academicYear)) {
+                    alert('Please enter a valid academic year in YYYY-YYYY format');
+                    return false;
+                }
+
                 let hasQuestions = false;
-                $('.section-card').each(function () {
+                $('.section-card').each(function() {
                     if ($(this).find('.question-card').length > 0) {
                         hasQuestions = true;
                     }
@@ -1768,14 +1796,6 @@
                     setTimeout(() => feedback.remove(), 3000);
                 }
             });
-
-            $('body').on('click', '.add-question', function () {
-                console.log('Add Question clicked');
-                const sectionCard = $(this).closest('.section-card');
-                const questionsContainer = sectionCard.find('.questions-container');
-                addNewQuestion(questionsContainer);
-            });
-
 
             // Add question to section
             $(document).on('click', '.add-question', function () {
