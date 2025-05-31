@@ -60,17 +60,15 @@ try {
     $conn->begin_transaction();
 
     // 1. Update form name and description
-    if (isset($data['form_name']) || isset($data['description']) || isset($data['academic_year'])) {
+    if (isset($data['form_name']) || isset($data['description'])) {
         $name = $data['form_name'] ?? '';
         $desc = $data['description'] ?? '';
-        $academicYear = $data['academic_year'] ?? ''; // Get academic year if provided
 
-        $stmt = $conn->prepare("UPDATE forms SET form_name = ?, description = ?, academic_year = ? WHERE form_index = ?");
-        $stmt->bind_param("sssi", $name, $desc, $academicYear, $formId);
+        $stmt = $conn->prepare("UPDATE forms SET form_name = ?, description = ? WHERE form_index = ?");
+        $stmt->bind_param("ssi", $name, $desc, $formId);
         $stmt->execute();
         $stmt->close();
     }
-
 
     // First delete dependent tables
     $stmt = $conn->prepare("DELETE FROM choices WHERE main_question_index IN (SELECT main_question_index FROM main_questions WHERE form_index = ?)");
@@ -158,34 +156,35 @@ try {
 
     // Now take snapshot with updated indexes
     try {
+        
         $stmt = $conn->prepare("
-            SELECT 
-                f.form_index,
-                f.form_name,
-                f.description,
-                fs.form_section_index,
-                fs.section_title,
-                fs.section_description,
-                fs.section_order,
-                IFNULL(fs.behavior, 'same-page') as behavior,
-                q.main_question_index,
-                q.main_question_text,
-                qt.type_name AS type_name,
-                q.subtype,
-                q.is_required,
-                c.choice_index,
-                c.choice_text,
-                sq.sub_question_index,
-                sq.sub_question_text
-            FROM forms f
-            LEFT JOIN form_sections fs ON f.form_index = fs.form_index
-            LEFT JOIN main_questions q ON fs.form_section_index = q.form_section_index
-            LEFT JOIN question_types qt ON q.type_index = qt.type_index
-            LEFT JOIN choices c ON q.main_question_index = c.main_question_index
-            LEFT JOIN sub_questions sq ON q.main_question_index = sq.main_question_index
-            WHERE f.form_index = ?
-            ORDER BY fs.section_order, q.main_question_index, c.choice_index, sq.sub_question_index
-        ");
+        SELECT 
+            f.form_index,
+            f.form_name,
+            f.description,
+            fs.form_section_index,
+            fs.section_title,
+            fs.section_description,
+            fs.section_order,
+            IFNULL(fs.behavior, 'same-page') as behavior,
+            q.main_question_index,
+            q.main_question_text,
+            qt.type_name AS type_name,
+            q.subtype, -- Add this line
+            q.is_required,
+            c.choice_index,
+            c.choice_text,
+            sq.sub_question_index,
+            sq.sub_question_text
+        FROM forms f
+        LEFT JOIN form_sections fs ON f.form_index = fs.form_index
+        LEFT JOIN main_questions q ON fs.form_section_index = q.form_section_index
+        LEFT JOIN question_types qt ON q.type_index = qt.type_index
+        LEFT JOIN choices c ON q.main_question_index = c.main_question_index
+        LEFT JOIN sub_questions sq ON q.main_question_index = sq.main_question_index
+        WHERE f.form_index = ?
+        ORDER BY fs.section_order, q.main_question_index, c.choice_index, sq.sub_question_index
+    ");
         $stmt->bind_param("i", $formId);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -200,7 +199,6 @@ try {
 
         $sectionMap = [];
         $questionMap = [];
-        $uniqueChoices = []; // Track unique choices per question
 
         while ($row = $result->fetch_assoc()) {
             if (!$form) {
@@ -226,43 +224,40 @@ try {
             $questionId = $row['main_question_index'];
             if ($questionId && !isset($questionMap[$questionId])) {
                 $questionMap[$questionId] = [
-                    'id' => (string)$questionId,
-                    'question' => $row['main_question_text'],
-                    'type' => $row['type_name'],
-                    'subtype' => $row['subtype'],
-                    'required' => (bool)$row['is_required'],
-                    'options' => [],
-                    'rows' => [],
-                    'form_section_index' => $sectionId
-                ];
-                $uniqueChoices[$questionId] = []; // Initialize for this question
+                'id' => (string)$questionId,
+                'question' => $row['main_question_text'],
+                'type' => $row['type_name'],
+                'subtype' => $row['subtype'],
+                'required' => (bool)$row['is_required'],
+                'options' => [],
+                'rows' => [],
+                'form_section_index' => $sectionId
+            ];
             }
 
-            // Add unique choices if they exist
             if ($row['choice_index'] !== null && $row['choice_text'] !== null) {
-                $choiceKey = $row['choice_index'].'_'.$row['choice_text'];
-                if (!in_array($choiceKey, $uniqueChoices[$questionId])) {
+                $choiceExists = array_filter($questionMap[$questionId]['options'], function ($opt) use ($row) {
+                    return $opt['choice_index'] == $row['choice_index'];
+                });
+                if (empty($choiceExists)) {
                     $questionMap[$questionId]['options'][] = [
                         'choice_index' => $row['choice_index'],
                         'choice_text' => $row['choice_text']
                     ];
-                    $uniqueChoices[$questionId][] = $choiceKey;
                 }
             }
 
-            // Add subquestions with their indexes if they exist
             if ($row['sub_question_index'] !== null && $row['sub_question_text'] !== null) {
-                $questionMap[$questionId]['rows'][] = [
-                    'sub_question_index' => $row['sub_question_index'],
-                    'sub_question_text' => $row['sub_question_text']
-                ];
+                if (!in_array($row['sub_question_text'], $questionMap[$questionId]['rows'])) {
+                    $questionMap[$questionId]['rows'][] = $row['sub_question_text'];
+                }
             }
         }
 
         foreach ($questionMap as $qid => $qdata) {
             $sectionId = $qdata['form_section_index'];
             if (isset($sectionMap[$sectionId])) {
-                $sectionMap[$sectionId]['questions'][] = $qid;
+                $sectionMap[$sectionId]['questions'][] = $qdata;
                 $allQuestions[] = $qdata;
             }
         }
@@ -276,7 +271,7 @@ try {
                 'description' => '',
                 'order' => 1,
                 'behavior' => 'same-page',
-                'questions' => array_map(function($q) { return $q['id']; }, $allQuestions)
+                'questions' => $allQuestions
             ];
         }
 
@@ -303,6 +298,7 @@ try {
         $stmtInsert->execute();
         $snapshotId = $conn->insert_id;
         $stmtInsert->close();
+
     } catch (Exception $e) {
         error_log("Snapshot failed: " . $e->getMessage());
     }
