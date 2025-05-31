@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 31, 2025 at 08:51 AM
+-- Generation Time: May 31, 2025 at 01:25 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -282,7 +282,9 @@ CREATE TABLE `counselors` (
   `counselor_number` varchar(255) DEFAULT NULL,
   `last_name` varchar(50) NOT NULL,
   `first_name` varchar(50) NOT NULL,
+  `image_path` varchar(255) NOT NULL,
   `calendar_link` varchar(200) NOT NULL,
+  `credentials` varchar(50) NOT NULL,
   `status` enum('active','inactive','deleted','') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -290,16 +292,16 @@ CREATE TABLE `counselors` (
 -- Dumping data for table `counselors`
 --
 
-INSERT INTO `counselors` (`counselor_index`, `user_index`, `counselor_number`, `last_name`, `first_name`, `calendar_link`, `status`) VALUES
-(1, 40, 'CG0001', 'Balion', 'Angel Amaya', 'https://calendar.app.google/DVooLDaj5wBZ9Jnj7', 'active'),
-(2, 41, 'CG0002', 'cruz', 'juan', 'https://calendly.com/juan-dela-cruz', 'active'),
-(3, 42, 'CG0003', 'santos', 'maria', 'https://calendly.com/maria-santos', 'active'),
-(4, 43, 'CG0004', 'lim', 'antonio', 'https://calendly.com/antonio-lim', 'active'),
-(5, 44, 'CG0005', 'reyes', 'sofia', 'https://calendly.com/sofia-reyes', 'active'),
-(6, 45, 'CG0006', 'gonzales', 'carlos', 'https://calendly.com/carlos-gonzales', 'active'),
-(7, 46, 'CG0007', 'ramirez', 'lucia', 'https://calendly.com/lucia-ramirez', 'active'),
-(8, 47, 'CG0008', 'tan', 'fernando', 'https://calendly.com/fernando-tan', 'active'),
-(9, 48, 'CG0009', 'garcia', 'isabela', 'https://calendly.com/isabela-garcia', 'active');
+INSERT INTO `counselors` (`counselor_index`, `user_index`, `counselor_number`, `last_name`, `first_name`, `image_path`, `calendar_link`, `credentials`, `status`) VALUES
+(1, 40, 'CG0001', 'Balion', 'Angel Amaya', '../../backend/public/Media/uploads/counselors/counselor_1_1748690178.png', 'https://calendar.app.google/DVooLDaj5wBZ9Jnj7', 'RGC', 'active'),
+(2, 41, 'CG0002', 'cruz', 'juan', '', 'https://calendly.com/juan-dela-cruz', '', 'active'),
+(3, 42, 'CG0003', 'santos', 'maria', '', 'https://calendly.com/maria-santos', '', 'active'),
+(4, 43, 'CG0004', 'lim', 'antonio', '', 'https://calendly.com/antonio-lim', '', 'active'),
+(5, 44, 'CG0005', 'reyes', 'sofia', '', 'https://calendly.com/sofia-reyes', '', 'active'),
+(6, 45, 'CG0006', 'gonzales', 'carlos', '', 'https://calendly.com/carlos-gonzales', '', 'active'),
+(7, 46, 'CG0007', 'ramirez', 'lucia', '', 'https://calendly.com/lucia-ramirez', '', 'active'),
+(8, 47, 'CG0008', 'tan', 'fernando', '', 'https://calendly.com/fernando-tan', '', 'active'),
+(9, 48, 'CG0009', 'garcia', 'isabela', '', 'https://calendly.com/isabela-garcia', '', 'active');
 
 -- --------------------------------------------------------
 
