@@ -2,7 +2,7 @@
 session_start();
 use Google\Service\Oauth2;
 require_once __DIR__ . '/../vendor/autoload.php';
-    require_once __DIR__ . '/connect3.php'; // include your DB connection
+    require_once __DIR__ . '/connect.php'; // include your DB connection
     
 // Initialize Google Client
 $client = new Google_Client();

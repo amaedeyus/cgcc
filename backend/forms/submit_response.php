@@ -24,7 +24,7 @@ if ($userType !== 'student') {
 }
 
 // Database connection
-require_once '../connect3.php';
+require_once '../connect.php';
 
 // Fetch student_index from DB using session user_index
 $stmtStudent = $conn->prepare("SELECT student_index FROM students WHERE user_index = ?");

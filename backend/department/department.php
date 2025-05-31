@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json');
-require_once '../connect3.php';
+require_once '../connect.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 

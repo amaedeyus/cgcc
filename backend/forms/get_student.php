@@ -7,7 +7,7 @@ if (!isset($_SESSION['user_index'])) {
     exit;
 }
 
-require_once '../connect3.php';
+require_once '../connect.php';
 
 $userIndex = $_SESSION['user_index'];
 

@@ -4,7 +4,7 @@ ob_start();
 include('connect.php'); // Include database connection
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $email = $_POST['email'] ?? null;
+    $email    = $_POST['email']    ?? null;
     $password = $_POST['password'] ?? null;
 
     if (!$email || !$password) {
@@ -12,20 +12,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 
-    // Modified query to get user, student, and counselor data
+    // 1) Explicitly alias the counselor’s name columns so they don’t collide with anything else:
     $query = "
         SELECT 
-            users.*, 
-            students.student_index,
-            students.first_name AS student_first_name,
-            students.last_name AS student_last_name,
-            counselors.counselor_index,
-            counselors.first_name AS counselor_first_name,
-            counselors.last_name AS counselor_last_name
-        FROM users 
-        LEFT JOIN students ON users.user_index = students.user_index 
-        LEFT JOIN counselors ON users.user_index = counselors.user_index 
-        WHERE users.email = ?
+            u.user_index,
+            u.email,
+            u.password,
+            u.type,
+            s.student_index,
+            s.first_name   AS student_first_name,
+            s.last_name    AS student_last_name,
+            c.counselor_index,
+            c.first_name   AS counselor_first_name,
+            c.last_name    AS counselor_last_name
+        FROM users u
+        LEFT JOIN students   s ON u.user_index = s.user_index
+        LEFT JOIN counselors c ON u.user_index = c.user_index
+        WHERE u.email = ?
     ";
 
     $stmt = $conn->prepare($query);
@@ -35,47 +38,51 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
+
+
         $hashed_password = $row['password'];
 
         if (password_verify($password, $hashed_password)) {
-            // Set common session variables
+            // Common session data:
             $_SESSION['user_index'] = $row['user_index'];
-            $_SESSION['email'] = $row['email'];
-            $_SESSION['user_type'] = $row['type'];
+            $_SESSION['email']      = $row['email'];
+            $_SESSION['user_type']  = $row['type'];
 
-            // Set user-specific session variables based on type
+            // 2) Based on u.type, pull from the correct alias:
             if ($row['type'] === 'student') {
                 $_SESSION['student_index'] = $row['student_index'];
-                $_SESSION['first_name'] = $row['student_first_name'] ?? 'Student';
-                $_SESSION['last_name'] = $row['student_last_name'] ?? '';
-            } 
+                $_SESSION['first_name']    = $row['student_first_name'] ?? 'Student';
+                $_SESSION['last_name']     = $row['student_last_name']  ?? '';
+            }
             elseif ($row['type'] === 'counselor') {
                 $_SESSION['counselor_index'] = $row['counselor_index'];
-                $_SESSION['first_name'] = $row['counselor_first_name'] ?? 'Counselor';
-                $_SESSION['last_name'] = $row['counselor_last_name'] ?? '';
-            } 
-            else { // Admin
+                $_SESSION['first_name']      = $row['counselor_first_name'] ?? 'Counselor';
+                $_SESSION['last_name']       = $row['counselor_last_name']  ?? '';
+            }
+            else { // admin or any other unexpected type
                 $_SESSION['first_name'] = 'Admin';
-                $_SESSION['last_name'] = '';
+                $_SESSION['last_name']  = '';
             }
 
-            $_SESSION['full_name'] = trim($_SESSION['first_name'] . ' ' . $_SESSION['last_name']);
+            $_SESSION['full_name'] = trim($_SESSION['first_name'] . ' ' . $_SESSION['last_name']);  
 
-            // Redirect based on user type
+            // 3) Finally, redirect according to type:
             if ($row['type'] === 'admin') {
                 header("Location: ../public/admin/admin-manage-forms.html");
-            } 
+            }
             elseif ($row['type'] === 'counselor'){
-                header("Location: ../public/counselor/student-record.php");
-            } 
+                header("Location: ../public/counselor/first-year.php");
+            }
             else {
                 header("Location: ../public/main.php");
             }
             exit();
-        } else {
+        }
+        else {
             echo "Invalid email or password.";
         }
-    } else {
+    }
+    else {
         echo "Invalid email or password.";
     }
 

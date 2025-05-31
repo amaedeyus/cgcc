@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-require_once '../connect3.php';
+require_once '../connect.php';
 
 // Get raw POST data
 $data = json_decode(file_get_contents('php://input'), true);

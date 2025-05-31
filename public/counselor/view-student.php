@@ -1,5 +1,5 @@
 <?php
-require("../../backend/connect2.php");
+require("../../backend/connect.php");
 
 if (!isset($_GET['id'])) {
     echo "Student ID not provided.";

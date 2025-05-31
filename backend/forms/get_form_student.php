@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 // Database connection
-require_once '../connect3.php';
+require_once '../connect.php';
 
 // Check database connection
 if ($conn->connect_error) {
