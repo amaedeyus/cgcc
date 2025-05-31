@@ -1,6 +1,6 @@
 <?php
 session_start();
-require "../backend/connect3.php";  // Your DB connection
+require "../backend/connect.php";  // Your DB connection
 
 if (!isset($_SESSION['student_index'])) {
     header("Location: login.php");

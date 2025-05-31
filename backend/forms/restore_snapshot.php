@@ -1,7 +1,7 @@
 <?php
 // restore_snapshot.php
 header("Content-Type: application/json");
-require_once '../connect3.php'; // Adjust path as needed
+require_once '../connect.php'; // Adjust path as needed
 
 // Enable error reporting for debugging
 error_reporting(E_ALL);

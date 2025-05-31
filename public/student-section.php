@@ -1,6 +1,6 @@
 <?php
 // get_sections.php
-require "../backend/connect2.php";
+require "../backend/connect.php";
 
 $program_index = intval($_GET['program_index'] ?? 0);
 $year_level = intval($_GET['year_level'] ?? 0);

@@ -1,7 +1,7 @@
 <?php
 header('Content-Type: application/json');
 header("Access-Control-Allow-Origin: *");
-require_once '../connect3.php';
+require_once '../connect.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 

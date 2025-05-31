@@ -1,6 +1,6 @@
 <?php
 session_start();
-require("../backend/connect2.php"); // include your DB connection
+require("../backend/connect.php"); // include your DB connection
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $student_id = $_POST['student_index'] ?? null;

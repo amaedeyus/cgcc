@@ -12,7 +12,7 @@ header("Access-Control-Allow-Methods: GET, POST, PATCH, OPTIONS");
 header("Access-Control-Allow-Credentials: true");
 header("Content-Type: application/json");
 
-require '../connect3.php';
+require '../connect.php';
 
 // Handle preflight OPTIONS request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {

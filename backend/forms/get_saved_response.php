@@ -2,7 +2,7 @@
 session_start();
 
 // Include your database configuration
-require_once '../connect3.php'; // This gives us $conn from connect3.php
+require_once '../connect.php'; // This gives us $conn from connect.php
 
 // Ensure the user is authenticated (example assumes student login)
 if (!isset($_SESSION['user_index'])) {

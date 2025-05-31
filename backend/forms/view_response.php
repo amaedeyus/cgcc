@@ -1,7 +1,7 @@
     <?php
     // view_response_mapped.php
     header("Content-Type: application/json");
-    require_once '../connect3.php';
+    require_once '../connect.php';
 
     // Enable error reporting
     error_reporting(E_ALL);

@@ -1,6 +1,6 @@
 <?php
 session_start();
-require "../../connect3.php";
+require "../../connect.php";
 
 if (!isset($_SESSION['counselor_index'])) {
     header("Location: login.php");

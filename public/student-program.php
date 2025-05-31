@@ -1,5 +1,5 @@
 <?php
-require "../backend/connect2.php";  // Adjust path if needed
+require "../backend/connect.php";  // Adjust path if needed
 
 header('Content-Type: application/json');
 

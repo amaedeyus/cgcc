@@ -1,5 +1,5 @@
 <?php
-require("../../backend/connect2.php");
+require("../../backend/connect.php");
 
 if (isset($_GET['program_code']) && isset($_GET['year_level'])) {
     $program_code = $_GET['program_code'];

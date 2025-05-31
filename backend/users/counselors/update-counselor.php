@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json');
-require_once '../../connect3.php';
+require_once '../../connect.php';
 
 $data = json_decode(file_get_contents('php://input'), true);
 $counselorId = $_GET['id'] ?? null;

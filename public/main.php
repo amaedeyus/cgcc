@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-require "../backend/connect2.php";  // include the database connection
+require "../backend/connect.php";  // include the database connection
 
 $student_index = $_SESSION['student_index'] ?? null;
 $student = [];
