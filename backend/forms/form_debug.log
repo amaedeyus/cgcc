@@ -7679,3 +7679,1685 @@ By accomplishing this form you understand and agree to the guidelines set by CGC
 
 --------------------------------------------------------------------------------
 
+[2025-05-31 23:14:32] Received Form Data:
+Array
+(
+    [form_index] => 1
+    [form_name] => Client Consent and Concern From
+    [description] => This form would only take 15- 20 minutes of your time.
+Every person's life is a developing story. The person you are today is a result of your upbringing and experiences, joys and sorrows, desires, and dreams. While we know that it's tempting to rush at times, please take some time to reflect on your life.
+    [academic_year] => 2024-2025
+    [sections] => Array
+        (
+            [0] => Array
+                (
+                    [title] => Consent
+                    [description] => This section outlines the terms and conditions regarding the collection, processing, and storage of personal information by the College Guidance and Counseling Center (CGCC) at De La Salle Lipa (DLSL).
+                    [behavior] => same-page
+                    [questions] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [question] => I understand that this form is considered an official record of De La Salle Lipa and that College Guidance and Counseling Center (CGCC) is required to keep my personal information and records until such time that these documents are due for disposal based on the DLSL data privacy retention policy. Some of the services of CGCC that would utilize this data are Counseling, Referral, and Research and Development. This form shall only be accessed by the CGCC team. CGCC shall retain the data in accordance with Document Retention Period and will be deleted upon disposal. By answering this form, you are giving CGCC consent to process and store this information. Please answer carefully and truthfully.
+                                    [type] => checkbox
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Yes
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                        )
+
+                )
+
+            [1] => Array
+                (
+                    [title] => DETAILED CONCERNS
+                    [description] => The items below describe some of the concerns that students your age might experience. Please check your top five concerns in which the guidance counselor can help you with.
+                    [behavior] => same-page
+                    [questions] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [question] => SOCIAL/EMOTIONAL CONCERNS
+                                    [type] => checkbox
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Adjusting to change
+                                            [1] => Experiencing Bullying/Discrimination
+                                            [2] => Struggling with Relationship Problems
+                                            [3] => Issues with self-image
+                                            [4] => Concerns about sexuality/gender identity
+                                            [5] => Finding it difficult to express one's thoughts/feelings
+                                            [6] => Struggling in getting along with others/making friends
+                                            [7] => Spiritual/Religious issues
+                                            [8] => Lack of decision making skills
+                                            [9] => Lack of social support
+                                            [10] => Lacking of self-confidence
+                                            [11] => Lacks effective communication skills
+                                            [12] => Need to develop leadership skills
+                                            [13] => Need to have better self-concept
+                                            [14] => Experiencing harassment
+                                            [15] => Trust issue
+                                            [16] => Feeling very strong emotions
+                                            [17] => No social/emotional concern
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [1] => Array
+                                (
+                                    [question] => FAMILY & HOME CONCERNS
+                                    [type] => checkbox
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Absence of father/mother
+                                            [1] => Dealing with a loss
+                                            [2] => Feeling of being unloved
+                                            [3] => Financial difficulties
+                                            [4] => Struggling with parents’ marital conflicts/separationz
+                                            [5] => Health of a family member
+                                            [6] => Home environment is not conducive to study
+                                            [7] => Homesickness/Living away from home
+                                            [8] => Lacking parents' appreciation
+                                            [9] => Not getting along well with a family member/relative
+                                            [10] => Feeling pressured by high expectations from parents/family
+                                            [11] => Feeling invalidated by family members
+                                            [12] => Concerned about the health of a family member
+                                            [13] => Too many responsibilities at home
+                                            [14] => No Family/Home Concern
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [2] => Array
+                                (
+                                    [question] => MENTAL/PHYSICAL HEALTH CONCERNS
+                                    [type] => checkbox
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Struggling with addiction (substance use, internet, gaming, gambling, shopping)
+                                            [1] => Difficulty in managing emotions
+                                            [2] => Feeling burned out
+                                            [3] => Feeling tired/fatigued most of the time (physically/emotionally)
+                                            [4] => Having a physical illness that needs medical attention
+                                            [5] => Racing thoughts
+                                            [6] => Overthinking / Anxiety
+                                            [7] => Having panic attacks
+                                            [8] => Experiencing stress
+                                            [9] => Difficulty coping with stress
+                                            [10] => Deep feelings of sadness
+                                            [11] => Self-harm behavior (cutting, scratching, burning, etc.)
+                                            [12] => Erratic sleeping patterns
+                                            [13] => Suicidal thoughts
+                                            [14] => Suicide attempt
+                                            [15] => Difficulty concentrating/being more forgetful
+                                            [16] => Avoiding people, situations, or responsibilities
+                                            [17] => Unable to enjoy/loss of interest in activities
+                                            [18] => Feeling empty/Not feeling anything
+                                            [19] => Increased irritability
+                                            [20] => Crying spells
+                                            [21] => Changes in appetite (eating more or less)
+                                            [22] => No Mental/Physical Health Concerns
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [3] => Array
+                                (
+                                    [question] => ACADEMIC CONCERNS
+                                    [type] => checkbox
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Difficulty in adjusting to learning modality
+                                            [1] => Difficulty in meeting academic requirements
+                                            [2] => Difficulty working independently
+                                            [3] => Difficulty working in a group/pair
+                                            [4] => Dissatisfaction with academic performance/grades
+                                            [5] => Lacking effective study habits (note-taking, time management)
+                                            [6] => Difficulty overcoming distractions
+                                            [7] => Lacking motivation
+                                            [8] => Struggling with procrastination
+                                            [9] => Struggling to balance academics with extracurricular/non-academic activities
+                                            [10] => Test anxiety
+                                            [11] => No Academic concern
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [4] => Array
+                                (
+                                    [question] => PROFESSOR ISSUE CONCERNS
+                                    [type] => checkbox
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Favoritism/ unfair treatment
+                                            [1] => Inadequate background knowledge about the subjects
+                                            [2] => Unavailable most of the time
+                                            [3] => Difficult to reach or communicate with
+                                            [4] => Unethical/unprofessional behavior
+                                            [5] => Does not provide timely feedback
+                                            [6] => No Professor issues/concerns
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [5] => Array
+                                (
+                                    [question] => CAREER CONCERNS
+                                    [type] => checkbox
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Uncertainty about career choice/ wanting to shift to another program
+                                            [1] => Career choice is limited by financial resources
+                                            [2] => Unaware of strengths, abilities, or interests
+                                            [3] => Feeling lost and overwhelmed about making a career decision
+                                            [4] => Feeling pressured by peers/family to succeed
+                                            [5] => Need help with career planning
+                                            [6] => Dissatisfied with the present college program
+                                            [7] => Anxious about the future/world of work
+                                            [8] => No Career concern
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [6] => Array
+                                (
+                                    [question] => I have other concerns/questions that I want to directly consult or discuss with my counselor.
+                                    [type] => multiple
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Yes
+                                            [1] => No
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [7] => Array
+                                (
+                                    [question] => We appreciate your feedback. Please let us know how we can best improve our CGCC Student Individual Inventory (SII) Form. If you have comments/suggestions, please indicate them below:
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [8] => Array
+                                (
+                                    [question] => By submitting this form, I certify that the above information are true and correct. FALSIFICATION of any information will be subjected to DISCIPLINARY ACTION.
+                                    [type] => checkbox
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => I Certify
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [title] => CLIENT CONSENT FORM
+                    [description] => This form is a document provided by the CGCC to students in order to properly acquire consent for Counseling. The form contains informalion about the counseling service and the agreement between the counselor and the student.
+
+APPOINTMENT
+Your sessions are scheduled and agreed upon by you and your counselors. When you need to cancel or reschedule an appointment, please give us at least 24-hours notice.
+
+COUNSELING and ASSESSMENT
+Counseling is an opportunity to identify and build on current strengths, learn problem-solving strategies, develop or enhance coping skills, learn more effective ways to communicate with others, and receive support and feedback. Assessment is crucial in facilitating the counselor’s understanding of the client. The counseling relationship is designed to be one that will promote change and growth. The counselor and client both have active roles. A record of the counseling and assessment services provided to each client is maintained.
+
+The goal of the counselor is to provide a comfortable and supportive environment conducive to insight, healing, and personal growth. Your role, as the client, will be to identify goals you would like to achieve during the course of counseling and be willing to examine any potential obstacles and strengths that will either hinder or help you achieve your desired goals.
+
+RISKS
+Counseling and assessment can have benefits and risks and it is important to consider both when making any treatment decisions. Since counseling involves discussing unpleasant aspects of your life, there is a risk that you may experience temporary uncomfortable feelings like sadness, guilt, anger, frustration, loneliness, and helplessness. Disclosing personal information during an assessment may likewise feel uncomfortable and might make you feel vulnerable.
+
+COUNSELOR CONTACT INFORMATION
+The primary way to get in touch with us is by contacting your counselor through Canvas or email. If you are in a crisis and need immediate assistance, please go to your nearest emergency room.
+                    [behavior] => next-page
+                    [questions] => Array
+                        (
+                        )
+
+                )
+
+            [3] => Array
+                (
+                    [title] => CONFIDENTIALITY and RELEASE of INFORMATION
+                    [description] => Protecting your privacy is very important. The information in your record is confidential and will not be disclosed to anyone without your written consent unless required by law.
+
+The exceptions to confidentiality include:
+If you tell your counselor that you are going to harm or kill yourself or someone else, we are required by law to do whatever we can do to prevent that from happening and to ensure your safety and the safety of others. This may require notifying family members, parents, legal guardians, legal authorities, and/or potential victims.
+
+If you tell us about incidents of abuse, we are required to report this to proper authorities.
+
+We are required to release your records if they are subpoenaed by a court of law.
+
+In addition to the above, there are several other situations where confidentiality cannot be insured, including:
+
+If you provide us with a request to release your records
+
+If you are in family counseling, we cannot guarantee confidentiality will be maintained by other family members.
+
+If you are a child/minor or unable to voluntarily consent, a guardian must give written consent and can access your records.
+                    [behavior] => same-page
+                    [questions] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [question] => I understand the nature and limits of confidentiality stated above and accept them as part of the benefits and conditions of participating in counseling. In the event that my counselor reasonably believes that there is evidence of clear and imminent danger of harm to myself and/or others, physically or emotionally, I give consent to my counselor to contact the following persons, in addition to the school and medical personnel.
+                                    [type] => multiple
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Agree
+                                            [1] => Disagree
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [1] => Array
+                                (
+                                    [question] => Name of Father/Mother or Legal Guardian
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [2] => Array
+                                (
+                                    [question] => Contact number of parent/guardian
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                        )
+
+                )
+
+            [4] => Array
+                (
+                    [title] => USE of CLIENT INFORMATION on OUTCOME RESEARCH
+                    [description] => 
+                    [behavior] => same-page
+                    [questions] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [question] => When client information is utilized on outcome research purposes, client names are not disclosed.
+                                    [type] => multiple
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => I allow the College Guidance and Counseling Center to use the data from my record for outcome research given that my identity is protected.
+                                            [1] => I do not allow the College Guidance and Counseling Center to use the data from my record for outcome research.
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [1] => Array
+                                (
+                                    [question] => Counseling Guidelines
+Please review the Counseling Guidelines through this link: https://bit.ly/counselingguide
+By accomplishing this form you understand and agree to the guidelines set by CGCC.
+                                    [type] => display
+                                    [subtype] => 
+                                    [required] => 
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [2] => Array
+                                (
+                                    [question] => This document has provided the information required to address expectations about counseling. I have read and fully understand this document. All questions that I had have been answered to my satisfaction. By filling out this form, I voluntarily agree to accept counseling.
+                                    [type] => display
+                                    [subtype] => 
+                                    [required] => 
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                        )
+
+                )
+
+        )
+
+)
+
+--------------------------------------------------------------------------------
+
+[2025-05-31 23:14:37] Received Form Data:
+Array
+(
+    [form_index] => 8
+    [form_name] => Counseling Service Evaluation Form
+    [description] => COUNSELING SERVICE EVALUATION
+
+In order for us to continuously evaluate and improve our counseling services, we would like to get feedback from you on your experience in your counseling session.
+    [academic_year] => 2024-2025
+    [sections] => Array
+        (
+            [0] => Array
+                (
+                    [title] => DATA PRIVACY NOTICE
+                    [description] => All data indicated in this evaluation form are to be kept confidential in compliance with the Republic Act 10173 otherwise known as Data Privacy Act of 2012 and shall only be used for the purpose of evaluating the student experience in counseling. This form shall only be accessed by guidance counselors. CGCC shall retain the data in accordance with Document Retention Period and will be deleted upon disposal. By answering this form, you are giving CGCC consent to process and store this information.
+                    [behavior] => same-page
+                    [questions] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [question] => Counselor being Evaluated
+                                    [type] => dropdown
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Ms. Jane Aira Ramilo
+                                            [1] => Ms. Nery Dumol
+                                            [2] => Ms. Geraldine Flores
+                                            [3] => Ms. Lot Prospero
+                                            [4] => Ms. Olive Diokno
+                                            [5] => Ms. Mercy Malabanan
+                                            [6] => Ms. Edchell Adajar
+                                            [7] => Ms. Kristine Mendoza
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                        )
+
+                )
+
+            [1] => Array
+                (
+                    [title] => Counseling Services Evaluation
+                    [description] => 
+                    [behavior] => next-page
+                    [questions] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [question] => Please choose the number that corresponds to your level of agreement to the following statements (4 being the HIGHEST and 1 being the LOWEST):
+                                    [type] => grid
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => 4 - Strongly Agree
+                                            [1] => 3 - Agree
+                                            [2] => 2 - Disagree
+                                            [3] => 1 - Strongly Agree
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                            [0] => The counselor understood my social/emotional, academic, and career-related concerns and provided useful information and assistance.
+                                            [1] => I felt comfortable with my counselor
+                                            [2] => I was able to express my thoughts and feelings effectively to my counselor.
+                                            [3] => The counselor actively listened to me.
+                                            [4] => The counselor provided professional and courteous assistance.
+                                            [5] => The counselor is always available.
+                                            [6] => Provides a venue for private confidential counseling sessions.
+                                            [7] => The time allotted for the session was sufficient.
+                                            [8] => Seeing the counselor was worth my time.
+                                            [9] => Overall, I was satisfied with the counseling session.
+                                        )
+
+                                )
+
+                            [1] => Array
+                                (
+                                    [question] => Please take this opportunity to express your comments and suggestion about your experience with this session. We encourage you to be completely open, as this is the only way we can evaluate ourselves and initiate improvements.
+                                    [type] => paragraph
+                                    [subtype] => 
+                                    [required] => 
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [2] => Array
+                                (
+                                    [question] => Thank you!
+
+We appreciate your comments and feedback.
+                                    [type] => display
+                                    [subtype] => 
+                                    [required] => 
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                        )
+
+                )
+
+        )
+
+)
+
+--------------------------------------------------------------------------------
+
+[2025-05-31 23:14:43] Received Form Data:
+Array
+(
+    [form_index] => 9
+    [form_name] => General Mental Health Screening
+    [description] => This form intends to determine your current mental health status based on your experience in the past two (2) weeks. This information would allow your counselor to better assist you with your concerns.
+
+*DSM-5-TR Self-Rated Level 1 Cross-Cutting Symptom Measure, American Psychiatric Association
+    [academic_year] => 2024-2025
+    [sections] => Array
+        (
+            [0] => Array
+                (
+                    [title] => DATA PRIVACY NOTICE
+                    [description] => All data indicated in this evaluation form are to be kept confidential in compliance with the Republic Act 10173 otherwise known as Data Privacy Act of 2012 and shall only be used for the purpose of assessing the students'  general mental health. This form shall only be accessed by guidance counselors. CGCC shall retain the data in accordance with Document Retention Period and will be deleted upon disposal. By answering this form, you are giving CGCC consent to process and store this information.
+                    [behavior] => same-page
+                    [questions] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [question] => 
+                                    [type] => grid
+                                    [subtype] => 
+                                    [required] => 
+                                    [options] => Array
+                                        (
+                                            [0] => Not at all
+                                            [1] => Rare, less than a day or two
+                                            [2] => Several days
+                                            [3] => Most of the days in the past 2 weeks
+                                            [4] => Almost everyday
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                            [0] => Worried about your health or about getting sick
+                                            [1] => Been bothered by not being able to fall asleep or stay asleep, or by waking up too early
+                                            [2] => Been bothered by not being able to focus when you were in class or doing homework/reading a book/playing a game
+                                            [3] => Had less fun doing things than you used to
+                                            [4] => Felt sad or depressed for several hours
+                                            [5] => Felt more irritated or easily annoyed than usual
+                                            [6] => Felt angry or lost your temper
+                                            [7] => Feeling nervous, anxious, or scared
+                                            [8] => Not been able to stop worrying
+                                            [9] => Not been able to do things you wanted to or should have done, because they made you feel nervous
+                                            [10] => Little interest or pleasure in doing things
+                                        )
+
+                                )
+
+                            [1] => Array
+                                (
+                                    [question] => In the past two (2) weeks, have you:
+                                    [type] => grid
+                                    [subtype] => 
+                                    [required] => 
+                                    [options] => Array
+                                        (
+                                            [0] => Yes
+                                            [1] => No
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                            [0] => Had an alcoholic beverage (beer, wine, liquor, etc)?
+                                            [1] => Smoked a cigarette/vape?
+                                            [2] => Used prohibited drugs?
+                                            [3] => Used any medicine without a doctor’s prescription to get high or change the way you feel?
+                                            [4] => Have you thought about ending your life or committing suicide?
+                                            [5] => Have you EVER tried to kill yourself?
+                                        )
+
+                                )
+
+                            [2] => Array
+                                (
+                                    [question] => Sometimes things happen to people that are unusually or especially frightening, horrible, or traumatic. For example a serious accident or fire, a physical or sexual assault or abuse, an earthquake or flood, a war, seeing someone be killed or seriously injured, having a loved one die through homicide or suicide. Have you ever experienced any of this kind of event?
+                                    [type] => multiple
+                                    [subtype] => 
+                                    [required] => 
+                                    [options] => Array
+                                        (
+                                            [0] => Yes
+                                            [1] => No
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [3] => Array
+                                (
+                                    [question] => How would you rate your current level of stress?
+                                    [type] => multiple
+                                    [subtype] => 
+                                    [required] => 
+                                    [options] => Array
+                                        (
+                                            [0] => Very Low
+                                            [1] => Low
+                                            [2] => Moderate
+                                            [3] => High
+                                            [4] => Very High
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [4] => Array
+                                (
+                                    [question] => Suicide Risk Screening/Assessment (Please respond to the following items)
+                                    [type] => grid
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Yes
+                                            [1] => No
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                            [0] => I have thoughts about killing myself in the last 7 days.
+                                            [1] => I wish I could go to sleep and never wake up.
+                                            [2] => I feel hopeless about my current situation.
+                                            [3] => I have taken steps to prepare to end my life
+                                            [4] => I have tried inflicting harm to myself within the last 7 days.
+                                            [5] => I am thinking about harming or killing someone.
+                                            [6] => I had suicidal attempts
+                                        )
+
+                                )
+
+                            [5] => Array
+                                (
+                                    [question] => Thanks for answering the questions above. At this point, we would like to know if there are other things that you would like to share or talk about with your counselor.
+                                    [type] => paragraph
+                                    [subtype] => 
+                                    [required] => 
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                        )
+
+                )
+
+        )
+
+)
+
+--------------------------------------------------------------------------------
+
+[2025-05-31 23:14:49] Received Form Data:
+Array
+(
+    [form_index] => 10
+    [form_name] => Student Individual Inventory
+    [description] => This form would only take 15- 20 minutes of your time.
+
+Every person's life is a developing story. The person you are today is a result of your upbringing and experiences, joys and sorrows, desires, and dreams. While we know that it's tempting to rush at times, please take some time to reflect on your life.
+    [academic_year] => 2024-2025
+    [sections] => Array
+        (
+            [0] => Array
+                (
+                    [title] => College Guidance and Counseling Center - Student Individual Inventory 2024-2025
+                    [description] => 
+                    [behavior] => same-page
+                    [questions] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [question] => I understand that this form is considered an official record of De La Salle Lipa and that College Guidance and Counseling Center (CGCC) is required to keep my personal information and records until such time that these documents are due for disposal based on the DLSL data privacy retention policy. Some of the services of CGCC that would utilize this data are Counseling, Referral, and Research and Development. This form shall only be accessed by the CGCC team. CGCC shall retain the data in accordance with Document Retention Period and will be deleted upon disposal. By answering this form, you are giving CGCC consent to process and store this information. Please answer carefully and truthfully.
+                                    [type] => display
+                                    [subtype] => 
+                                    [required] => 
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                        )
+
+                )
+
+            [1] => Array
+                (
+                    [title] => Personal Information
+                    [description] => 
+                    [behavior] => same-page
+                    [questions] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [question] => Nickname
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [1] => Array
+                                (
+                                    [question] => Last school attended during SHS                              
+2nd Year - 5th Year College students, Put N/A
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [2] => Array
+                                (
+                                    [question] => Birthday
+                                    [type] => date
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [3] => Array
+                                (
+                                    [question] => Age
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [4] => Array
+                                (
+                                    [question] => Nationality
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [5] => Array
+                                (
+                                    [question] => Personal Mobile Number
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [6] => Array
+                                (
+                                    [question] => Home Landline Phone Number (Area Code & Phone Number)
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [7] => Array
+                                (
+                                    [question] => COMPLETE PERMANENT ADDRESS (House Number, Block No., Lot No., Street, Subdivision, Barangay, City/Municipality, Province)
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [8] => Array
+                                (
+                                    [question] => COMPLETE "PRESENT ADDRESS" (if living in apartment, dormitory etc.) Put N/A if not applicable
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [9] => Array
+                                (
+                                    [question] => Name of Landlord/Landlady 
+Put N/A if not applicable
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [10] => Array
+                                (
+                                    [question] => Religion
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [11] => Array
+                                (
+                                    [question] => Sex at birth
+                                    [type] => multiple
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Male
+                                            [1] => Female
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [12] => Array
+                                (
+                                    [question] => To which gender identity do you most identify?
+                                    [type] => dropdown
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Female
+                                            [1] => Male
+                                            [2] => Transgender
+                                            [3] => Gender neutral
+                                            [4] => Non-binary
+                                            [5] => Agender
+                                            [6] => Pangender
+                                            [7] => Genderqueer
+                                            [8] => Two-spirit
+                                            [9] => Third gender
+                                            [10] => Prefer to self-describe
+                                            [11] => Prefer not to say
+                                            [12] => A gender not listed
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [13] => Array
+                                (
+                                    [question] => Current Status
+                                    [type] => multiple
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Single
+                                            [1] => Married WIHT child/children
+                                            [2] => Married WITHOUT child/children
+                                            [3] => Living with Partner WITH child/children
+                                            [4] => Living with Partner WITHOUT child/children
+                                            [5] => Single Parent
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [title] => College Varsity
+                    [description] => 
+                    [behavior] => next-page
+                    [questions] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [question] => Are you a college student varsity?
+                                    [type] => dropdown
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => No
+                                            [1] => Yes
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                        )
+
+                )
+
+            [3] => Array
+                (
+                    [title] => Family and Home
+                    [description] => 
+                    [behavior] => same-page
+                    [questions] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [question] => Are your parents working abroad?
+                                    [type] => multiple
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Father only
+                                            [1] => Mother only
+                                            [2] => Both parents
+                                            [3] => No. I do not have an OFW parent
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [1] => Array
+                                (
+                                    [question] => Father's Complete Name (Last Name, First Name M.I)
+Write "D" if deceased and "NI" if no information
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [2] => Array
+                                (
+                                    [question] => Occupation/Business of Father
+Put N/A if not applicable
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [3] => Array
+                                (
+                                    [question] => Father's Cellphone Number
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [4] => Array
+                                (
+                                    [question] => Father's email address
+Put N/A if not applicable
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [5] => Array
+                                (
+                                    [question] => If father is OFW (what country)
+Put N/A if not applicable
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [6] => Array
+                                (
+                                    [question] => Mother's Complete Name (Last Name, First Name M.I.)
+Write "D" if deceased and "NI" if no information
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [7] => Array
+                                (
+                                    [question] => Occupation/Business of Mother
+Put N/A if not applicable
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [8] => Array
+                                (
+                                    [question] => Mother's Cellphone Number
+Put N/A if not applicable
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [9] => Array
+                                (
+                                    [question] => Mother's email address
+Put N/A if not applicable
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [10] => Array
+                                (
+                                    [question] => If mother is OFW (what country)
+Put N/A if not applicable
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [11] => Array
+                                (
+                                    [question] => Parents are?
+This portion will be treated with utmost confidentiality, please answer with all honesty
+                                    [type] => checkbox
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Married and living together
+                                            [1] => Permanently separated
+                                            [2] => Marriage annulled
+                                            [3] => Legally separated
+                                            [4] => Father w/ another partner
+                                            [5] => Mother w/ another partner
+                                            [6] => Temporarily separated
+                                            [7] => Father is deceased
+                                            [8] => Mother is deceased
+                                            [9] => Other
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [12] => Array
+                                (
+                                    [question] => Guardian's Name
+Contact person other than parents. Put N/A if not applicable.
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [13] => Array
+                                (
+                                    [question] => Relationship to Guardian (e.g. uncle, aunt, grandmother, family friend, etc.)
+Put N/A if not applicable
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [14] => Array
+                                (
+                                    [question] => Guardian's Contact Number
+Put N/A if not applicable
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [15] => Array
+                                (
+                                    [question] => Living arrangement
+                                    [type] => multiple
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Own House (with parents)
+                                            [1] => Own house (without parents/guardian)
+                                            [2] => Renting with parents/relatives (boarding house, dormitory, apartment)
+                                            [3] => Renting Alone (boarding house, dormitory, apartment)
+                                            [4] => Living with relatives
+                                            [5] => Other
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [16] => Array
+                                (
+                                    [question] => Have you received therapy, counseling, or mental health treatment in the past?
+                                    [type] => dropdown
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => No
+                                            [1] => Yes
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                        )
+
+                )
+
+            [4] => Array
+                (
+                    [title] => College Guidance and Counseling Center
+                    [description] => 
+                    [behavior] => next-page
+                    [questions] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [question] => Scholarship Category
+                                    [type] => multiple
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => No Scholarship
+                                            [1] => Academic Scholarship
+                                            [2] => Clerical Assistant
+                                            [3] => Brother Gregory Refuerzo Scholarship Grants Program (c/o Lasallian Partners)
+                                            [4] => Miguel Febres Cordero Scholarship (FEBRES)
+                                            [5] => PD577
+                                            [6] => Br. Henry Virgil Scholarship (ATHLETES)
+                                            [7] => Privately Funded Scholarship
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [1] => Array
+                                (
+                                    [question] => Other persons who financially support you
+Put N/A if not applicable
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [2] => Array
+                                (
+                                    [question] => Hobbies/interests
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                        )
+
+                )
+
+        )
+
+)
+
+--------------------------------------------------------------------------------
+
+[2025-05-31 23:14:54] Received Form Data:
+Array
+(
+    [form_index] => 11
+    [form_name] => EXIT INTERVIEW FORM
+    [description] => This form is designed for graduating students to evaluate various aspects of their academic and campus experience. It collects feedback on: Academic Quality (courses, faculty, resources), Campus Life (facilities, extracurriculars, support services), Career Preparation (internships, counseling, skill development), and Overall Satisfaction. Responses help the institution improve programs and services for future students.
+    [academic_year] => 2024-2025
+    [sections] => Array
+        (
+            [0] => Array
+                (
+                    [title] => EXIT INTERVIEW FORM
+                    [description] => 
+                    [behavior] => same-page
+                    [questions] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [question] => How would you evaluate the overall quality of your college experience at De La Salle Lipa?
+                                    [type] => multiple
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Very Good
+                                            [1] => Good
+                                            [2] => Poor
+                                            [3] => Very Poor
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [1] => Array
+                                (
+                                    [question] => How satisfied are you with the following aspects that De La Salle Lipa has provided?
+                                    [type] => grid
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Very Satisfied
+                                            [1] => Satisfied
+                                            [2] => Dissatisfied
+                                            [3] => Not Satisfied
+                                            [4] => N/A
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                            [0] => Teachers
+                                            [1] => Curriculum
+                                            [2] => Quality of academic advising
+                                            [3] => Quality of teaching modules
+                                            [4] => Quality of practice/OJT opportunities (e.g. facilitating access to internships))
+                                            [5] => Overall usefulness of De La Salle Lipa’s website
+                                            [6] => Quality of library resources and services
+                                            [7] => Quality of enrollment process and services
+                                            [8] => Quality of payment process
+                                            [9] => Viewing of grades
+                                            [10] => Quality of services in acquiring copy of student records (e.g. copy of grades etc.)
+                                            [11] => Overall value of the education with respect to tuition fee
+                                            [12] => Quality of online academic-related engagements with students
+                                            [13] => Quality of activities of student organizations
+                                            [14] => Quality of student government plans and programs
+                                            [15] => Campus safety and security services
+                                            [16] => Student Formation and Discipline Office services
+                                            [17] => Institutional Lasallian Formation Office (ILFO) services
+                                            [18] => Lasallian Assistance Management Program (LAMP) services
+                                            [19] => Quality of Institutional Health Services (Clinic)
+                                            [20] => College Guidance and Counseling Center services
+                                        )
+
+                                )
+
+                            [2] => Array
+                                (
+                                    [question] => Please share any comments about your level of satisfaction with the services above (optional).
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [3] => Array
+                                (
+                                    [question] => How would you evaluate the following learning results that you have gained at the end of this College Experience?
+                                    [type] => grid
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Very Good
+                                            [1] => Good
+                                            [2] => Poor
+                                            [3] => Very Poor
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                            [0] => General preparation for life
+                                            [1] => Competence in your major field of study
+                                            [2] => Foundation for graduate studies
+                                            [3] => Critical thinking skills
+                                            [4] => Quantitative reasoning skills
+                                            [5] => Written communication skills
+                                            [6] => Oral communication skills
+                                            [7] => Leadership skills
+                                            [8] => Capacity to understand current world issues
+                                            [9] => Capacity to understand human diversity (cultural diversity, sexual diversity, etc.)
+                                            [10] => Capacity to access relevant and trustworthy information
+                                        )
+
+                                )
+
+                            [4] => Array
+                                (
+                                    [question] => What are your next plans regarding education and career
+                                    [type] => checkbox
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Continue with graduate studies in the same field
+                                            [1] => Continue with graduate studies in a different field
+                                            [2] => Continue with higher education in another field
+                                            [3] => Review for Licensure Examination
+                                            [4] => Look for a job
+                                            [5] => I already have a job and will immediately start working
+                                            [6] => Involve myself with volunteer activities
+                                            [7] => Help manage our family business
+                                            [8] => Work on an online job
+                                            [9] => Stay unemployed and rest for a while
+                                            [10] => Other
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [5] => Array
+                                (
+                                    [question] => What are your worries/concerns now that you are graduating from college?
+                                    [type] => checkbox
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Feels unprepared for job application process (job interview, creating a resume, visiting companies, etc.)
+                                            [1] => Feels not ready for the world of work
+                                            [2] => Anxious about competition in job hunting
+                                            [3] => Pressure to provide/give back for the family
+                                            [4] => Expectations from family, society to succeed
+                                            [5] => Concerns about adjusting to change (workplace environment, new people, work responsibilities, leaving DLSL)
+                                            [6] => Other
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [6] => Array
+                                (
+                                    [question] => How likely would you recommend the following to a friend
+                                    [type] => grid
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Strongly Recommended
+                                            [1] => Recommended
+                                            [2] => NOT Recommended
+                                            [3] => Strongly NOT Recommended De La Salle Lipa as an academic institution	 To enroll my college program in De La Salle Lipa.	 To enroll in other college programs in De La Salle Lipa
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                            [0] => De La Salle Lipa as an academic institution
+                                            [1] => To enroll my college program in De La Salle Lipa.
+                                            [2] => To enroll in other college programs in De La Salle Lipa
+                                        )
+
+                                )
+
+                            [7] => Array
+                                (
+                                    [question] => Overall comments in your stay in De La Salle Lipa.
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                        )
+
+                )
+
+        )
+
+)
+
+--------------------------------------------------------------------------------
+

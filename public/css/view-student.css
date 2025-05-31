@@ -127,7 +127,6 @@ input[type="text"][readonly] {
     border-bottom: 1px solid #eee;
 }
 
-/* New styles for form grouping */
 .form-container-group {
     background-color: white;
     border-radius: 10px;
@@ -177,6 +176,17 @@ input[type="text"][readonly] {
     transform: translateX(5px);
 }
 
+.response-card.recent-response {
+    background-color: #e8f5ee;
+    border-left: 4px solid #2ecc71;
+}
+
+.response-card.previous-response {
+    background-color: #f5f5f5;
+    border-left: 4px solid #95a5a6;
+    margin-top: 10px;
+}
+
 .response-card:last-child {
     margin-bottom: 0;
 }
@@ -208,6 +218,38 @@ input[type="text"][readonly] {
     color: #7f8c8d;
     padding: 20px;
     font-style: italic;
+}
+
+.previous-responses-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    margin-top: 15px;
+    border-top: 1px dashed #ddd;
+    color: #7f8c8d;
+    font-size: 0.9em;
+}
+
+.view-all-btn {
+    background-color: #316b50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 0.8em;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.view-all-btn:hover {
+    background-color: #2a5a44;
+}
+
+.previous-responses-content {
+    max-height: 300px;
+    overflow-y: auto;
+    transition: all 0.3s ease;
 }
 
 /* Animation for loading */

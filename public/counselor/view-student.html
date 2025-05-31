@@ -145,8 +145,44 @@
                     if (data.responses && data.responses.length > 0) {
                         responsesList.innerHTML = '';
                         
+                        // Group responses by form_id
+                        const groupedResponses = {};
                         data.responses.forEach(response => {
-                            const date = new Date(response.created_at);
+                            if (!groupedResponses[response.form_index]) {
+                                groupedResponses[response.form_index] = [];
+                            }
+                            groupedResponses[response.form_index].push(response);
+                        });
+                        
+                        // Sort each group by date (newest first)
+                        Object.keys(groupedResponses).forEach(formId => {
+                            groupedResponses[formId].sort((a, b) => {
+                                return new Date(b.created_at) - new Date(a.created_at);
+                            });
+                        });
+                        
+                        // Create UI for each form group
+                        Object.keys(groupedResponses).forEach(formId => {
+                            const formResponses = groupedResponses[formId];
+                            const formName = formResponses[0].form_name;
+                            const academicYear = formResponses[0].academic_year || 'N/A';
+                            
+                            const formGroup = document.createElement('div');
+                            formGroup.className = 'form-container-group';
+                            
+                            const formHeader = document.createElement('div');
+                            formHeader.className = 'form-header';
+                            formHeader.innerHTML = `
+                                <span class="form-name">${formName}</span>
+                                <span class="response-count">${formResponses.length} response${formResponses.length > 1 ? 's' : ''}</span>
+                            `;
+                            
+                            const formContent = document.createElement('div');
+                            formContent.className = 'form-responses';
+                            
+                            // Add most recent response (highlighted)
+                            const mostRecent = formResponses[0];
+                            const date = new Date(mostRecent.created_at);
                             const formattedDate = date.toLocaleDateString('en-US', {
                                 year: 'numeric',
                                 month: 'long',
@@ -154,20 +190,87 @@
                                 hour: '2-digit',
                                 minute: '2-digit'
                             });
-
-                            const responseCard = document.createElement('div');
-                            responseCard.className = 'response-card';
-                            responseCard.innerHTML = `
+                            
+                            const recentCard = document.createElement('div');
+                            recentCard.className = 'response-card recent-response';
+                            recentCard.innerHTML = `
                                 <div class="response-header">
-                                    <span class="response-form-name">${response.form_name}</span>
+                                    <span class="response-form-name">Most Recent</span>
                                     <span class="response-date">${formattedDate}</span>
                                 </div>
                                 <div class="response-details">
-                                    <span>Academic Year: ${response.academic_year || 'N/A'}</span>
-                                    <span>Answers: ${response.answer_count}</span>
+                                    <span>Academic Year: ${academicYear}</span>
+                                    <span>Answers: ${mostRecent.answer_count}</span>
                                 </div>
                             `;
-                            responsesList.appendChild(responseCard);
+                            
+                            recentCard.addEventListener('click', () => {
+                                window.location.href = `view-response.html?id=${mostRecent.response_index}`;
+                            });
+                            
+                            formContent.appendChild(recentCard);
+                            
+                            // Add previous responses dropdown if there are more
+                            if (formResponses.length > 1) {
+                                const prevResponsesHeader = document.createElement('div');
+                                prevResponsesHeader.className = 'previous-responses-header';
+                                prevResponsesHeader.innerHTML = `
+                                    <span>Previous Responses (${formResponses.length - 1})</span>
+                                    <button class="view-all-btn">View All</button>
+                                `;
+                                
+                                const prevResponsesContent = document.createElement('div');
+                                prevResponsesContent.className = 'previous-responses-content';
+                                prevResponsesContent.style.display = 'none';
+                                
+                                // Add previous responses
+                                for (let i = 1; i < formResponses.length; i++) {
+                                    const response = formResponses[i];
+                                    const prevDate = new Date(response.created_at);
+                                    const prevFormattedDate = prevDate.toLocaleDateString('en-US', {
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    });
+                                    
+                                    const prevCard = document.createElement('div');
+                                    prevCard.className = 'response-card previous-response';
+                                    prevCard.innerHTML = `
+                                        <div class="response-header">
+                                            <span class="response-form-name">Response #${i + 1}</span>
+                                            <span class="response-date">${prevFormattedDate}</span>
+                                        </div>
+                                        <div class="response-details">
+                                            <span>Academic Year: ${academicYear}</span>
+                                            <span>Answers: ${response.answer_count}</span>
+                                        </div>
+                                    `;
+                                    
+                                    prevCard.addEventListener('click', () => {
+                                        window.location.href = `view-response.html?id=${response.response_index}`;
+                                    });
+                                    
+                                    prevResponsesContent.appendChild(prevCard);
+                                }
+                                
+                                prevResponsesHeader.querySelector('.view-all-btn').addEventListener('click', (e) => {
+                                    e.stopPropagation();
+                                    if (prevResponsesContent.style.display === 'none') {
+                                        prevResponsesContent.style.display = 'block';
+                                    } else {
+                                        prevResponsesContent.style.display = 'none';
+                                    }
+                                });
+                                
+                                formContent.appendChild(prevResponsesHeader);
+                                formContent.appendChild(prevResponsesContent);
+                            }
+                            
+                            formGroup.appendChild(formHeader);
+                            formGroup.appendChild(formContent);
+                            responsesList.appendChild(formGroup);
                         });
                     } else {
                         responsesList.innerHTML = '<div class="no-responses">No form responses found</div>';
