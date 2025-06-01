@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $upload_dir = __DIR__ . '/../../public/Media/uploads/';
         $filename = uniqid() . "-" . basename($_FILES["profile_image"]["name"]);
         $target_path = $upload_dir . $filename;
-        $relative_path = '/Media/uploads/' . $filename;
+        $relative_path = '/../../public/Media/uploads/' . $filename;
 
         if (!is_dir($upload_dir)) {
             mkdir($upload_dir, 0755, true);
