@@ -8,7 +8,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = $_POST['password'] ?? null;
 
     if (!$email || !$password) {
-        echo "Please enter both email and password.";
+        echo "<script>alert('Please enter both email and password.'); window.history.back();</script>";
         exit();
     }
 
@@ -38,7 +38,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
-
 
         $hashed_password = $row['password'];
 
@@ -79,11 +78,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit();
         }
         else {
-            echo "Invalid email or password.";
+            echo "<script>alert('Invalid email or password.'); window.history.back();</script>";
+            exit();
         }
     }
     else {
-        echo "Invalid email or password.";
+        echo "<script>alert('Invalid email or password.'); window.history.back();</script>";
+        exit();
     }
 
     $stmt->close();

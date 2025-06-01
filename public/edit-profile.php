@@ -398,6 +398,46 @@ document.getElementById('dept_index').addEventListener('change', function () {
         });
 });
 
+document.querySelector("form").addEventListener("submit", function (e) {
+        // Get input values
+        const contactNumber = document.getElementById("contact-number").value.trim();
+        const guardianName = document.getElementById("guardian-full-name").value.trim();
+        const guardianNumber = document.getElementById("guardian-contact-number").value.trim();
+        const dept = document.getElementById("dept_index").value;
+        const program = document.getElementById("program_index").value;
+        const section = document.getElementById("section-index").value;
+        const yearLevelChecked = document.querySelector('input[name="year_level"]:checked');
+
+        // Check for empty fields
+        if (!contactNumber || !guardianName || !guardianNumber || !dept || !program || !section || !yearLevelChecked) {
+            alert("Please fill out all fields before saving changes.");
+            e.preventDefault(); // Prevent form submission
+            return;
+        }
+
+        // Validate contact numbers (should be exactly 11 digits and numeric)
+        const contactRegex = /^\d{11}$/;
+        if (!contactRegex.test(contactNumber)) {
+            alert("Student contact number must be exactly 11 digits.");
+            e.preventDefault();
+            return;
+        }
+
+        if (!contactRegex.test(guardianNumber)) {
+            alert("Guardian contact number must be exactly 11 digits.");
+            e.preventDefault();
+            return;
+        }
+
+        // Validate guardian full name (should not contain any digits)
+        const nameRegex = /^[^\d]+$/;
+        if (!nameRegex.test(guardianName)) {
+            alert("Guardian name must not contain any numbers.");
+            e.preventDefault();
+            return;
+        }
+    });
+
 </script>
 
 
