@@ -163,9 +163,9 @@ function toggleDropdown(id){
 function goToPage(){
     const condition = true;
     if (condition){
-        window.location.href = "../schedule-forms-uncompleted.html";
+        window.location.href = "schedule-forms-uncompleted.html";
     } else{
-        window.location.href = "../schedule-forms-uncompleted.html";
+        window.location.href = "schedule-forms-uncompleted.html";
     }
 }
 </script>
