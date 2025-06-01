@@ -46,6 +46,15 @@ while ($form = $formsResult->fetch_assoc()) {
         $otherForms[] = $form;
     }
 }
+
+$allRequiredFormsCompleted = true;
+
+foreach ($counselingForms as $form) {
+    if ($form['has_responded'] == 0) {
+        $allRequiredFormsCompleted = false;
+        break;
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -141,12 +150,12 @@ while ($form = $formsResult->fetch_assoc()) {
                 that promote mental well-being and help you reach your fullest potential.</p>
             </div>
             <div class="schedule">
-                <button class="button-class" onclick="">
+                <button class="button-class" onclick="goToPage()">
                 Schedule a Counseling Appointment
                 </button>
             </div>
             <div class="update">
-                <button class="button-class" onclick="">
+                <button class="button-class" onclick="window.location.href='edit-profile.php'">
                     Edit Profile Information
                 </button>
             </div>
@@ -155,15 +164,16 @@ while ($form = $formsResult->fetch_assoc()) {
     </div>
 
 <script>
+const allRequiredFormsCompleted = <?= $allRequiredFormsCompleted ? 'true' : 'false' ?>;
+
 function toggleDropdown(id){
     const content = document.getElementById(id);
     content.style.display = content.style.display === "block" ? "none" : "block";
 }
 
 function goToPage(){
-    const condition = true;
-    if (condition){
-        window.location.href = "schedule-forms-uncompleted.html";
+    if (allRequiredFormsCompleted){
+        window.location.href = "schedule-forms-completed.php";
     } else{
         window.location.href = "schedule-forms-uncompleted.html";
     }

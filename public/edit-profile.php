@@ -105,21 +105,18 @@ if ($program_index !== null && $selected_year_level !== null) {
 }
 
 $guardian = [
-    'first_name' => '',
-    'last_name' => '',
+    'full_name' => '',
     'contact_number' => ''
 ];
 
-
 if (!empty($student['guardian_index'])) {
-    $guardian_stmt = $conn->prepare("SELECT first_name, last_name, contact_number FROM guardians WHERE guardian_index = ?");
+    $guardian_stmt = $conn->prepare("SELECT full_name, contact_number FROM guardians WHERE guardian_index = ?");
     $guardian_stmt->bind_param("i", $student['guardian_index']);
     $guardian_stmt->execute();
     $guardian_result = $guardian_stmt->get_result();
     $guardian = $guardian_result->fetch_assoc() ?: $guardian;
 }
 
-$guardian_full_name = trim(($guardian['first_name'] ?? '') . ' ' . ($guardian['last_name'] ?? ''));
 
 
 
@@ -189,10 +186,10 @@ $guardian_full_name = trim(($guardian['first_name'] ?? '') . ' ' . ($guardian['l
         College Guidance and Counseling Center
     </div>
     <nav class="navigation">
-        <a href="../main.html">Home</a>
-        <a href="#">Contact</a>
-        <a href="#">About Mental Health</a>
-        <a href="#">FAQ</a>
+        <a href="main.php">Home</a>
+        <a href="contact.html">Contact</a>
+        <a href="about-mental-health.html">About Mental Health</a>
+        <a href="faq.html">FAQ</a>
     </nav>
 </header>
 
@@ -229,13 +226,14 @@ $guardian_full_name = trim(($guardian['first_name'] ?? '') . ' ' . ($guardian['l
         <label for="contact-number">Contact Number</label>
         <input type="text" id="contact-number" name="contact_number" value="<?= htmlspecialchars($student['contact_number'] ?? '') ?>" placeholder="Ex. 09123456789" />
 
-        <label for="guardian-index">Guardian</label>
-        <input readonly type="text" id="guardian-full-name" name="guardian_full_name" 
-        value="<?= htmlspecialchars($guardian_full_name) ?>" placeholder="Guardian Full Name" />
+        <label for="guardian-full-name">Guardian</label>
+        <input type="text" id="guardian-full-name" name="guardian_full_name" 
+        value="<?= htmlspecialchars($guardian['full_name'] ?? '') ?>" placeholder="Guardian Full Name" />
+
         
 
         <label for="guardian-index">Guardian Contact No.</label>
-        <input readonly type="text" id="guardian-contact-number" name="guardian_contact_number" 
+        <input type="text" id="guardian-contact-number" name="guardian_contact_number" 
         value="<?= htmlspecialchars($guardian['contact_number'] ?? '') ?>" placeholder="Guardian Contact Number" />
         
 
@@ -399,6 +397,46 @@ document.getElementById('dept_index').addEventListener('change', function () {
             console.error('Error fetching sections:', err);
         });
 });
+
+document.querySelector("form").addEventListener("submit", function (e) {
+        // Get input values
+        const contactNumber = document.getElementById("contact-number").value.trim();
+        const guardianName = document.getElementById("guardian-full-name").value.trim();
+        const guardianNumber = document.getElementById("guardian-contact-number").value.trim();
+        const dept = document.getElementById("dept_index").value;
+        const program = document.getElementById("program_index").value;
+        const section = document.getElementById("section-index").value;
+        const yearLevelChecked = document.querySelector('input[name="year_level"]:checked');
+
+        // Check for empty fields
+        if (!contactNumber || !guardianName || !guardianNumber || !dept || !program || !section || !yearLevelChecked) {
+            alert("Please fill out all fields before saving changes.");
+            e.preventDefault(); // Prevent form submission
+            return;
+        }
+
+        // Validate contact numbers (should be exactly 11 digits and numeric)
+        const contactRegex = /^\d{11}$/;
+        if (!contactRegex.test(contactNumber)) {
+            alert("Student contact number must be exactly 11 digits.");
+            e.preventDefault();
+            return;
+        }
+
+        if (!contactRegex.test(guardianNumber)) {
+            alert("Guardian contact number must be exactly 11 digits.");
+            e.preventDefault();
+            return;
+        }
+
+        // Validate guardian full name (should not contain any digits)
+        const nameRegex = /^[^\d]+$/;
+        if (!nameRegex.test(guardianName)) {
+            alert("Guardian name must not contain any numbers.");
+            e.preventDefault();
+            return;
+        }
+    });
 
 </script>
 

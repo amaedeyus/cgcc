@@ -4,7 +4,7 @@
     grid-template-rows: auto 1fr;
     height: 100vh;
     user-select: none;
-    background-color: #f5f7fa;
+    background-color: rgb(243, 255, 243);
     padding: 20px;
 }
 
@@ -125,6 +125,25 @@
     transition: background-color 0.2s;
     text-align: center;
     margin-top: 10px;
+}
+
+.back{
+    position: fixed !important;
+    bottom: 20px !important;
+    right: 20px !important;
+    padding: 8px 15px;
+    background-color: rgb(79, 189, 156);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    width: 100px;
+    text-align: center;
+}
+
+.back:hover{
+    background: rgb(36, 154, 118);
 }
 
 .btn-primary:hover {
