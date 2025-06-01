@@ -37,8 +37,9 @@ try {
     $student_index = $student['student_index'];
 
     // Get the latest saved response for this form and student
+    // Only consider responses that are autosaves (is_autosave = 1)
     $stmt = $conn->prepare("
-        SELECT response_index 
+        SELECT response_index, is_autosave 
         FROM responses 
         WHERE form_index = ? AND student_index = ? 
         ORDER BY updated_at DESC LIMIT 1
@@ -48,8 +49,8 @@ try {
     $result = $stmt->get_result();
     $response = $result->fetch_assoc();
 
-    if (!$response) {
-        // No saved response found
+    if (!$response || $response['is_autosave'] == 0) {
+        // No saved response found or the latest response was a submission (not autosave)
         echo json_encode(['formId' => $form_index]);
         exit;
     }
@@ -84,7 +85,6 @@ try {
     $stmt->execute();
     $result = $stmt->get_result();
 
-    // In get_saved_response.php, modify the answer processing section:
     while ($row = $result->fetch_assoc()) {
         $questionId = $row['main_question_index'];
         $choice = $row['choice_index'];

@@ -4,14 +4,16 @@ header('Content-Type: application/json');
 // Include your existing connection file
 require_once '../connect.php';
 
-try {
-    // Get student ID from session or request
-    $student_id = $_GET['student_id'] ?? null;
-    
-    if (!$student_id) {
-        throw new Exception("Student ID not provided");
-    }
+// Start session and get student_index from session
+session_start();
+$student_id = $_SESSION['student_index'] ?? null;
 
+if (!$student_id) {
+    echo json_encode(['status' => 'error', 'message' => 'Student ID not found in session. Please log in again.']);
+    exit;
+}
+
+try {
     // Get all required and active forms
     $query = "
         SELECT f.form_index, f.form_name, f.description 

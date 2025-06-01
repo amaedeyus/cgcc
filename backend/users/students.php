@@ -39,14 +39,14 @@ try {
             r.academic_year
         FROM responses r
         JOIN forms f ON r.form_index = f.form_index
-        WHERE r.student_index = ?
+        WHERE r.student_index = ? AND r.is_autosave = 0
         ORDER BY r.created_at DESC
     ";
 
     $countAnswersSql = "
         SELECT COUNT(*) AS answer_count
         FROM responses
-        WHERE student_index = ? AND form_index = ?
+        WHERE student_index = ? AND form_index = ? AND is_autosave = 0
     ";
     // --- Fetch student info ---
     $stmt = $conn->prepare($studentSql);
@@ -73,7 +73,7 @@ try {
         $stmt = $conn->prepare($countAnswersSql);
         if (!$stmt) throw new Exception($conn->error);
         
-        $stmt->bind_param("ii", $studentId, $responseItem['form_index']); // FIXED
+        $stmt->bind_param("ii", $studentId, $responseItem['form_index']);
         $stmt->execute();
         $countResult = $stmt->get_result();
         $count = $countResult->fetch_assoc();
@@ -104,4 +104,4 @@ try {
 
 echo json_encode($response, JSON_PRETTY_PRINT);
 $conn->close();
-?> 
+?>

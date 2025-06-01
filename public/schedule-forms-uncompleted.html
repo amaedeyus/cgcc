@@ -36,9 +36,8 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const studentId = 1; // Replace with actual student ID
-            
-            fetch(`../../backend/users/check_forms.php?student_id=${studentId}`)
+            // No need to set studentId here; backend will use session
+            fetch(`../../backend/users/check_forms.php`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'error') {

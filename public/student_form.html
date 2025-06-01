@@ -134,14 +134,6 @@
                     validateCurrentSection();
                 }
             });
-
-            // In the grid creation function, after creating the radio:
-            formSectionsEl.addEventListener('change', function(e) {
-                if (e.target.matches('.grid-table input[type="radio"]')) {
-                    triggerAutosave();
-                    validateCurrentSection();
-                }
-            });
                         
             // Listen for text input (for textareas and text inputs)
             formSectionsEl.addEventListener('input', function(e) {
@@ -183,14 +175,19 @@
             formDescriptionEl.textContent = formData.description || '';
         }
         
-        // Load saved response if exists
+        // Add this global variable
+        let hasSubmittedResponse = false;
+
+        // Update the loadSavedResponse function
         async function loadSavedResponse() {
             try {
+                // Check for any saved response (both autosave and submitted)
                 const response = await fetch(`../backend/forms/get_saved_response.php?formId=${formId}`);
                 if (!response.ok) {
                     throw new Error('Failed to check for saved response');
                 }
                 savedResponse = await response.json();
+                
             } catch (error) {
                 console.error('Error loading saved response:', error);
             }
@@ -255,8 +252,6 @@
             // Validate initial section
             validateCurrentSection();
         }
-
-        
         
         // Create a page element containing one or more sections
         function createPageElement(sections) {
@@ -581,19 +576,16 @@
                 const input = document.createElement('input');
                 input.type = 'radio';
                 input.name = question.id;
-                input.value = option.choice_index; // Store the choice ID
+                input.value = option.choice_index;
                 input.id = optionId;
 
                 const label = document.createElement('label');
                 label.htmlFor = optionId;
-                label.textContent = option.choice_text; // Display the choice text
+                label.textContent = option.choice_text;
 
-                // Make the whole optionDiv clickable
                 optionDiv.addEventListener('click', (e) => {
-                    // Don't trigger if clicking directly on the input
                     if (e.target !== input) {
                         input.checked = !input.checked;
-                        // Trigger change event for validation
                         const event = new Event('change');
                         input.dispatchEvent(event);
                     }
@@ -621,19 +613,16 @@
                 const input = document.createElement('input');
                 input.type = 'checkbox';
                 input.name = question.id;
-                input.value = option.choice_index; // Store the choice ID
+                input.value = option.choice_index;
                 input.id = optionId;
 
                 const label = document.createElement('label');
                 label.htmlFor = optionId;
-                label.textContent = option.choice_text; // Display the choice text
+                label.textContent = option.choice_text;
 
-                // Make the whole optionDiv clickable
                 optionDiv.addEventListener('click', (e) => {
-                    // Don't trigger if clicking directly on the input
                     if (e.target !== input) {
                         input.checked = !input.checked;
-                        // Trigger change event for validation
                         const event = new Event('change');
                         input.dispatchEvent(event);
                     }
@@ -651,7 +640,6 @@
         function createTextInput(container, question) {
             let input;
             
-            // Check for subtype
             if (question.subtype) {
                 switch (question.subtype) {
                     case 'number':
@@ -661,10 +649,14 @@
                     case 'email':
                         input = document.createElement('input');
                         input.type = 'email';
+                        input.placeholder = 'example@email.com';
                         break;
                     case 'phone':
                         input = document.createElement('input');
                         input.type = 'tel';
+                        input.pattern = '^09[0-9]{9}$';
+                        input.title = 'Please enter a valid phone number (09xxxxxxxxx)';
+                        input.placeholder = '09xxxxxxxxx';
                         break;
                     default:
                         input = document.createElement('input');
@@ -678,12 +670,6 @@
             input.name = question.id;
             input.id = question.id;
             input.className = 'text-input';
-            
-            // Add pattern for phone numbers if needed
-            if (question.subtype === 'phone') {
-                input.pattern = '09[0-9]{9}';
-                input.title = 'Please enter a valid phone number';
-            }
             
             container.appendChild(input);
         }
@@ -703,7 +689,6 @@
             select.id = question.id;
             select.className = 'dropdown-input';
 
-            // Add default empty option
             const defaultOption = document.createElement('option');
             defaultOption.value = '';
             defaultOption.textContent = '-- Select an option --';
@@ -711,11 +696,10 @@
             defaultOption.selected = true;
             select.appendChild(defaultOption);
 
-            // Add options
             question.options.forEach((option, index) => {
                 const optionEl = document.createElement('option');
-                optionEl.value = option.choice_index; // Store the choice ID
-                optionEl.textContent = option.choice_text; // Display the choice text
+                optionEl.value = option.choice_index;
+                optionEl.textContent = option.choice_text;
                 select.appendChild(optionEl);
             });
 
@@ -755,7 +739,7 @@
             // Create rows with radio buttons
             question.rows.forEach((row, rowIndex) => {
                 const tr = document.createElement('tr');
-                tr.dataset.subQuestionIndex = row.sub_question_index; // Store actual sub_question_index
+                tr.dataset.subQuestionIndex = row.sub_question_index;
 
                 const rowHeader = document.createElement('td');
                 rowHeader.textContent = row.sub_question_text;
@@ -769,12 +753,18 @@
                     // Create radio button
                     const radio = document.createElement('input');
                     radio.type = 'radio';
-                    radio.name = `${question.id}_${rowIndex}`; // Still use rowIndex for name
+                    radio.name = `${question.id}_${rowIndex}`;
                     radio.value = option.choice_index;
                     radio.dataset.questionId = question.id;
                     radio.dataset.rowIndex = rowIndex;
-                    radio.dataset.subQuestionIndex = row.sub_question_index; // Store actual sub_question_index
+                    radio.dataset.subQuestionIndex = row.sub_question_index;
                     radio.style.display = 'none';
+
+                    // Add change event listener for autosave
+                    radio.addEventListener('change', function() {
+                        triggerAutosave();
+                        validateCurrentSection();
+                    });
 
                     // Create visual indicator
                     const radioVisual = document.createElement('div');
@@ -788,7 +778,6 @@
                             // Manually trigger change event for autosave
                             const changeEvent = new Event('change', { bubbles: true });
                             radio.dispatchEvent(changeEvent);
-                            triggerAutosave(); // Explicitly trigger autosave
                         }
                     });
 
@@ -803,7 +792,7 @@
             gridDiv.appendChild(table);
             container.appendChild(gridDiv);
 
-            // Add CSS for the grid (same as before)
+            // Add CSS for the grid
             const style = document.createElement('style');
             style.textContent = `
                 .grid-table {
@@ -873,7 +862,6 @@
         function applySavedResponses() {
             if (!savedResponse || !savedResponse.formId) return;
             
-            // Loop through all questions in the saved response
             for (const [questionId, responseData] of Object.entries(savedResponse)) {
                 if (questionId === 'formId') continue;
                 
@@ -883,10 +871,8 @@
                 const questionType = questionEl.dataset.questionType;
                 
                 if (questionType === 'grid') {
-                    // Handle grid answers
                     if (Array.isArray(responseData.value)) {
                         responseData.value.forEach(gridAnswer => {
-                            // Find the row with matching sub_question_index
                             const row = document.querySelector(`tr[data-sub-question-index="${gridAnswer.rowIndex}"]`);
                             if (row) {
                                 const radio = row.querySelector(`input[value="${gridAnswer.optionIndex}"]`);
@@ -898,7 +884,6 @@
                         });
                     }
                 } else if (questionType === 'checkbox') {
-                    // Handle checkbox answers (multiple possible)
                     if (Array.isArray(responseData.value)) {
                         responseData.value.forEach(value => {
                             const input = document.querySelector(
@@ -909,8 +894,7 @@
                             }
                         });
                     }
-                } else if (questionType === 'multiple') {  // Changed from 'radio' to 'multiple'
-                    // Handle radio answers (single selection)
+                } else if (questionType === 'multiple') {
                     if (responseData.value && responseData.value.length > 0) {
                         const input = document.querySelector(
                             `input[name="${questionId}"][value="${responseData.value[0]}"]`
@@ -920,7 +904,6 @@
                         }
                     }
                 } else if (questionType === 'short' || questionType === 'paragraph' || questionType === 'date') {
-                    // Handle text inputs (short, paragraph, date)
                     const input = document.querySelector(
                         `input[name="${questionId}"], 
                         textarea[name="${questionId}"],
@@ -930,7 +913,6 @@
                         input.value = responseData.value;
                     }
                 } else if (questionType === 'dropdown') {
-                    // Handle dropdown inputs
                     const select = document.querySelector(
                         `select[name="${questionId}"]`
                     );
@@ -949,17 +931,14 @@
             let isValid = true;
             const requiredQuestions = [];
             
-            // Clear previous error messages
             document.querySelectorAll('.error-message').forEach(el => {
                 el.classList.remove('show');
                 el.textContent = '';
             });
             
-            // Hide section error
             sectionErrorEl.classList.remove('show');
             sectionErrorEl.textContent = '';
             
-            // Check all required questions
             formData.sections.forEach(section => {
                 section.questions.forEach(question => {
                     if (question.type === 'display') return;
@@ -985,7 +964,6 @@
                                 if (textInput) {
                                     isAnswered = textInput.value.trim() !== '';
                                     
-                                    // Validate subtype if exists
                                     if (isAnswered && question.subtype) {
                                         [isValidAnswer, validationMessage] = validateSubtype(textInput.value.trim(), question.subtype);
                                     }
@@ -1004,7 +982,6 @@
                                 isAnswered = dateInput && dateInput.value !== '';
                                 break;
                             case 'grid':
-                                // For grids, we need at least one radio selected per row
                                 const gridRows = question.rows.length;
                                 let answeredRows = 0;
                                 
@@ -1024,7 +1001,6 @@
                             errorEl.classList.add('show');
                             requiredQuestions.push(question.id);
                             
-                            // Scroll to first error
                             if (requiredQuestions.length === 1) {
                                 questionEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
                             }
@@ -1047,15 +1023,14 @@
                 form_index: parseInt(formId),
                 answers: [],
                 grid_answers: [],
-                is_autosave: isAutosave
+                is_autosave: isAutosave ? 1 : 0
             };
             
-            // Process all questions
             formData.sections.forEach(section => {
                 section.questions.forEach(question => {
                     if (question.type === 'display') return;
                     switch (question.type) {
-                        case 'multiple': // radio buttons
+                        case 'multiple':
                             const checkedRadio = document.querySelector(
                                 `[data-question-id="${question.id}"] input[name="${question.id}"]:checked`
                             );
@@ -1134,12 +1109,11 @@
                                 );
                                 
                                 if (checkedRadio) {
-                                    // Get the actual sub_question_index from the data attribute
                                     const subQuestionIndex = parseInt(checkedRadio.dataset.subQuestionIndex);
                                     
                                     formDataToSubmit.grid_answers.push({
                                         main_question_index: parseInt(question.id),
-                                        sub_question_index: subQuestionIndex, // Use actual sub_question_index
+                                        sub_question_index: subQuestionIndex,
                                         choice_index: parseInt(checkedRadio.value)
                                     });
                                 }
@@ -1157,7 +1131,6 @@
             if (!hasChanges) return;
             
             try {
-                // Don't validate for autosave
                 const formDataToSubmit = collectFormData(true);
                 
                 const response = await fetch('../backend/forms/submit_response.php', {
@@ -1174,11 +1147,11 @@
                     showAutosaveStatus('Draft saved automatically', true);
                     hasChanges = false;
                 } else {
-                    showAutosaveStatus('Failed to save draft', false);
+                    showAutosaveStatus(result.message || 'Failed to save draft', false);
                 }
             } catch (error) {
                 console.error('Error saving draft:', error);
-                showAutosaveStatus('Error saving draft', false);
+                showAutosaveStatus('Connection error saving draft', false);
             }
         }
         
@@ -1205,22 +1178,29 @@
                 const result = await response.json();
                 
                 if (result.success) {
-                    // Stop autosave
+                    // Clear any autosave timers
                     if (autosaveInterval) {
                         clearInterval(autosaveInterval);
                     }
+                    if (autosaveTimeout) {
+                        clearTimeout(autosaveTimeout);
+                    }
                     
-                    // Show success message
+                    // Update the submission status
+                    hasChanges = false;
+                    
                     alert('Form submitted successfully!');
-                    window.location.href = 'main.php'; // Redirect to confirmation page
+                    window.location.href = 'main.php';
                 } else {
-                    alert('Failed to submit form. Please try again.');
+                    // Show more detailed error message if available
+                    const errorMsg = result.message || 'Failed to submit form. Please try again.';
+                    alert(errorMsg);
                     submitFormBtn.disabled = false;
                     submitFormBtn.textContent = 'Submit Form';
                 }
             } catch (error) {
                 console.error('Error submitting form:', error);
-                alert('An error occurred while submitting the form.');
+                alert('An error occurred while submitting the form. Please check your connection and try again.');
                 submitFormBtn.disabled = false;
                 submitFormBtn.textContent = 'Submit Form';
             }
@@ -1231,7 +1211,6 @@
             autosaveStatusEl.textContent = message;
             autosaveStatusEl.style.color = isSuccess ? '#27ae60' : '#e74c3c';
             
-            // Hide after 3 seconds
             setTimeout(() => {
                 if (autosaveStatusEl.textContent === message) {
                     autosaveStatusEl.textContent = '';
@@ -1252,18 +1231,14 @@
         
         submitFormBtn.addEventListener('click', submitForm);
         
-        // Navigation button event listeners
         prevSectionBtn.addEventListener('click', () => {
             navigateToPage(currentPageIndex - 1);
         });
         
         nextSectionBtn.addEventListener('click', attemptNextSection);
-
-        
     </script>
 
     <!-- Floating Back Button -->
-     
     <div class="floating-buttons">
         <button type="button" class="btn floating-back-btn" id="floating-back-btn">
             <i class="fas fa-arrow-left me-1"></i> <span id="floating-back-text">Back</span>
