@@ -36,6 +36,7 @@ $imagePath = $counselor['counselor_image_path'] ?? 'assets/default-avatar.png';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/record.css?v=<?= time() ?>">
+    <link rel="icon" type="image/png" href="../Media/cgcc2.png" />
     <title>Student Records</title>
 </head>
 

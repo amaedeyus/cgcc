@@ -128,26 +128,30 @@ td a:hover{
 .actions{
     white-space: nowrap;
 }
-.page-left{
+
+/* Left Sidebar Styles */
+.page-left {
     grid-column: 1;
     display: flex;
     flex-direction: column;
     position: relative;
     z-index: 0;
-    height: 100vh;
+    min-height: 100vh; /* Changed from height to min-height */
     font-family: 'Poppins', sans-serif;
     color: rgb(2, 55, 2);
-    box-shadow: 10px -15px 15px -10px rgba(2, 55, 2, 0.313);
+    box-shadow: 0.625rem -0.9375rem 0.9375rem -0.625rem rgba(2, 55, 2, 0.313);
     user-select: none;
     padding: 2rem 1rem;
     justify-content: flex-start;
+    font-size: 1rem;
+    box-sizing: border-box; /* Ensures padding is included in height calculations */
 }
 
-.page-left::before{
+.page-left::before {
     content: "";
     background-image: url("../Media/lasalle.png");
-    background-size: cover;
-    background-position: 20% center;
+    background-repeat: repeat;
+    background-position: top left;
     opacity: 0.3;
     position: absolute;
     top: 0;
