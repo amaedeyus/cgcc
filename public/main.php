@@ -150,12 +150,12 @@ foreach ($counselingForms as $form) {
                 that promote mental well-being and help you reach your fullest potential.</p>
             </div>
             <div class="schedule">
-                <button class="button-class" onclick="">
+                <button class="button-class" onclick="goToPage()">
                 Schedule a Counseling Appointment
                 </button>
             </div>
             <div class="update">
-                <button class="button-class" onclick="">
+                <button class="button-class" onclick="window.location.href='edit-profile.php'">
                     Edit Profile Information
                 </button>
             </div>
