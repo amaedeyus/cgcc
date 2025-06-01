@@ -62,8 +62,15 @@
                         <label for="guardian">Guardian</label>
                         <input readonly type="text" id="guardian" placeholder="Loading...">
                         
-                        <label for="guardian-contact">Guardian Contact No.:</label>
+                        <label for="guardian-contact">Guardian Contact No.</label>
                         <input readonly type="text" id="guardian-contact" placeholder="Loading...">
+
+                        <div class="counselors-section">
+                            <label>Assigned Counselors</label>
+                            <div id="counselors-list" class="counselors-list">
+                                <!-- Counselors will be populated here -->
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -274,6 +281,25 @@
                         });
                     } else {
                         responsesList.innerHTML = '<div class="no-responses">No form responses found</div>';
+                    }
+
+                    // Update counselors list
+                    const counselorsList = document.getElementById('counselors-list');
+                    if (student.assigned_counselors && student.assigned_counselors.length > 0) {
+                        student.assigned_counselors.forEach(counselor => {
+                            const counselorDiv = document.createElement('div');
+                            counselorDiv.className = 'counselor-item';
+                            counselorDiv.innerHTML = `
+                                <img src="${counselor.image_path}" alt="${counselor.full_name}" class="counselor-image">
+                                <div class="counselor-info">
+                                    <div class="counselor-name">${counselor.full_name}</div>
+                                    ${counselor.credentials ? `<div class="counselor-credentials">${counselor.credentials}</div>` : ''}
+                                </div>
+                            `;
+                            counselorsList.appendChild(counselorDiv);
+                        });
+                    } else {
+                        counselorsList.innerHTML = '<div class="no-counselors">No counselors assigned</div>';
                     }
                 })
                 .catch(error => {

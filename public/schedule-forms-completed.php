@@ -46,73 +46,72 @@ if ($student_index) {
     <title>CGCC</title>
     <style>
         .counselor-panel {
-    margin: 50px auto;
-    padding: 30px;
-    max-width: 600px;
-    background-color: rgb(237, 253, 243); /* match form container */
-    border-radius: 20px;
-    box-shadow: 0 3px 10px rgba(0, 71, 0, 0.2); /* match form shadow */
-    text-align: center;
-    font-family: 'Poppins', sans-serif;
-    color: rgb(41, 51, 41);
-}
+            margin: 50px auto;
+            padding: 30px;
+            max-width: 600px;
+            background-color: rgb(237, 253, 243);
+            border-radius: 20px;
+            box-shadow: 0 3px 10px rgba(0, 71, 0, 0.2);
+            text-align: center;
+            font-family: 'Poppins', sans-serif;
+            color: rgb(41, 51, 41);
+        }
 
-.counselor-photo {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-bottom: 15px;
-    border: 3px solid #316b50;
-}
+        .counselor-photo {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 15px;
+            border: 3px solid #316b50;
+        }
 
-.counselor-panel h2 {
-    color: #0c3b25;
-    font-size: 1.8em;
-    margin-bottom: 10px;
-}
+        .counselor-panel h2 {
+            color: #0c3b25;
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
 
-.counselor-panel p {
-    font-size: 1em;
-    margin: 6px 0;
-    color: #5b5b5b;
-}
+        .counselor-panel p {
+            font-size: 1em;
+            margin: 6px 0;
+            color: #5b5b5b;
+        }
 
-.calendar-link {
-    display: inline-block;
-    margin-top: 15px;
-    padding: 10px 20px;
-    background-color: rgb(79, 189, 156);
-    color: white;
-    border-radius: 30px;
-    text-decoration: none;
-    font-weight: 500;
-    transition: background-color 0.3s ease;
-}
+        .calendar-link {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: rgb(79, 189, 156);
+            color: white;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
 
-.calendar-link:hover {
-    background-color: rgb(36, 154, 118);
-}
+        .calendar-link:hover {
+            background-color: rgb(36, 154, 118);
+        }
 
-.back{
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    padding: 8px 15px;
-    background-color: rgb(79, 189, 156);
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-family: 'Poppins', sans-serif;
-    width: 100px;
-    text-align: center;
-}
+        .back {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 8px 15px;
+            background-color: rgb(79, 189, 156);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            width: 100px;
+            text-align: center;
+        }
 
-.back:hover{
-    background: rgb(36, 154, 118);
-}
-
+        .back:hover {
+            background: rgb(36, 154, 118);
+        }
     </style>
 </head>
 <body>
@@ -130,24 +129,23 @@ if ($student_index) {
     </header>
 
     <?php if (!empty($counselor)): ?>
-<div class="counselor-panel">
-    <img src="image.php?file=<?= urlencode($counselor['image_path']) ?>" alt="Counselor Photo" class="counselor-photo">
+    <div class="counselor-panel">
+        <img src="image.php?file=<?= urlencode($counselor['image_path']) ?>" alt="Counselor Photo" class="counselor-photo">
 
-
-    <h2><?= htmlspecialchars($counselor['first_name'] . ' ' . $counselor['last_name'] . (!empty($counselor['credentials']) ? ', ' . $counselor['credentials'] : '')) ?></h2>
-    <p><strong>Email:</strong> <a href="mailto:<?= htmlspecialchars($counselor['email']) ?>"><?= htmlspecialchars($counselor['email']) ?></a></p>
-    <?php if (!empty($counselor['calendar_link'])): ?>
-    <p><a href="<?= htmlspecialchars($counselor['calendar_link']) ?>" target="_blank" class="calendar-link">📅 Schedule an Appointment</a></p>
+        <h2><?= htmlspecialchars($counselor['first_name'] . ' ' . $counselor['last_name'] . (!empty($counselor['credentials']) ? ', ' . $counselor['credentials'] : '')) ?></h2>
+        <p><strong>Email:</strong> <a href="mailto:<?= htmlspecialchars($counselor['email']) ?>"><?= htmlspecialchars($counselor['email']) ?></a></p>
+        <?php if (!empty($counselor['calendar_link'])): ?>
+        <p><a href="<?= htmlspecialchars($counselor['calendar_link']) ?>" target="_blank" class="calendar-link">📅 Schedule an Appointment</a></p>
+        <?php endif; ?>
+    </div>
+    <?php else: ?>
+    <div class="counselor-panel">
+        <h2>No Assigned Counselor</h2>
+        <p>Your program currently has no counselor assigned. Please contact the CGCC office.</p>
+    </div>
     <?php endif; ?>
-</div>
-<?php else: ?>
-<div class="counselor-panel">
-    <h2>No Assigned Counselor</h2>
-    <p>Your program currently has no counselor assigned. Please contact the CGCC office.</p>
-</div>
-<?php endif; ?>
 
-<button class="back" onclick="window.location.href='main.php'">Back</button>
+    <button class="back" onclick="window.location.href='main.php'">Back</button>
 
 </body>
 </html>

@@ -19,7 +19,8 @@ try {
             g.full_name AS guardian_fullname,
             g.contact_number AS guardian_contact,
             sec.section_name, 
-            p.program_code, 
+            p.program_code,
+            p.program_index,
             d.dept_code
         FROM students s
         LEFT JOIN users u ON s.user_index = u.user_index
@@ -28,6 +29,18 @@ try {
         LEFT JOIN programs p ON sec.program_index = p.program_index
         LEFT JOIN departments d ON p.dept_index = d.dept_index
         WHERE s.student_index = ?
+    ";
+
+    $counselorsSql = "
+        SELECT 
+            c.counselor_index,
+            c.first_name,
+            c.last_name,
+            c.credentials,
+            c.image_path
+        FROM counselors c
+        JOIN counselor_programs cp ON c.counselor_index = cp.counselor_index
+        WHERE cp.program_index = ?
     ";
 
     $responsesSql = "
@@ -61,6 +74,17 @@ try {
 
     $student = $studentResult->fetch_assoc();
 
+    // --- Fetch assigned counselors ---
+    $counselors = [];
+    if (!empty($student['program_index'])) {
+        $stmt = $conn->prepare($counselorsSql);
+        if (!$stmt) throw new Exception($conn->error);
+        $stmt->bind_param("i", $student['program_index']);
+        $stmt->execute();
+        $counselorsResult = $stmt->get_result();
+        $counselors = $counselorsResult->fetch_all(MYSQLI_ASSOC);
+    }
+
     // --- Fetch responses ---
     $stmt = $conn->prepare($responsesSql);
     if (!$stmt) throw new Exception($conn->error);
@@ -90,10 +114,18 @@ try {
         'section_name' => $student['section_name'] ?? '',
         'dept_code' => $student['dept_code'] ?? '',
         'program_code' => $student['program_code'] ?? '',
-        'student_email' => $student['student_email'] ?? '',
+        'student_email' => !empty($student['student_email']) ? $student['student_email'] : strtolower($student['first_name'] . $student['last_name'] . '@dlsl.edu.ph'),
         'contact_number' => $student['contact_number'] ?? '',
-        'guardian_fullname' => $student['guardian_fullname'] ?? '',
-        'guardian_contact' => $student['guardian_contact'] ?? ''
+        'guardian_fullname' => !empty($student['guardian_fullname']) ? $student['guardian_fullname'] : $student['last_name'] . ', Guardian',
+        'guardian_contact' => !empty($student['guardian_contact']) ? $student['guardian_contact'] : '09' . str_pad(rand(0, 999999999), 9, '0', STR_PAD_LEFT),
+        'assigned_counselors' => array_map(function($counselor) {
+            return [
+                'counselor_index' => $counselor['counselor_index'],
+                'full_name' => $counselor['first_name'] . ' ' . $counselor['last_name'],
+                'credentials' => $counselor['credentials'] ?? '',
+                'image_path' => !empty($counselor['image_path']) ? $counselor['image_path'] : '../Media/user.jpg'
+            ];
+        }, $counselors)
     ];
 
     $response['responses'] = $responses;
