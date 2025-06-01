@@ -8,10 +8,10 @@
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/form-validation.css">
     <base href="Media/">
-    <title>CGCC</title>
+    <title>CGCC - Appointment Check</title>
 </head>
+<!-- Previous head section remains the same -->
 <body>
-
     <header>
         <div class="logo">
             <img src="cgcc.png" alt="cgcc-logo" class="logo-img">
@@ -29,10 +29,83 @@
 
     <div class="grid-body">
         <div class="notice">
-            <center><img src="wait.png" alt="wait-icon" class="wait-icon" style="height: 500px; width: 500px;"></center>
-            <h1>You can't make a schedule just yet...</h1>
-            <p>Please accomplish all the required forms first.</p>
+            <h1>Appointment Requirements</h1>
+            <div id="forms-container">
+                <p>Checking your form completion status...</p>
+            </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const studentId = 1; // Replace with actual student ID
+            
+            fetch(`../../backend/users/check_forms.php?student_id=${studentId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'error') {
+                        document.getElementById('forms-container').innerHTML = `
+                            <div class="alert alert-danger">${data.message}</div>
+                        `;
+                        return;
+                    }
+
+                    const container = document.getElementById('forms-container');
+                    
+                    if (data.required_forms.length === 0) {
+                        container.innerHTML = `
+                            <div class="alert alert-success">
+                                No forms required at this time. You may proceed with scheduling.
+                            </div>
+                            <a href="schedule.html" class="btn-primary">Schedule Appointment</a>
+                        `;
+                        return;
+                    }
+
+                    let html = `<p>You need to complete the following forms before scheduling an appointment:</p>`;
+                    html += `<ul class="form-list">`;
+                    
+                    data.required_forms.forEach(form => {
+                        const isCompleted = data.completed_forms.includes(form.form_index);
+                        html += `
+                            <li class="${isCompleted ? 'form-completed' : ''}">
+                                <a href="../student_form.html?id=${form.form_index}" class="form-link">
+                                    <div class="form-title">${form.form_name}</div>
+                                </a>
+                                <span class="status-badge ${isCompleted ? 'status-completed' : 'status-pending'}">
+                                    ${isCompleted ? 'Done' : 'Pending'}
+                                </span>
+                            </li>
+                        `;
+                    });
+                    
+                    html += `</ul>`;
+                    
+                    const allCompleted = data.required_forms.length === data.completed_forms.length;
+                    if (allCompleted) {
+                        html += `
+                            <div class="alert alert-success">
+                                All required forms completed! You may now schedule an appointment.
+                            </div>
+                            <a href="schedule.html" class="btn-primary">Schedule Appointment</a>
+                        `;
+                    } else {
+                        html += `
+                            <div class="alert alert-warning">
+                                Please complete all required forms before scheduling.
+                            </div>
+                        `;
+                    }
+                    
+                    container.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('forms-container').innerHTML = `
+                        <div class="alert alert-danger">An error occurred while loading form data.</div>
+                    `;
+                });
+        });
+    </script>
 </body>
 </html>

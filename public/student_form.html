@@ -125,12 +125,24 @@
         function setupChangeDetection() {
             // Listen for all input changes
             formSectionsEl.addEventListener('change', function(e) {
-                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+                const target = e.target;
+                if (target.tagName === 'INPUT' || 
+                    target.tagName === 'TEXTAREA' || 
+                    target.tagName === 'SELECT' ||
+                    (target.type === 'radio' && target.closest('.grid-table'))) {
                     triggerAutosave();
                     validateCurrentSection();
                 }
             });
-            
+
+            // In the grid creation function, after creating the radio:
+            formSectionsEl.addEventListener('change', function(e) {
+                if (e.target.matches('.grid-table input[type="radio"]')) {
+                    triggerAutosave();
+                    validateCurrentSection();
+                }
+            });
+                        
             // Listen for text input (for textareas and text inputs)
             formSectionsEl.addEventListener('input', function(e) {
                 if (e.target.tagName === 'TEXTAREA' || 
@@ -243,6 +255,8 @@
             // Validate initial section
             validateCurrentSection();
         }
+
+        
         
         // Create a page element containing one or more sections
         function createPageElement(sections) {
@@ -771,8 +785,10 @@
                         if (e.target !== radio) {
                             radio.checked = true;
                             updateRadioVisuals(tr);
-                            const event = new Event('change');
-                            radio.dispatchEvent(event);
+                            // Manually trigger change event for autosave
+                            const changeEvent = new Event('change', { bubbles: true });
+                            radio.dispatchEvent(changeEvent);
+                            triggerAutosave(); // Explicitly trigger autosave
                         }
                     });
 

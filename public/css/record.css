@@ -136,11 +136,7 @@ td a:hover{
     flex-direction: column;
     position: relative;
     z-index: 0;
-<<<<<<< HEAD
     height: 100%;
-=======
-    min-height: 100vh; /* Changed from height to min-height */
->>>>>>> 59199ef2350a093f0b59cb63c299a2613bc043e3
     font-family: 'Poppins', sans-serif;
     color: rgb(2, 55, 2);
     box-shadow: 0.625rem -0.9375rem 0.9375rem -0.625rem rgba(2, 55, 2, 0.313);
