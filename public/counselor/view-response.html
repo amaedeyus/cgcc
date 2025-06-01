@@ -4,12 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Form Responses</title>
+    <link rel="icon" type="image/png" href="../Media/cgcc2.png" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
             background-color: #f8f9fa;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             padding: 20px 0;
+            position: relative;
+            min-height: 100vh;
         }
         
         .response-container {
@@ -19,6 +22,28 @@
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0,0,0,0.1);
             padding: 30px;
+            margin-bottom: 80px; /* Add space for floating button */
+        }
+        
+        /* Floating back button styles */
+        .floating-back-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .floating-back-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
         }
         
         .header-section {
@@ -112,10 +137,6 @@
             font-style: italic;
         }
         
-        .back-button {
-            margin-bottom: 20px;
-        }
-        
         @media (max-width: 768px) {
             .response-container {
                 padding: 15px;
@@ -128,14 +149,18 @@
             .question-card {
                 padding: 15px;
             }
+            
+            .floating-back-button {
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <button id="back-button" class="btn btn-outline-secondary back-button">
-            &larr; Back to Responses
-        </button>
         
         <div id="response-container" class="response-container">
             <div class="text-center mb-4">
@@ -156,6 +181,14 @@
                         </div>
                         <div class="row mt-2">
                             <div class="col-md-6">
+                                <strong>Section:</strong> <span id="student-section"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Program:</strong> <span id="student-program"></span>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-6">
                                 <strong>Submitted:</strong> <span id="submission-date"></span>
                             </div>
                         </div>
@@ -165,6 +198,13 @@
                 <div id="sections-container"></div>
             </div>
         </div>
+        <!-- Floating back button -->
+        <button id="back-button" class="floating-back-button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+            </svg>
+        </button>
+
     </div>
 
     <script>
@@ -180,8 +220,13 @@
             
             // Set back button URL
             document.getElementById('back-button').addEventListener('click', function() {
-                // You might want to adjust this to go back to your responses listing page
-                window.location.href = 'responses_list.php';
+                if (window.history.length > 1) {
+                    window.history.back();
+                } 
+                // Fallback to specified URL if no history is available
+                else {
+                    window.location.href = 'first-year.php';
+                }
             });
             
             // Fetch response data
@@ -218,6 +263,8 @@
             document.getElementById('form-title').textContent = responseData.form_name;
             document.getElementById('student-name').textContent = responseData.student.name;
             document.getElementById('student-number').textContent = responseData.student.student_number;
+            document.getElementById('student-section').textContent = responseData.student.section || 'N/A';
+            document.getElementById('student-program').textContent = responseData.student.program || 'N/A';
             document.getElementById('submission-date').textContent = formatDate(responseData.student.submitted_at);
             
             // Render sections
@@ -254,45 +301,53 @@
                 
                 // Questions
                 if (section.questions && section.questions.length > 0) {
-                    section.questions.forEach(question => {
-                        const questionCard = document.createElement('div');
-                        questionCard.className = 'question-card';
-                        
-                        const questionText = document.createElement('div');
-                        questionText.className = 'question-text';
-                        questionText.textContent = question.question;
-                        questionCard.appendChild(questionText);
-                        
-                        const responseDiv = document.createElement('div');
-                        responseDiv.className = 'response-text';
-                        
-                        if (question.response === null) {
-                            responseDiv.innerHTML = '<span class="no-response">No response provided</span>';
-                        } else {
-                            if (question.type === 'grid') {
-                                responseDiv.appendChild(createGridResponse(question.response));
-                            } else if (Array.isArray(question.response)) {
-                                // Checkbox or other multiple response
-                                if (question.response.length === 0) {
-                                    responseDiv.innerHTML = '<span class="no-response">No response provided</span>';
-                                } else {
-                                    const ul = document.createElement('ul');
-                                    question.response.forEach(item => {
-                                        const li = document.createElement('li');
-                                        li.textContent = item;
-                                        ul.appendChild(li);
-                                    });
-                                    responseDiv.appendChild(ul);
-                                }
+                    // Filter out display-type questions
+                    const filteredQuestions = section.questions.filter(question => question.type !== 'display');
+                    
+                    if (filteredQuestions.length === 0) {
+                        const noQuestions = document.createElement('div');
+                        noQuestions.className = 'question-card';
+                        noQuestions.innerHTML = '<p class="no-response">No questions in this section</p>';
+                        sectionCard.appendChild(noQuestions);
+                    } else {
+                        filteredQuestions.forEach(question => {
+                            const questionCard = document.createElement('div');
+                            questionCard.className = 'question-card';
+                            
+                            const questionText = document.createElement('div');
+                            questionText.className = 'question-text';
+                            questionText.textContent = question.question;
+                            questionCard.appendChild(questionText);
+                            
+                            const responseDiv = document.createElement('div');
+                            responseDiv.className = 'response-text';
+                            
+                            if (question.response === null || question.response === '') {
+                                responseDiv.innerHTML = '<span class="no-response">No response provided</span>';
                             } else {
-                                // Single response (text, radio, dropdown, etc.)
-                                responseDiv.textContent = question.response;
+                                if (question.type === 'grid') {
+                                    responseDiv.appendChild(createGridResponse(question.response));
+                                } else if (Array.isArray(question.response)) {
+                                    if (question.response.length === 0) {
+                                        responseDiv.innerHTML = '<span class="no-response">No response provided</span>';
+                                    } else {
+                                        const ul = document.createElement('ul');
+                                        question.response.forEach(item => {
+                                            const li = document.createElement('li');
+                                            li.textContent = item;
+                                            ul.appendChild(li);
+                                        });
+                                        responseDiv.appendChild(ul);
+                                    }
+                                } else {
+                                    responseDiv.textContent = question.response;
+                                }
                             }
-                        }
-                        
-                        questionCard.appendChild(responseDiv);
-                        sectionCard.appendChild(questionCard);
-                    });
+                            
+                            questionCard.appendChild(responseDiv);
+                            sectionCard.appendChild(questionCard);
+                        });
+                    }
                 } else {
                     const noQuestions = document.createElement('div');
                     noQuestions.className = 'question-card';

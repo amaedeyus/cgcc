@@ -329,7 +329,8 @@ button {
 
 /* Subtype specific styles */
 input[type="number"] {
-    -moz-appearance: textfield;
+    -moz-appearance: textfield; /* Firefox */
+    appearance: textfield; /* Standard */
 }
 
 input[type="number"]::-webkit-outer-spin-button,
