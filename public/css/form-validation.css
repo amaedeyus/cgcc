@@ -20,3 +20,22 @@
 .notice h1{
     font-weight: bold;
 }
+
+.back{
+    position: fixed !important;
+    bottom: 20px !important;
+    right: 20px !important;
+    padding: 8px 15px;
+    background-color: rgb(79, 189, 156);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    width: 100px;
+    text-align: center;
+}
+
+.back:hover{
+    background: rgb(36, 154, 118);
+}
