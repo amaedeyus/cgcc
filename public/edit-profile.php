@@ -105,21 +105,18 @@ if ($program_index !== null && $selected_year_level !== null) {
 }
 
 $guardian = [
-    'first_name' => '',
-    'last_name' => '',
+    'full_name' => '',
     'contact_number' => ''
 ];
 
-
 if (!empty($student['guardian_index'])) {
-    $guardian_stmt = $conn->prepare("SELECT first_name, last_name, contact_number FROM guardians WHERE guardian_index = ?");
+    $guardian_stmt = $conn->prepare("SELECT full_name, contact_number FROM guardians WHERE guardian_index = ?");
     $guardian_stmt->bind_param("i", $student['guardian_index']);
     $guardian_stmt->execute();
     $guardian_result = $guardian_stmt->get_result();
     $guardian = $guardian_result->fetch_assoc() ?: $guardian;
 }
 
-$guardian_full_name = trim(($guardian['first_name'] ?? '') . ' ' . ($guardian['last_name'] ?? ''));
 
 
 
@@ -229,13 +226,14 @@ $guardian_full_name = trim(($guardian['first_name'] ?? '') . ' ' . ($guardian['l
         <label for="contact-number">Contact Number</label>
         <input type="text" id="contact-number" name="contact_number" value="<?= htmlspecialchars($student['contact_number'] ?? '') ?>" placeholder="Ex. 09123456789" />
 
-        <label for="guardian-index">Guardian</label>
-        <input readonly type="text" id="guardian-full-name" name="guardian_full_name" 
-        value="<?= htmlspecialchars($guardian_full_name) ?>" placeholder="Guardian Full Name" />
+        <label for="guardian-full-name">Guardian</label>
+        <input type="text" id="guardian-full-name" name="guardian_full_name" 
+        value="<?= htmlspecialchars($guardian['full_name'] ?? '') ?>" placeholder="Guardian Full Name" />
+
         
 
         <label for="guardian-index">Guardian Contact No.</label>
-        <input readonly type="text" id="guardian-contact-number" name="guardian_contact_number" 
+        <input type="text" id="guardian-contact-number" name="guardian_contact_number" 
         value="<?= htmlspecialchars($guardian['contact_number'] ?? '') ?>" placeholder="Guardian Contact Number" />
         
 

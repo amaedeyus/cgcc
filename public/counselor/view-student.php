@@ -11,7 +11,7 @@ $sql = "
     SELECT 
         s.*, 
         u.email AS student_email, 
-        CONCAT(g.first_name, ' ', g.last_name) AS guardian_fullname, 
+        g.full_name AS guardian_fullname, 
         g.contact_number AS guardian_contact,
         sec.section_name, 
         p.program_code, 
@@ -24,8 +24,6 @@ $sql = "
     JOIN departments d ON p.dept_index = d.dept_index
     WHERE s.student_index = $studentId
 ";
-
-
 
 $result = $conn->query($sql);
 
@@ -50,68 +48,70 @@ if ($result && $result->num_rows > 0) {
 </head>
 <body>
 
-    <header>
-        <div class="logo">
-            <img src="../Media/cgcc.png" alt="cgcc-logo" class="logo-img">
-            College Guidance and Counseling Center
-        </div>
-    </header>
+<header>
+    <div class="logo">
+        <img src="../Media/cgcc.png" alt="cgcc-logo" class="logo-img">
+        College Guidance and Counseling Center
+    </div>
+</header>
 
-    <div class="grid-body">
-        <div class="page-left">
-            <h1 class="form-title">Student Information</h1>
-    <div class="profile-section">
+<div class="grid-body">
+    <div class="page-left">
+        <h1 class="form-title">Student Information</h1>
+        
+        <div class="profile-section">
             <div class="profile-title">Profile Picture</div>
             <img src="<?= !empty($student['image_path']) ? htmlspecialchars($student['image_path']) : '../Media/user.jpg' ?>" alt="Profile Picture" class="profile-picture" id="profile-picture" />
-
         </div>
 
         <div class="form-container">
             <div class="form-columns">
-       
-            <div class="form-group">
-            <label for="student-number">Student Number</label>
-            <input readonly type="text" id="student-number" name="student_number" value="<?= htmlspecialchars($student['student_number'] ?? '') ?>" placeholder="Ex. 2023-12345" />
+                <div class="form-group">
+                    <label for="student-number">Student Number</label>
+                    <input readonly type="text" id="student-number" value="<?= htmlspecialchars($student['student_number']) ?>" />
 
-            <label for="first-name">First Name</label>
-            <input readonly type="text" id="first-name" name="first_name" value="<?= htmlspecialchars($student['first_name'] ?? '') ?>" placeholder="Ex. John" />
+                    <label for="first-name">First Name</label>
+                    <input readonly type="text" id="first-name" value="<?= htmlspecialchars($student['first_name']) ?>" />
 
-            <label for="last-name">Last Name</label>
-            <input readonly type="text" id="last-name" name="last_name" value="<?= htmlspecialchars($student['last_name'] ?? '') ?>" placeholder="Ex. Dela Cerna" />
-        
-            <label for="contact-number">Year Level</label>
-            <input readonly type="text" id="year-level" name="contact_number" value="<?= htmlspecialchars($student['year_level'] ?? '') ?>" placeholder="Ex. 09123456789" />
+                    <label for="last-name">Last Name</label>
+                    <input readonly type="text" id="last-name" value="<?= htmlspecialchars($student['last_name']) ?>" />
 
-            <label for="contact-number">Section</label>
-            <input readonly type="text" id="section" name="contact_number" value="<?= htmlspecialchars($student['section_name'] ?? '') ?>" placeholder="Ex. 09123456789" />
+                    <label for="year-level">Year Level</label>
+                    <input readonly type="text" id="year-level" value="<?= htmlspecialchars($student['year_level']) ?>" />
 
-            <label for="contact-number">Department</label>
-            <input readonly type="text" id="department" name="contact_number" value="<?= htmlspecialchars($student['dept_code'] ?? '') ?>" placeholder="Ex. 09123456789" />
+                    <label for="section">Section</label>
+                    <input readonly type="text" id="section" value="<?= htmlspecialchars($student['section_name']) ?>" />
 
-            <label for="contact-number">Program</label>
-            <input readonly type="text" id="department" name="contact_number" value="<?= htmlspecialchars($student['program_code'] ?? '') ?>" placeholder="Ex. 09123456789" />
-</div>
-            <div class="form-group-one">
-            <label for="email">Email</label>
-            <input readonly type="text" id="email" name="email" value="<?= htmlspecialchars($student['student_email'] ?? '') ?>" placeholder="Ex. john@example.com" />
+                    <label for="department">Department</label>
+                    <input readonly type="text" id="department" value="<?= htmlspecialchars($student['dept_code']) ?>" />
 
-            <label for="contact-number">Contact Number</label>
-            <input readonly type="text" id="contact-number" name="contact_number" value="<?= htmlspecialchars($student['contact_number'] ?? '') ?>" placeholder="Ex. 09123456789" />
+                    <label for="program">Program</label>
+                    <input readonly type="text" id="program" value="<?= htmlspecialchars($student['program_code']) ?>" />
+                </div>
 
-            <br>
-            <label for="contact-number">Guardian</label>
-            <input readonly type="text" id="department" name="contact_number" value="<?= htmlspecialchars($student['guardian_fullname'] ?? '') ?>" placeholder="Ex. 09123456789" />
+                <div class="form-group-one">
+                    <label for="email">Email</label>
+                    <input readonly type="text" id="email" value="<?= htmlspecialchars($student['student_email']) ?>" />
 
-            <label for="guardian-index">Guardian Contact No.:</label>
-            <input readonly type="text" id="guardian-contact" name="guardian_contact" value="<?= htmlspecialchars($student['guardian_contact'] ?? '') ?>" placeholder="Ex. 09123456789" />
-</div>
-        </form>
-</div>
+                    <label for="contact-number">Contact Number</label>
+                    <input readonly type="text" id="contact-number" value="<?= htmlspecialchars($student['contact_number']) ?>" />
+
+                    <label for="guardian">Guardian</label>
+                    <input readonly type="text" id="guardian" value="<?= htmlspecialchars($student['guardian_fullname']) ?>" />
+
+                    <label for="guardian-contact">Guardian Contact No.</label>
+                    <input readonly type="text" id="guardian-contact" value="<?= htmlspecialchars($student['guardian_contact']) ?>" />
+                </div>
+            </div>
         </div>
 
-    <button class="back" onclick="javascript:history.back()">Back</button>
-</div>
-    
-    <div class="page-right">
-    hello
+        <button class="back" onclick="javascript:history.back()">Back</button>
     </div>
+
+    <div class="page-right">
+        <!-- You can add right panel content here -->
+    </div>
+</div>
+
+</body>
+</html>

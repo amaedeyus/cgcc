@@ -16,7 +16,7 @@ try {
         SELECT 
             s.*, 
             u.email AS student_email, 
-            CONCAT(g.first_name, ' ', g.last_name) AS guardian_fullname, 
+            g.full_name AS guardian_fullname,
             g.contact_number AS guardian_contact,
             sec.section_name, 
             p.program_code, 
