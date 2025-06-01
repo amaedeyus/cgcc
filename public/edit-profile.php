@@ -186,10 +186,10 @@ if (!empty($student['guardian_index'])) {
         College Guidance and Counseling Center
     </div>
     <nav class="navigation">
-        <a href="../main.html">Home</a>
-        <a href="#">Contact</a>
-        <a href="#">About Mental Health</a>
-        <a href="#">FAQ</a>
+        <a href="main.php">Home</a>
+        <a href="contact.html">Contact</a>
+        <a href="about-mental-health.html">About Mental Health</a>
+        <a href="faq.html">FAQ</a>
     </nav>
 </header>
 
