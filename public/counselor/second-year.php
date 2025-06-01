@@ -202,23 +202,6 @@ $imagePath = $counselor['counselor_image_path'] ?? 'assets/default-avatar.png';
 
                         $result = $conn->query($sql);
 
-<<<<<<< HEAD
-        if ($result->num_rows > 0) {
-            while($row = $result->fetch_assoc()) {
-                echo "<tr>";
-                echo "<td>" . $row['student_number'] . "</td>";
-                echo "<td>" . $row['last_name'] . "</td>"; 
-                echo "<td>" . $row['first_name'] . "</td>";
-                echo "<td>" . $row['year_level'] . "</td>";
-                echo "<td>" . $row['section_name'] . "</td>";
-                echo "<td class='actions'><a href='view-student.php?id=" . $row['student_index'] . "'>View</a></td>";
-                echo "</tr>";
-            }
-        } else {
-            echo "<tr><td colspan='6' style='text-align: center; color: #bdc3c7;'>No records found</td></tr>";
-        }
-    ?>
-=======
                         if ($result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
                                 echo "<tr>";
@@ -235,7 +218,6 @@ $imagePath = $counselor['counselor_image_path'] ?? 'assets/default-avatar.png';
                         }
                         ?>
 
->>>>>>> 59199ef2350a093f0b59cb63c299a2613bc043e3
                     </tbody>
 
                     <tfoot>

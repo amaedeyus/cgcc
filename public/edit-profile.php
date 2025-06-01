@@ -208,8 +208,8 @@ $guardian_full_name = trim(($guardian['first_name'] ?? '') . ' ' . ($guardian['l
 
         <div class="profile-section">
             <div class="profile-title">Profile Picture</div>
-            <img src="<?= htmlspecialchars($student['image_path'] ?? 'default-profile.png') ?>" 
-                alt="Profile Picture" class="profile-picture" id="profile-picture" />
+            <img src="<?= !empty($student['image_path']) ? htmlspecialchars($student['image_path']) : 'Media/user.jpg' ?>" 
+            alt="Profile Picture" class="profile-picture" id="profile-picture" />
             <input type="file" id="profile-upload" name="profile_image" accept="image/*" />
             <button type="button" class="upload-btn" onclick="document.getElementById('profile-upload').click()">Upload Photo</button>
         </div>
