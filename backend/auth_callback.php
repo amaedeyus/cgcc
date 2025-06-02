@@ -74,7 +74,7 @@ if (!isset($_GET['code'])) {
             if ($row['type'] === 'admin') {
                 header("Location: ../public/admin/admin-manage-forms.html");
             } else if ($row['type'] === 'counselor'){
-                header("Location: ../public/counselor/student-record.php");
+                header("Location: ../public/counselor/first-year.php");
             } else {
                 header("Location: ../public/main.php");
             }

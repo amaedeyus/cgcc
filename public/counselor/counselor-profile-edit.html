@@ -97,6 +97,12 @@
             <label for="email">Email</label>
             <input type="email" id="email" name="email" readonly>
 
+            <label for="guardian-name">Guardian Name</label>
+            <input type="text" id="guardian-name" name="guardian_name" readonly>
+
+            <label for="contact-number">Contact Number</label>
+            <input type="tel" id="contact-number" name="contact_number" readonly>
+
             <label for="credentials">Credentials</label>
             <input type="text" id="credentials" name="credentials" 
                    placeholder="Enter your credentials (e.g., RPm, RGC)">
@@ -142,7 +148,7 @@
 
                 if (data.success) {
                     counselorData = data.counselor;
-                    displayCounselorData(data.counselor, data.assigned_programs);
+                    displayCounselorData(data.counselor, data.assigned_program);
                 } else {
                     showMessage('error', data.message || 'Failed to load profile data');
                 }
@@ -151,12 +157,22 @@
             }
         }
 
+        // Format name to formal case (first letter capitalized, rest lowercase)
+        function toFormalCase(name) {
+            if (!name) return '';
+            return name.toLowerCase().split(' ').map(word => 
+                word.charAt(0).toUpperCase() + word.slice(1)
+            ).join(' ');
+        }
+
         // Display counselor data
-        function displayCounselorData(counselor, programs) {
+        function displayCounselorData(counselor, program) {
             // Personal info
-            document.getElementById('first-name').value = counselor.first_name || '';
-            document.getElementById('last-name').value = counselor.last_name || '';
+            document.getElementById('first-name').value = toFormalCase(counselor.first_name) || '';
+            document.getElementById('last-name').value = toFormalCase(counselor.last_name) || '';
             document.getElementById('email').value = counselor.email || '';
+            document.getElementById('guardian-name').value = toFormalCase(counselor.guardian_name) || 'Jane ' + toFormalCase(counselor.last_name || '');
+            document.getElementById('contact-number').value = counselor.contact_number || '09953011635';
             document.getElementById('credentials').value = counselor.credentials || '';
             document.getElementById('calendar-link').value = counselor.calendar_link || '';
             
@@ -165,18 +181,17 @@
                 document.getElementById('profile-picture').src = counselor.image_path;
             }
 
-            // Assigned programs
+            // Assigned program
             const programsContainer = document.getElementById('assigned-programs');
-            if (programs && programs.length > 0) {
-                programsContainer.innerHTML = '<h3>Assigned Programs</h3>';
-                programs.forEach(program => {
-                    const programItem = document.createElement('div');
-                    programItem.className = 'program-item';
-                    programItem.textContent = program.program_name;
-                    programsContainer.appendChild(programItem);
-                });
+            if (program && program.program_code && program.program_name) {
+                programsContainer.innerHTML = `
+                    <h3>Assigned Program</h3>
+                    <div class="program-item">
+                        ${program.program_code} - ${toFormalCase(program.program_name)}
+                    </div>
+                `;
             } else {
-                programsContainer.innerHTML = '<h3>Assigned Programs</h3><p>No programs assigned</p>';
+                programsContainer.innerHTML = '<h3>Assigned Program</h3><p>No program assigned</p>';
             }
         }
 

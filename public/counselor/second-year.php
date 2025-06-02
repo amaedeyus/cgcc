@@ -5,7 +5,7 @@ require "../../backend/connect.php";  // include the database connection
 $counselor_index = $_SESSION['counselor_index'] ?? null;
 $student = [];
 
-// 1) Fetch the counselor’s data, including an image_path column
+// 1) Fetch the counselor's data, including an image_path column
 if ($counselor_index) {
     $stmt = $conn->prepare("
         SELECT 
@@ -23,8 +23,12 @@ if ($counselor_index) {
 }
 
 $fullName  = $_SESSION['full_name'] ?? 'Guest';
-// If the counselor row didn’t exist or no image_path, fall back to a default:
+// If the counselor row didn't exist or no image_path, fall back to a default:
 $imagePath = $counselor['counselor_image_path'] ?? 'assets/default-avatar.png';
+$displayName = $fullName;
+if (!empty($counselor['credentials'])) {
+    $displayName .= ', ' . $counselor['credentials'];
+}
 ?>
 
 <!DOCTYPE html>
@@ -57,7 +61,7 @@ $imagePath = $counselor['counselor_image_path'] ?? 'assets/default-avatar.png';
                         src="<?= htmlspecialchars($imagePath) ?>"
                         alt="Profile Picture">
                 </div>
-                <span id="user-name"><?= htmlspecialchars($fullName) ?></span>
+                <span id="user-name"><?= htmlspecialchars($displayName) ?></span>
                 <div class="edit">
                     <a href="counselor-profile-edit.html">✎Edit Profile</a>
                 </div>

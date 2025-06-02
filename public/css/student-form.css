@@ -119,6 +119,19 @@ input[type="checkbox"]:focus {
     outline: none;
 }
 
+input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #81C784;
+    border-radius: 6px;
+    font-family: inherit;
+    box-sizing: border-box;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .text-input,
 .dropdown-input,
 .date-input {
@@ -147,8 +160,8 @@ textarea {
     min-height: 100px;
     font-family: inherit;
     resize: vertical;
-    box-sizing: border-box; /* Add this to include padding in width calculation */
-    max-width: 100%; /* Ensure it doesn't exceed parent's width */
+    box-sizing: border-box;
+    max-width: 100%;
 }
 /* Grid table styles - updated for mobile responsiveness */
 .grid-question {

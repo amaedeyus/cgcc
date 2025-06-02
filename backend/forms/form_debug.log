@@ -10078,3 +10078,227 @@ Put N/A if not applicable
 
 --------------------------------------------------------------------------------
 
+[2025-06-01 12:06:40] Received Form Data:
+Array
+(
+    [form_index] => 11
+    [form_name] => EXIT INTERVIEW FORM
+    [description] => This form is designed for graduating students to evaluate various aspects of their academic and campus experience. It collects feedback on: Academic Quality (courses, faculty, resources), Campus Life (facilities, extracurriculars, support services), Career Preparation (internships, counseling, skill development), and Overall Satisfaction. Responses help the institution improve programs and services for future students.
+    [academic_year] => 2024-2025
+    [sections] => Array
+        (
+            [0] => Array
+                (
+                    [title] => EXIT INTERVIEW FORM
+                    [description] => 
+                    [behavior] => same-page
+                    [questions] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [question] => How would you evaluate the overall quality of your college experience at De La Salle Lipa?
+                                    [type] => multiple
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Very Good
+                                            [1] => Good
+                                            [2] => Poor
+                                            [3] => Very Poor
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [1] => Array
+                                (
+                                    [question] => How satisfied are you with the following aspects that De La Salle Lipa has provided?
+                                    [type] => grid
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Very Satisfied
+                                            [1] => Satisfied
+                                            [2] => Dissatisfied
+                                            [3] => Not Satisfied
+                                            [4] => N/A
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                            [0] => Teachers
+                                            [1] => Curriculum
+                                            [2] => Quality of academic advising
+                                            [3] => Quality of teaching modules
+                                            [4] => Quality of practice/OJT opportunities (e.g. facilitating access to internships))
+                                            [5] => Overall usefulness of De La Salle Lipa’s website
+                                            [6] => Quality of library resources and services
+                                            [7] => Quality of enrollment process and services
+                                            [8] => Quality of payment process
+                                            [9] => Viewing of grades
+                                            [10] => Quality of services in acquiring copy of student records (e.g. copy of grades etc.)
+                                            [11] => Overall value of the education with respect to tuition fee
+                                            [12] => Quality of online academic-related engagements with students
+                                            [13] => Quality of activities of student organizations
+                                            [14] => Quality of student government plans and programs
+                                            [15] => Campus safety and security services
+                                            [16] => Student Formation and Discipline Office services
+                                            [17] => Institutional Lasallian Formation Office (ILFO) services
+                                            [18] => Lasallian Assistance Management Program (LAMP) services
+                                            [19] => Quality of Institutional Health Services (Clinic)
+                                            [20] => College Guidance and Counseling Center services
+                                        )
+
+                                )
+
+                            [2] => Array
+                                (
+                                    [question] => Please share any comments about your level of satisfaction with the services above (optional).
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [3] => Array
+                                (
+                                    [question] => How would you evaluate the following learning results that you have gained at the end of this College Experience?
+                                    [type] => grid
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Very Good
+                                            [1] => Good
+                                            [2] => Poor
+                                            [3] => Very Poor
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                            [0] => General preparation for life
+                                            [1] => Competence in your major field of study
+                                            [2] => Foundation for graduate studies
+                                            [3] => Critical thinking skills
+                                            [4] => Quantitative reasoning skills
+                                            [5] => Written communication skills
+                                            [6] => Oral communication skills
+                                            [7] => Leadership skills
+                                            [8] => Capacity to understand current world issues
+                                            [9] => Capacity to understand human diversity (cultural diversity, sexual diversity, etc.)
+                                            [10] => Capacity to access relevant and trustworthy information
+                                        )
+
+                                )
+
+                            [4] => Array
+                                (
+                                    [question] => What are your next plans regarding education and career
+                                    [type] => checkbox
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Continue with graduate studies in the same field
+                                            [1] => Continue with graduate studies in a different field
+                                            [2] => Continue with higher education in another field
+                                            [3] => Review for Licensure Examination
+                                            [4] => Look for a job
+                                            [5] => I already have a job and will immediately start working
+                                            [6] => Involve myself with volunteer activities
+                                            [7] => Help manage our family business
+                                            [8] => Work on an online job
+                                            [9] => Stay unemployed and rest for a while
+                                            [10] => Other
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [5] => Array
+                                (
+                                    [question] => What are your worries/concerns now that you are graduating from college?
+                                    [type] => checkbox
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Feels unprepared for job application process (job interview, creating a resume, visiting companies, etc.)
+                                            [1] => Feels not ready for the world of work
+                                            [2] => Anxious about competition in job hunting
+                                            [3] => Pressure to provide/give back for the family
+                                            [4] => Expectations from family, society to succeed
+                                            [5] => Concerns about adjusting to change (workplace environment, new people, work responsibilities, leaving DLSL)
+                                            [6] => Other
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [6] => Array
+                                (
+                                    [question] => How likely would you recommend the following to a friend
+                                    [type] => grid
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                            [0] => Strongly Recommended
+                                            [1] => Recommended
+                                            [2] => NOT Recommended
+                                            [3] => Strongly NOT Recommended
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                            [0] => De La Salle Lipa as an academic institution
+                                            [1] => To enroll my college program in De La Salle Lipa.
+                                            [2] => To enroll in other college programs in De La Salle Lipa
+                                        )
+
+                                )
+
+                            [7] => Array
+                                (
+                                    [question] => Overall comments in your stay in De La Salle Lipa.
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                        )
+
+                )
+
+        )
+
+)
+
+--------------------------------------------------------------------------------
+
