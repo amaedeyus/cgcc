@@ -19,7 +19,7 @@ try {
             g.full_name AS guardian_fullname,
             g.contact_number AS guardian_contact,
             sec.section_name, 
-            p.program_code, 
+            p.program_name, 
             d.dept_code
         FROM students s
         LEFT JOIN users u ON s.user_index = u.user_index
@@ -89,7 +89,7 @@ try {
         'year_level' => $student['year_level'] ?? '',
         'section_name' => $student['section_name'] ?? '',
         'dept_code' => $student['dept_code'] ?? '',
-        'program_code' => $student['program_code'] ?? '',
+        'program_name' => $student['program_name'] ?? '',
         'student_email' => $student['student_email'] ?? '',
         'contact_number' => $student['contact_number'] ?? '',
         'guardian_fullname' => $student['guardian_fullname'] ?? '',

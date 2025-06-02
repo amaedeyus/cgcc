@@ -695,3 +695,30 @@ Array
     [last_name] => 
     [full_name] => Admin
 )
+Array
+(
+    [user_index] => 50
+    [email] => xyrelle.dominique.talens@dlsl.edu.ph
+    [user_type] => admin
+    [first_name] => Admin
+    [last_name] => 
+    [full_name] => Admin
+)
+Array
+(
+    [user_index] => 50
+    [email] => xyrelle.dominique.talens@dlsl.edu.ph
+    [user_type] => admin
+    [first_name] => Admin
+    [last_name] => 
+    [full_name] => Admin
+)
+Array
+(
+    [user_index] => 50
+    [email] => xyrelle.dominique.talens@dlsl.edu.ph
+    [user_type] => admin
+    [first_name] => Admin
+    [last_name] => 
+    [full_name] => Admin
+)

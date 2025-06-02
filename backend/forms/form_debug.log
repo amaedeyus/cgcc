@@ -10302,3 +10302,177 @@ Array
 
 --------------------------------------------------------------------------------
 
+[2025-06-02 04:54:00] Received Form Data:
+Array
+(
+    [form_index] => 12
+    [form_name] => Test Form
+    [description] => For testing
+    [academic_year] => 2025-2026
+    [sections] => Array
+        (
+            [0] => Array
+                (
+                    [title] => Test Section
+                    [description] => Test Section Descri
+                    [behavior] => same-page
+                    [questions] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [question] => How are you
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                        )
+
+                )
+
+        )
+
+)
+
+--------------------------------------------------------------------------------
+
+[2025-06-02 04:56:16] Received Form Data:
+Array
+(
+    [form_index] => 12
+    [form_name] => Test 2
+    [description] => For testing
+    [academic_year] => 2025-2026
+    [sections] => Array
+        (
+            [0] => Array
+                (
+                    [title] => Test Section
+                    [description] => Test Section Descri
+                    [behavior] => same-page
+                    [questions] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [question] => How are you
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [1] => Array
+                                (
+                                    [question] => Musta ka na
+                                    [type] => date
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                        )
+
+                )
+
+        )
+
+)
+
+--------------------------------------------------------------------------------
+
+[2025-06-02 04:58:28] Received Form Data:
+Array
+(
+    [form_index] => 12
+    [form_name] => Test 2
+    [description] => For testing
+    [academic_year] => 2025-2026
+    [sections] => Array
+        (
+            [0] => Array
+                (
+                    [title] => Test Section
+                    [description] => Test Section Descri
+                    [behavior] => same-page
+                    [questions] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [question] => How are you
+                                    [type] => short
+                                    [subtype] => text
+                                    [required] => 
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [1] => Array
+                                (
+                                    [question] => Musta ka na
+                                    [type] => date
+                                    [subtype] => 
+                                    [required] => 1
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [2] => Array
+                                (
+                                    [question] => Number mo puta ka
+                                    [type] => short
+                                    [subtype] => number
+                                    [required] => 
+                                    [options] => Array
+                                        (
+                                        )
+
+                                    [rows] => Array
+                                        (
+                                        )
+
+                                )
+
+                        )
+
+                )
+
+        )
+
+)
+
+--------------------------------------------------------------------------------
+
