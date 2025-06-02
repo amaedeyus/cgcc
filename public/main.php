@@ -164,6 +164,11 @@ $isProfileComplete = $profileStatus['is_complete'];
                     Edit Profile Information
                 </button>
             </div>
+            <div class="view-responses">
+                <button class="button-class" onclick="window.location.href='student-view-response.html?id=<?= $student_index ?>'">
+                    View My Responses
+                </button>
+            </div>
         </div>
 
     </div>
