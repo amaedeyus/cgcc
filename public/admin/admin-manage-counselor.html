@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/manage-counselors.css">
+    <link rel="stylesheet" href="../css/alert.css">
     <title>Manage Counselors | CGCC</title>
 </head>
 
@@ -161,6 +162,126 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Alert functions
+            function showAlert(title, message, type = 'warning') {
+                // Remove any existing alerts
+                const existingAlert = document.querySelector('.alert');
+                if (existingAlert) {
+                    existingAlert.remove();
+                }
+
+                // Create alert elements
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert alert-${type}`;
+                alertDiv.style.zIndex = '9999';
+
+                const alertContent = document.createElement('div');
+                alertContent.className = 'alert-content';
+
+                const alertTitle = document.createElement('div');
+                alertTitle.className = 'alert-title';
+                alertTitle.textContent = title;
+                alertTitle.style.color = type === 'success' ? '#316b50' : 
+                                       type === 'danger' ? '#dc3545' : 
+                                       type === 'warning' ? '#ffc107' : '#316b50';
+
+                const alertMessage = document.createElement('div');
+                alertMessage.className = 'alert-message';
+                alertMessage.textContent = message;
+
+                const alertButton = document.createElement('button');
+                alertButton.className = 'alert-button';
+                alertButton.textContent = 'OK';
+                alertButton.style.backgroundColor = type === 'success' ? '#316b50' : 
+                                                  type === 'danger' ? '#dc3545' : 
+                                                  type === 'warning' ? '#ffc107' : '#316b50';
+                alertButton.style.color = type === 'warning' ? '#000' : '#fff';
+                alertButton.onclick = () => {
+                    alertDiv.classList.add('fade-out');
+                    setTimeout(() => alertDiv.remove(), 300);
+                };
+
+                // Assemble the alert
+                alertContent.appendChild(alertTitle);
+                alertContent.appendChild(alertMessage);
+                alertContent.appendChild(alertButton);
+                alertDiv.appendChild(alertContent);
+
+                // Add to document
+                document.body.appendChild(alertDiv);
+
+                // Add fade-in animation
+                setTimeout(() => alertDiv.style.opacity = '1', 10);
+            }
+
+            function styledConfirm(message) {
+                return new Promise((resolve) => {
+                    // Remove any existing alerts
+                    const existingAlert = document.querySelector('.alert');
+                    if (existingAlert) {
+                        existingAlert.remove();
+                    }
+
+                    // Create alert elements
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-warning';
+                    alertDiv.style.zIndex = '9999';
+
+                    const alertContent = document.createElement('div');
+                    alertContent.className = 'alert-content';
+
+                    const alertTitle = document.createElement('div');
+                    alertTitle.className = 'alert-title';
+                    alertTitle.textContent = 'Confirm Action';
+                    alertTitle.style.color = '#ffc107';
+
+                    const alertMessage = document.createElement('div');
+                    alertMessage.className = 'alert-message';
+                    alertMessage.textContent = message;
+
+                    const buttonContainer = document.createElement('div');
+                    buttonContainer.style.display = 'flex';
+                    buttonContainer.style.gap = '10px';
+                    buttonContainer.style.justifyContent = 'center';
+
+                    const cancelButton = document.createElement('button');
+                    cancelButton.className = 'alert-button';
+                    cancelButton.textContent = 'Cancel';
+                    cancelButton.style.backgroundColor = '#6c757d';
+                    cancelButton.style.color = '#fff';
+                    cancelButton.onclick = () => {
+                        alertDiv.classList.add('fade-out');
+                        setTimeout(() => alertDiv.remove(), 300);
+                        resolve(false);
+                    };
+
+                    const confirmButton = document.createElement('button');
+                    confirmButton.className = 'alert-button';
+                    confirmButton.textContent = 'Confirm';
+                    confirmButton.style.backgroundColor = '#ffc107';
+                    confirmButton.style.color = '#000';
+                    confirmButton.onclick = () => {
+                        alertDiv.classList.add('fade-out');
+                        setTimeout(() => alertDiv.remove(), 300);
+                        resolve(true);
+                    };
+
+                    // Assemble the alert
+                    buttonContainer.appendChild(cancelButton);
+                    buttonContainer.appendChild(confirmButton);
+                    alertContent.appendChild(alertTitle);
+                    alertContent.appendChild(alertMessage);
+                    alertContent.appendChild(buttonContainer);
+                    alertDiv.appendChild(alertContent);
+
+                    // Add to document
+                    document.body.appendChild(alertDiv);
+
+                    // Add fade-in animation
+                    setTimeout(() => alertDiv.style.opacity = '1', 10);
+                });
+            }
+
             // Set username from localStorage
             const userName = localStorage.getItem('username') || 'Admin';
             document.getElementById('user-name').innerText = userName;
@@ -257,7 +378,7 @@
                     })
                     .catch(error => {
                         console.error('Error fetching counselors:', error);
-                        alert('Failed to load counselor data');
+                        showAlert('Error', 'Failed to load counselor data', 'danger');
                     });
             }
 
@@ -463,7 +584,7 @@
                 }
                 
                 if (!formData.email.endsWith('@dlsl.edu.ph')) {
-                    alert('Please use a valid DLSL email address');
+                    showAlert('Invalid Email', 'Please use a valid DLSL email address', 'danger');
                     return;
                 }
                 
@@ -488,14 +609,22 @@
                     if (data.success) {
                         fetchCounselors();
                         closeModal();
-                        alert(`Counselor ${currentAction === 'add' ? 'added' : 'updated'} successfully`);
+                        showAlert(
+                            'Success',
+                            `Counselor ${currentAction === 'add' ? 'added' : 'updated'} successfully`,
+                            'success'
+                        );
                     } else {
                         throw new Error(data.message || 'Operation failed');
                     }
                 })
                 .catch(error => {
                     console.error(`Error ${currentAction === 'add' ? 'adding' : 'updating'} counselor:`, error);
-                    alert(`Failed to ${currentAction === 'add' ? 'add' : 'update'} counselor: ${error.message}`);
+                    showAlert(
+                        'Error',
+                        `Failed to ${currentAction === 'add' ? 'add' : 'update'} counselor: ${error.message}`,
+                        'danger'
+                    );
                 });
             }
 
@@ -525,14 +654,14 @@
                     if (data.success) {
                         fetchCounselors();
                         closeModal();
-                        alert('Program assignments updated successfully');
+                        showAlert('Success', 'Program assignments updated successfully', 'success');
                     } else {
                         throw new Error(data.message || 'Assignment failed');
                     }
                 })
                 .catch(error => {
                     console.error('Error assigning programs:', error);
-                    alert('Failed to assign programs: ' + error.message);
+                    showAlert('Error', 'Failed to assign programs: ' + error.message, 'danger');
                 });
             }
 
@@ -551,14 +680,14 @@
                         fetchCounselors();
                         closeModal();
                         counselorToDelete = null;
-                        alert('Counselor deleted successfully');
+                        showAlert('Success', 'Counselor deleted successfully', 'success');
                     } else {
                         throw new Error(data.message || 'Deletion failed');
                     }
                 })
                 .catch(error => {
                     console.error('Error deleting counselor:', error);
-                    alert('Failed to delete counselor: ' + error.message);
+                    showAlert('Error', 'Failed to delete counselor: ' + error.message, 'danger');
                 });
             }
             

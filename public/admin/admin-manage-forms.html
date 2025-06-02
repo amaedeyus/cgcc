@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/base.css" />
   <link rel="stylesheet" href="../css/manage-forms.css" />
+  <link rel="stylesheet" href="../css/alert.css" />
   <title>CGCC</title>
 </head>
 
@@ -133,6 +134,127 @@
       1: { text: "Required", class: "required-status" },
       0: { text: "Optional", class: "optional-status" },
     };
+
+    // Function to show styled alert
+    function showAlert(title, message, type = 'warning') {
+        // Remove any existing alerts
+        const existingAlert = document.querySelector('.alert');
+        if (existingAlert) {
+            existingAlert.remove();
+        }
+
+        // Create alert elements
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type}`;
+        alertDiv.style.zIndex = '9999';
+
+        const alertContent = document.createElement('div');
+        alertContent.className = 'alert-content';
+
+        const alertTitle = document.createElement('div');
+        alertTitle.className = 'alert-title';
+        alertTitle.textContent = title;
+        alertTitle.style.color = type === 'success' ? '#316b50' : 
+                               type === 'danger' ? '#dc3545' : 
+                               type === 'warning' ? '#ffc107' : '#316b50';
+
+        const alertMessage = document.createElement('div');
+        alertMessage.className = 'alert-message';
+        alertMessage.textContent = message;
+
+        const alertButton = document.createElement('button');
+        alertButton.className = 'alert-button';
+        alertButton.textContent = 'OK';
+        alertButton.style.backgroundColor = type === 'success' ? '#316b50' : 
+                                          type === 'danger' ? '#dc3545' : 
+                                          type === 'warning' ? '#ffc107' : '#316b50';
+        alertButton.style.color = type === 'warning' ? '#000' : '#fff';
+        alertButton.onclick = () => {
+            alertDiv.classList.add('fade-out');
+            setTimeout(() => alertDiv.remove(), 300);
+        };
+
+        // Assemble the alert
+        alertContent.appendChild(alertTitle);
+        alertContent.appendChild(alertMessage);
+        alertContent.appendChild(alertButton);
+        alertDiv.appendChild(alertContent);
+
+        // Add to document
+        document.body.appendChild(alertDiv);
+
+        // Add fade-in animation
+        setTimeout(() => alertDiv.style.opacity = '1', 10);
+    }
+
+    // Function to show styled confirmation dialog
+    function styledConfirm(message) {
+        return new Promise((resolve) => {
+            // Remove any existing alerts
+            const existingAlert = document.querySelector('.alert');
+            if (existingAlert) {
+                existingAlert.remove();
+            }
+
+            // Create alert elements
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-warning';
+            alertDiv.style.zIndex = '9999';
+
+            const alertContent = document.createElement('div');
+            alertContent.className = 'alert-content';
+
+            const alertTitle = document.createElement('div');
+            alertTitle.className = 'alert-title';
+            alertTitle.textContent = 'Confirm Action';
+            alertTitle.style.color = '#ffc107';
+
+            const alertMessage = document.createElement('div');
+            alertMessage.className = 'alert-message';
+            alertMessage.textContent = message;
+
+            const buttonContainer = document.createElement('div');
+            buttonContainer.style.display = 'flex';
+            buttonContainer.style.gap = '10px';
+            buttonContainer.style.justifyContent = 'center';
+
+            const cancelButton = document.createElement('button');
+            cancelButton.className = 'alert-button';
+            cancelButton.textContent = 'Cancel';
+            cancelButton.style.backgroundColor = '#6c757d';
+            cancelButton.style.color = '#fff';
+            cancelButton.onclick = () => {
+                alertDiv.classList.add('fade-out');
+                setTimeout(() => alertDiv.remove(), 300);
+                resolve(false);
+            };
+
+            const confirmButton = document.createElement('button');
+            confirmButton.className = 'alert-button';
+            confirmButton.textContent = 'Confirm';
+            confirmButton.style.backgroundColor = '#ffc107';
+            confirmButton.style.color = '#000';
+            confirmButton.onclick = () => {
+                alertDiv.classList.add('fade-out');
+                setTimeout(() => alertDiv.remove(), 300);
+                resolve(true);
+            };
+
+            // Assemble the alert
+            buttonContainer.appendChild(cancelButton);
+            buttonContainer.appendChild(confirmButton);
+            alertContent.appendChild(alertTitle);
+            alertContent.appendChild(alertMessage);
+            alertContent.appendChild(buttonContainer);
+            alertDiv.appendChild(alertContent);
+
+            // Add to document
+            document.body.appendChild(alertDiv);
+
+            // Add fade-in animation
+            setTimeout(() => alertDiv.style.opacity = '1', 10);
+        });
+    }
 
     // Fetch and display forms
     async function loadForms() {
@@ -420,7 +542,7 @@
         .getElementById("dropdownArchiveBtn")
         .addEventListener("click", async function () {
           const action = currentFormStatus === "-1" ? "unarchive" : "archive";
-          const confirmAction = confirm(
+          const confirmAction = await styledConfirm(
             `Are you sure you want to ${action} this form?`
           );
 
@@ -457,19 +579,20 @@
             if (result.success) {
               closeSettingsMenu();
               loadForms();
-              showStatusMessage(
-                `Form ${newStatus === "-1" ? "archived" : "unarchived"
-                } successfully`,
-                "success"
+              showAlert(
+                'Success',
+                `Form ${newStatus === "-1" ? "archived" : "unarchived"} successfully`,
+                'success'
               );
             } else {
               throw new Error(result.message || "Update failed");
             }
           } catch (error) {
             console.error("Error:", error);
-            showStatusMessage(
+            showAlert(
+              'Error',
               "Failed to archive form: " + error.message,
-              "error"
+              'danger'
             );
           }
         });

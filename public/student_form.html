@@ -6,6 +6,8 @@
     <link rel="icon" type="image/png" href="Media/cgcc2.png">
     <title>Student Form Response</title>
     <link rel="stylesheet" href="css/student-form.css">
+    <link rel="stylesheet" href="css/alert.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="form-container">
@@ -67,6 +69,47 @@
         const progressContainerEl = document.getElementById('progressContainer');
         const sectionErrorEl = document.getElementById('sectionError');
         
+        // Function to show styled alert
+        function showAlert(title, message, type = 'warning', callback = null) {
+            // Remove any existing alerts
+            const existingAlert = document.querySelector('.alert');
+            if (existingAlert) {
+                existingAlert.remove();
+            }
+
+            // Create alert elements
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+
+            const alertContent = document.createElement('div');
+            alertContent.className = 'alert-content';
+
+            const alertTitle = document.createElement('div');
+            alertTitle.className = 'alert-title';
+            alertTitle.textContent = title;
+
+            const alertMessage = document.createElement('div');
+            alertMessage.className = 'alert-message';
+            alertMessage.textContent = message;
+
+            const alertButton = document.createElement('button');
+            alertButton.className = 'alert-button';
+            alertButton.textContent = 'OK';
+            alertButton.onclick = () => {
+                alertDiv.remove();
+                if (callback) callback();
+            };
+
+            // Assemble the alert
+            alertContent.appendChild(alertTitle);
+            alertContent.appendChild(alertMessage);
+            alertContent.appendChild(alertButton);
+            alertDiv.appendChild(alertContent);
+
+            // Add to document
+            document.body.appendChild(alertDiv);
+        }
+        
         // Initialize the form
         document.addEventListener('DOMContentLoaded', async function() {
             // Get form ID from URL
@@ -74,7 +117,7 @@
             formId = urlParams.get('id');
             
             if (!formId) {
-                alert('No form ID specified in URL');
+                showAlert('Error', 'No form ID specified in URL', 'danger');
                 return;
             }
 
@@ -106,11 +149,9 @@
                 updateSectionNavigation();
 
                 document.querySelectorAll('.grid-table').forEach(table => {
-                    // Count the number of option columns (total columns - 1 for question column)
                     const columnCount = table.querySelectorAll('th').length - 1;
                     table.style.setProperty('--columns-count', columnCount);
                     
-                    // Prevent text selection in grid cells
                     table.querySelectorAll('td').forEach(cell => {
                         cell.addEventListener('selectstart', e => e.preventDefault());
                     });
@@ -118,7 +159,7 @@
                 
             } catch (error) {
                 console.error('Error initializing form:', error);
-                alert('Failed to load form. Please try again.');
+                showAlert('Error', 'Failed to load form. Please try again.', 'danger');
             }
         });
         
@@ -1196,18 +1237,19 @@
                     // Update the submission status
                     hasChanges = false;
                     
-                    alert('Form submitted successfully!');
-                    window.location.href = 'main.php';
+                    showAlert('Success', 'Form submitted successfully!', 'success', () => {
+                        window.location.href = 'main.php';
+                    });
                 } else {
                     // Show more detailed error message if available
                     const errorMsg = result.message || 'Failed to submit form. Please try again.';
-                    alert(errorMsg);
+                    showAlert('Error', errorMsg, 'danger');
                     submitFormBtn.disabled = false;
                     submitFormBtn.textContent = 'Submit Form';
                 }
             } catch (error) {
                 console.error('Error submitting form:', error);
-                alert('An error occurred while submitting the form. Please check your connection and try again.');
+                showAlert('Error', 'An error occurred while submitting the form. Please check your connection and try again.', 'danger');
                 submitFormBtn.disabled = false;
                 submitFormBtn.textContent = 'Submit Form';
             }

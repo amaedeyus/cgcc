@@ -101,12 +101,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    echo "<script>
-        alert('Profile Saved!');
-        window.location.href = '../public/edit-profile.php';
-        </script>";
+    // Output HTML with styled alert
+    echo '<!DOCTYPE html>
+    <html>
+    <head>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="../public/css/alert.css">
+    </head>
+    <body>
+        <div class="alert alert-success">
+            <div class="alert-content">
+                <div class="alert-title">Success!</div>
+                <div class="alert-message">Your profile has been saved successfully.</div>
+                <button class="alert-button" onclick="window.location.href=\'../public/edit-profile.php\'">Continue</button>
+            </div>
+        </div>
+    </body>
+    </html>';
     exit;
 } else {
-    echo "Invalid request method.";
+    // Handle invalid request method with error alert
+    echo '<!DOCTYPE html>
+    <html>
+    <head>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="../public/css/alert.css">
+    </head>
+    <body>
+        <div class="alert alert-danger">
+            <div class="alert-content">
+                <div class="alert-title">Error</div>
+                <div class="alert-message">Invalid request method.</div>
+                <button class="alert-button" onclick="window.location.href=\'../public/edit-profile.php\'">Go Back</button>
+            </div>
+        </div>
+    </body>
+    </html>';
 }
 ?>

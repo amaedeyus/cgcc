@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/manage-programs.css">
+    <link rel="stylesheet" href="../css/alert.css">
     <title>Manage Programs | CGCC</title>
     <style>
         .dept-tab-wrapper {
@@ -351,6 +352,58 @@
             // Set username from localStorage
             const userName = localStorage.getItem('username') || 'Admin';
             document.getElementById('user-name').innerText = userName;
+
+            // Function to show styled alert
+            function showAlert(title, message, type = 'warning') {
+                // Remove any existing alerts
+                const existingAlert = document.querySelector('.alert');
+                if (existingAlert) {
+                    existingAlert.remove();
+                }
+
+                // Create alert elements
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert alert-${type}`;
+                alertDiv.style.zIndex = '9999'; // Ensure it's above other elements
+
+                const alertContent = document.createElement('div');
+                alertContent.className = 'alert-content';
+
+                const alertTitle = document.createElement('div');
+                alertTitle.className = 'alert-title';
+                alertTitle.textContent = title;
+                alertTitle.style.color = type === 'success' ? '#316b50' : 
+                                       type === 'danger' ? '#dc3545' : 
+                                       type === 'warning' ? '#ffc107' : '#316b50';
+
+                const alertMessage = document.createElement('div');
+                alertMessage.className = 'alert-message';
+                alertMessage.textContent = message;
+
+                const alertButton = document.createElement('button');
+                alertButton.className = 'alert-button';
+                alertButton.textContent = 'OK';
+                alertButton.style.backgroundColor = type === 'success' ? '#316b50' : 
+                                                  type === 'danger' ? '#dc3545' : 
+                                                  type === 'warning' ? '#ffc107' : '#316b50';
+                alertButton.style.color = type === 'warning' ? '#000' : '#fff';
+                alertButton.onclick = () => {
+                    alertDiv.classList.add('fade-out');
+                    setTimeout(() => alertDiv.remove(), 300);
+                };
+
+                // Assemble the alert
+                alertContent.appendChild(alertTitle);
+                alertContent.appendChild(alertMessage);
+                alertContent.appendChild(alertButton);
+                alertDiv.appendChild(alertContent);
+
+                // Add to document
+                document.body.appendChild(alertDiv);
+
+                // Add fade-in animation
+                setTimeout(() => alertDiv.style.opacity = '1', 10);
+            }
 
             // DOM Elements
             const addDeptBtn = document.getElementById('add-dept-btn');
@@ -796,7 +849,7 @@
 
             function openAddProgramModal() {
                 if (departments.length === 0) {
-                    alert('Please add at least one department first');
+                    showAlert('Error', 'Please add at least one department first', 'danger');
                     return;
                 }
 
@@ -935,14 +988,14 @@
                     if (data.success) {
                         fetchDepartments().then(fetchPrograms);
                         closeModal();
-                        alert(`Department ${currentAction === 'add' ? 'added' : 'updated'} successfully`);
+                        showAlert('Success', `Department ${currentAction === 'add' ? 'added' : 'updated'} successfully`, 'success');
                     } else {
                         throw new Error(data.message || 'Operation failed');
                     }
                 })
                 .catch(error => {
                     console.error(`Error ${currentAction === 'add' ? 'adding' : 'updating'} department:`, error);
-                    alert(`Failed to ${currentAction === 'add' ? 'add' : 'update'} department: ${error.message}`);
+                    showAlert('Error', `Failed to ${currentAction === 'add' ? 'add' : 'update'} department: ${error.message}`, 'danger');
                 });
             }
 
@@ -981,14 +1034,14 @@
                     if (data.success) {
                         fetchPrograms();
                         closeModal();
-                        alert(`Program ${currentAction === 'add' ? 'added' : 'updated'} successfully`);
+                        showAlert('Success', `Program ${currentAction === 'add' ? 'added' : 'updated'} successfully`, 'success');
                     } else {
                         throw new Error(data.message || 'Operation failed');
                     }
                 })
                 .catch(error => {
                     console.error(`Error ${currentAction === 'add' ? 'adding' : 'updating'} program:`, error);
-                    alert(`Failed to ${currentAction === 'add' ? 'add' : 'update'} program: ${error.message}`);
+                    showAlert('Error', `Failed to ${currentAction === 'add' ? 'add' : 'update'} program: ${error.message}`, 'danger');
                 });
             }
 
@@ -997,12 +1050,12 @@
                 const sectionName = document.getElementById('section-name').value.trim();
 
                 if (!sectionName) {
-                    alert('Please enter a section name');
+                    showAlert('Error', 'Please enter a section name', 'danger');
                     return;
                 }
 
                 if (!currentProgramId) {
-                    alert('No program selected');
+                    showAlert('Error', 'No program selected', 'danger');
                     return;
                 }
 
@@ -1035,7 +1088,7 @@
                 })
                 .catch(error => {
                     console.error('Error adding section:', error);
-                    alert('Failed to add section: ' + error.message);
+                    showAlert('Error', 'Failed to add section: ' + error.message, 'danger');
                 });
             }
 
@@ -1070,7 +1123,7 @@
                 })
                 .catch(error => {
                     console.error('Error updating section:', error);
-                    alert('Failed to update section: ' + error.message);
+                    showAlert('Error', 'Failed to update section: ' + error.message, 'danger');
                 });
             }
 
@@ -1149,7 +1202,7 @@
             function deleteItem(id, type) {
                 if (!id || !type) {
                     console.error("Missing ID or type for deletion");
-                    alert('Error: No valid item selected for deletion');
+                    showAlert('Error', 'No valid item selected for deletion', 'danger');
                     closeModal();
                     return;
                 }
@@ -1216,14 +1269,14 @@
                             if (data && data.success) {
                                 fetchDepartments().then(fetchPrograms);
                                 closeModal();
-                                alert('Department and all associated programs and sections deleted successfully');
+                                showAlert('Success', 'Department and all associated programs and sections deleted successfully', 'success');
                             } else {
                                 throw new Error(data?.message || 'Operation failed');
                             }
                         })
                         .catch(error => {
                             console.error('Error deleting department:', error);
-                            alert('Error: ' + error.message);
+                            showAlert('Error', error.message, 'danger');
                         });
                 } else if (type === 'program') {
                     // First delete all sections for this program
@@ -1265,14 +1318,14 @@
                             if (data && data.success) {
                                 fetchPrograms();
                                 closeModal();
-                                alert('Program and all its sections deleted successfully');
+                                showAlert('Success', 'Program and all its sections deleted successfully', 'success');
                             } else {
                                 throw new Error(data?.message || 'Operation failed');
                             }
                         })
                         .catch(error => {
                             console.error('Error deleting program:', error);
-                            alert('Error: ' + error.message);
+                            showAlert('Error', error.message, 'danger');
                         });
                 } else {
                     // Section deletion
@@ -1294,14 +1347,14 @@
                         if (data && data.success) {
                             fetchSections(currentProgramId).then(fetchPrograms);
                             closeModal();
-                            alert('Section deleted successfully');
+                            showAlert('Success', 'Section deleted successfully', 'success');
                         } else {
                             throw new Error(data?.message || 'Operation failed');
                         }
                     })
                     .catch(error => {
                         console.error('Error deleting section:', error);
-                        alert('Error deleting section: ' + error.message);
+                        showAlert('Error', 'Error deleting section: ' + error.message, 'danger');
                     });
                 }
             }

@@ -132,6 +132,7 @@ if (!empty($student['guardian_index'])) {
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/base.css?v=<?= time() ?>" />
     <link rel="stylesheet" href="css/form.css?v=<?= time() ?>" />
+    <link rel="stylesheet" href="css/alert.css?v=<?= time() ?>" />
     <title>CGCC - Edit Profile</title>
     <style>
         .profile-section {
@@ -304,6 +305,44 @@ for ($y = 1; $y <= 4; $y++) {
 </section>
 
 <script>
+    // Function to show styled alert
+    function showAlert(title, message, type = 'warning') {
+        // Remove any existing alerts
+        const existingAlert = document.querySelector('.alert');
+        if (existingAlert) {
+            existingAlert.remove();
+        }
+
+        // Create alert elements
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type}`;
+
+        const alertContent = document.createElement('div');
+        alertContent.className = 'alert-content';
+
+        const alertTitle = document.createElement('div');
+        alertTitle.className = 'alert-title';
+        alertTitle.textContent = title;
+
+        const alertMessage = document.createElement('div');
+        alertMessage.className = 'alert-message';
+        alertMessage.textContent = message;
+
+        const alertButton = document.createElement('button');
+        alertButton.className = 'alert-button';
+        alertButton.textContent = 'OK';
+        alertButton.onclick = () => alertDiv.remove();
+
+        // Assemble the alert
+        alertContent.appendChild(alertTitle);
+        alertContent.appendChild(alertMessage);
+        alertContent.appendChild(alertButton);
+        alertDiv.appendChild(alertContent);
+
+        // Add to document
+        document.body.appendChild(alertDiv);
+    }
+
     // Preview image when uploaded
     // Update sections dropdown when year level changes
     document.querySelectorAll('input[name="year_level"]').forEach(radio => {
@@ -410,28 +449,40 @@ document.querySelector("form").addEventListener("submit", function (e) {
 
     // Check for empty fields
     if (!contactNumber || !guardianName || !guardianNumber || !dept || !program || !section || !yearLevelChecked) {
-        alert("Please fill out all required fields before saving changes:\n\n" +
-              "- Contact Number\n" +
-              "- Year Level\n" +
-              "- Department\n" +
-              "- Program\n" +
-              "- Section\n" +
-              "- Guardian Name\n" +
-              "- Guardian Contact Number");
-        e.preventDefault(); // Prevent form submission
+        showAlert(
+            'Required Fields',
+            'Please fill out all required fields before saving changes:\n\n' +
+            '• Contact Number\n\n' +
+            '• Year Level\n\n' +
+            '• Department\n\n' +
+            '• Program\n\n' +
+            '• Section\n\n' +
+            '• Guardian Name\n\n' +
+            '• Guardian Contact Number',
+            'warning'
+        );
+        e.preventDefault();
         return;
     }
 
     // Validate contact numbers (should be exactly 11 digits and numeric)
     const contactRegex = /^\d{11}$/;
     if (!contactRegex.test(contactNumber)) {
-        alert("Student contact number must be exactly 11 digits.");
+        showAlert(
+            'Invalid Contact Number',
+            'Student contact number must be exactly 11 digits.',
+            'danger'
+        );
         e.preventDefault();
         return;
     }
 
     if (!contactRegex.test(guardianNumber)) {
-        alert("Guardian contact number must be exactly 11 digits.");
+        showAlert(
+            'Invalid Guardian Contact',
+            'Guardian contact number must be exactly 11 digits.',
+            'danger'
+        );
         e.preventDefault();
         return;
     }
@@ -439,7 +490,11 @@ document.querySelector("form").addEventListener("submit", function (e) {
     // Validate guardian full name (should not contain any digits)
     const nameRegex = /^[^\d]+$/;
     if (!nameRegex.test(guardianName)) {
-        alert("Guardian name must not contain any numbers.");
+        showAlert(
+            'Invalid Guardian Name',
+            'Guardian name must not contain any numbers.',
+            'danger'
+        );
         e.preventDefault();
         return;
     }
