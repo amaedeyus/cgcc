@@ -1,9 +1,6 @@
 <?php
 session_start();
 
-// Debugging: Log session data
-file_put_contents('session_debug.log', print_r($_SESSION, true), FILE_APPEND);
-
 if (!isset($_SESSION['user_index'])) {
     http_response_code(401);
     echo json_encode(['error' => 'Unauthorized']);
@@ -17,14 +14,6 @@ if ($userType !== 'admin') {
     echo json_encode(['error' => 'Access denied']);
     exit;
 }
-
-function logFormData($data, $filename = 'form_debug.log') {
-    $timestamp = date('Y-m-d H:i:s');
-    $logEntry = "[$timestamp] Received Form Data:\n" . print_r($data, true) . "\n" . str_repeat('-', 80) . "\n\n";
-    file_put_contents($filename, $logEntry, FILE_APPEND);
-}
-// Optional: Log user type
-error_log("User type: " . $userType);
 
 header("Access-Control-Allow-Credentials: true");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
@@ -50,8 +39,6 @@ if (!isset($data['form_index'])) {
     echo json_encode(['error' => 'Form ID missing']);
     exit;
 }
-
-logFormData($data);
 
 $formId = (int)$data['form_index'];
 
