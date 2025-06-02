@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="cgcc/public/Media/cgcc2.png">
+    <link rel="icon" type="image/png" href="Media/cgcc2.png">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/form-validation.css">
@@ -17,10 +17,10 @@
             College Guidance and Counseling Center
         </div>
         <nav class="navigation">
-            <a href="../main.php">Home</a>
-            <a href="../contact.html">Contact</a>
-            <a href="../about-mental-health.html">About Mental Health</a>
-            <a href="../faq.html">FAQ</a>
+            <a href="main.php">Home</a>
+            <a href="contact.html">Contact</a>
+            <a href="about-mental-health.html">About Mental Health</a>
+            <a href="faq.html">FAQ</a>
         </nav>
     </header>
 
@@ -67,7 +67,7 @@
                         const isCompleted = data.completed_forms.includes(form.form_index);
                         html += `
                             <li class="${isCompleted ? 'form-completed' : ''}">
-                                <a href="../student_form.html?id=${form.form_index}" class="form-link">
+                                <a href="student_form.html?id=${form.form_index}" class="form-link">
                                     <div class="form-title">${form.form_name}</div>
                                 </a>
                                 <span class="status-badge ${isCompleted ? 'status-completed' : 'status-pending'}">
