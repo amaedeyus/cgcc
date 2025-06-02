@@ -22,6 +22,9 @@ try {
     }
     $checkStmt->close();
 
+    // Start transaction
+    $conn->begin_transaction();
+
     // Soft delete by updating status
     $stmt = $conn->prepare("UPDATE counselors SET status = 'deleted' WHERE counselor_index = ?");
     $stmt->bind_param("i", $counselorId);
@@ -30,12 +33,20 @@ try {
     if ($stmt->affected_rows === 0) {
         throw new Exception("Failed to mark counselor as deleted");
     }
-    
     $stmt->close();
+
+    // Update programs to remove counselor reference
+    $stmt = $conn->prepare("UPDATE programs SET counselor_index = NULL WHERE counselor_index = ?");
+    $stmt->bind_param("i", $counselorId);
+    $stmt->execute();
+    $stmt->close();
+
+    $conn->commit();
     
-    echo json_encode(['success' => true, 'message' => 'Counselor marked as deleted']);
+    echo json_encode(['success' => true, 'message' => 'Counselor marked as deleted and program assignments cleared']);
     
 } catch (Exception $e) {
+    $conn->rollback();
     http_response_code(500);
     echo json_encode(['error' => 'Failed to delete counselor', 'message' => $e->getMessage()]);
 }
