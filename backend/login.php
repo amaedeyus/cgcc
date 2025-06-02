@@ -3,6 +3,40 @@ session_start();
 ob_start();
 include('connect.php'); // Include database connection
 
+function showStyledAlert($message, $type = 'danger', $title = 'Error') {
+    ob_clean(); // Clear any previous output
+    echo '<!DOCTYPE html>
+    <html>
+    <head>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="../public/css/alert.css">
+        <style>
+            .alert {
+                opacity: 1 !important;
+                display: flex !important;
+            }
+            .alert-content {
+                transform: scale(1) !important;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="alert alert-' . $type . '">
+            <div class="alert-content">
+                <div class="alert-title">' . htmlspecialchars($title) . '</div>
+                <div class="alert-message">' . htmlspecialchars($message) . '</div>
+                <button class="alert-button" style="background-color: ' . 
+                    ($type === 'success' ? '#316b50' : 
+                    ($type === 'warning' ? '#ffc107' : 
+                    ($type === 'danger' ? '#dc3545' : '#17a2b8'))) . 
+                    '" onclick="window.history.back()">Go Back</button>
+            </div>
+        </div>
+    </body>
+    </html>';
+    exit();
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email    = $_POST['email']    ?? null;
     $password = $_POST['password'] ?? null;
@@ -11,8 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (!$email || !$password) {
         error_log("Login failed: Missing email or password");
-        echo "<script>alert('Please enter both email and password.'); window.history.back();</script>";
-        exit();
+        showStyledAlert('Please enter both email and password.', 'danger', 'Login Error');
     }
 
     // 1) Explicitly alias the counselor's name columns so they don't collide with anything else:
@@ -39,15 +72,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt = $conn->prepare($query);
     if (!$stmt) {
         error_log("Query preparation failed: " . $conn->error);
-        echo "<script>alert('Database error occurred. Please try again.'); window.history.back();</script>";
-        exit();
+        showStyledAlert('Database error occurred. Please try again.', 'danger', 'Database Error');
     }
 
     $stmt->bind_param("s", $email);
     if (!$stmt->execute()) {
         error_log("Query execution failed: " . $stmt->error);
-        echo "<script>alert('Database error occurred. Please try again.'); window.history.back();</script>";
-        exit();
+        showStyledAlert('Database error occurred. Please try again.', 'danger', 'Database Error');
     }
 
     $result = $stmt->get_result();
@@ -79,8 +110,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($row['type'] === 'student') {
                 if (!$row['student_index']) {
                     error_log("Error: Student type but no student_index found");
-                    echo "<script>alert('Account error: Student record not found.'); window.history.back();</script>";
-                    exit();
+                    showStyledAlert('Account error: Student record not found.', 'danger', 'Account Error');
                 }
                 $_SESSION['student_index'] = $row['student_index'];
                 $_SESSION['first_name']    = $row['student_first_name'] ?? 'Student';
@@ -91,8 +121,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             elseif ($row['type'] === 'counselor') {
                 if (!$row['counselor_index']) {
                     error_log("Error: Counselor type but no counselor_index found");
-                    echo "<script>alert('Account error: Counselor record not found.'); window.history.back();</script>";
-                    exit();
+                    showStyledAlert('Account error: Counselor record not found.', 'danger', 'Account Error');
                 }
                 $_SESSION['counselor_index'] = $row['counselor_index'];
                 $_SESSION['first_name']      = $row['counselor_first_name'] ?? 'Counselor';
@@ -128,17 +157,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         else {
             error_log("Password verification failed for email: " . $email);
             error_log("Input password: " . $password);
-            echo "<script>alert('Invalid email or password.'); window.history.back();</script>";
-            exit();
+            showStyledAlert('Invalid email or password.', 'danger', 'Authentication Error');
         }
     }
     else {
         error_log("No user found with email: " . $email);
-        echo "<script>alert('Invalid email or password.'); window.history.back();</script>";
-        exit();
+        showStyledAlert('Invalid email or password.', 'danger', 'Authentication Error');
     }
 
     $stmt->close();
     $conn->close();
+} else {
+    // If not POST method, show error
+    showStyledAlert('Invalid request method.', 'danger', 'Error');
 }
 ?>

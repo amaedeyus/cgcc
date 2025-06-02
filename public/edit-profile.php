@@ -316,9 +316,12 @@ for ($y = 1; $y <= 4; $y++) {
         // Create alert elements
         const alertDiv = document.createElement('div');
         alertDiv.className = `alert alert-${type}`;
+        alertDiv.style.opacity = '1';
+        alertDiv.style.display = 'flex';
 
         const alertContent = document.createElement('div');
         alertContent.className = 'alert-content';
+        alertContent.style.transform = 'scale(1)';
 
         const alertTitle = document.createElement('div');
         alertTitle.className = 'alert-title';
@@ -331,7 +334,14 @@ for ($y = 1; $y <= 4; $y++) {
         const alertButton = document.createElement('button');
         alertButton.className = 'alert-button';
         alertButton.textContent = 'OK';
-        alertButton.onclick = () => alertDiv.remove();
+        alertButton.style.backgroundColor = type === 'success' ? '#316b50' : 
+                                         type === 'warning' ? '#ffc107' : 
+                                         type === 'danger' ? '#dc3545' : '#17a2b8';
+        alertButton.style.color = type === 'warning' ? '#000' : '#fff';
+        
+        alertButton.onclick = () => {
+            alertDiv.remove();
+        };
 
         // Assemble the alert
         alertContent.appendChild(alertTitle);
@@ -438,6 +448,8 @@ document.getElementById('dept_index').addEventListener('change', function () {
 });
 
 document.querySelector("form").addEventListener("submit", function (e) {
+    e.preventDefault(); // Prevent form submission initially
+
     // Get input values
     const contactNumber = document.getElementById("contact-number").value.trim();
     const guardianName = document.getElementById("guardian-full-name").value.trim();
@@ -447,22 +459,27 @@ document.querySelector("form").addEventListener("submit", function (e) {
     const section = document.getElementById("section-index").value;
     const yearLevelChecked = document.querySelector('input[name="year_level"]:checked');
 
-    // Check for empty fields
-    if (!contactNumber || !guardianName || !guardianNumber || !dept || !program || !section || !yearLevelChecked) {
+    // Create array to store missing fields
+    let missingFields = [];
+
+    // Check each required field and add to missing fields if empty
+    if (!contactNumber) missingFields.push('Contact Number');
+    if (!yearLevelChecked) missingFields.push('Year Level');
+    if (!dept) missingFields.push('Department');
+    if (!program) missingFields.push('Program');
+    if (!section) missingFields.push('Section');
+    if (!guardianName) missingFields.push('Guardian Name');
+    if (!guardianNumber) missingFields.push('Guardian Contact Number');
+
+    // If there are missing fields, show alert and stop form submission
+    if (missingFields.length > 0) {
         showAlert(
             'Required Fields',
-            'Please fill out all required fields before saving changes:\n\n' +
-            '• Contact Number\n\n' +
-            '• Year Level\n\n' +
-            '• Department\n\n' +
-            '• Program\n\n' +
-            '• Section\n\n' +
-            '• Guardian Name\n\n' +
-            '• Guardian Contact Number',
+            'Please fill out the following required fields:\n\n' + 
+            missingFields.map(field => '• ' + field).join('\n\n'),
             'warning'
         );
-        e.preventDefault();
-        return;
+        return false;
     }
 
     // Validate contact numbers (should be exactly 11 digits and numeric)
@@ -473,8 +490,7 @@ document.querySelector("form").addEventListener("submit", function (e) {
             'Student contact number must be exactly 11 digits.',
             'danger'
         );
-        e.preventDefault();
-        return;
+        return false;
     }
 
     if (!contactRegex.test(guardianNumber)) {
@@ -483,8 +499,7 @@ document.querySelector("form").addEventListener("submit", function (e) {
             'Guardian contact number must be exactly 11 digits.',
             'danger'
         );
-        e.preventDefault();
-        return;
+        return false;
     }
 
     // Validate guardian full name (should not contain any digits)
@@ -495,9 +510,11 @@ document.querySelector("form").addEventListener("submit", function (e) {
             'Guardian name must not contain any numbers.',
             'danger'
         );
-        e.preventDefault();
-        return;
+        return false;
     }
+
+    // If all validations pass, submit the form
+    this.submit();
 });
 
 </script>

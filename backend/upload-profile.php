@@ -2,6 +2,35 @@
 session_start();
 require("../backend/connect.php");
 
+function showAlert($message, $type = 'success', $title = 'Success!') {
+    echo '<!DOCTYPE html>
+    <html>
+    <head>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="../public/css/alert.css">
+        <style>
+            .alert {
+                opacity: 1 !important;
+                display: flex !important;
+            }
+            .alert-content {
+                transform: scale(1) !important;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="alert alert-' . $type . '">
+            <div class="alert-content">
+                <div class="alert-title">' . htmlspecialchars($title) . '</div>
+                <div class="alert-message">' . htmlspecialchars($message) . '</div>
+                <button class="alert-button" onclick="window.location.href=\'../public/edit-profile.php\'">Continue</button>
+            </div>
+        </div>
+    </body>
+    </html>';
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $student_id = $_POST['student_index'] ?? null;
     $year_level = $_POST['year_level'] ?? null;
@@ -13,8 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $guardian_contact_number = $_POST['guardian_contact_number'] ?? null;
 
     if (!$student_id) {
-        echo "Student ID is missing or empty.";
-        exit;
+        showAlert('Student ID is missing or empty.', 'danger', 'Error');
     }
 
     $updateImage = false;
@@ -33,8 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (move_uploaded_file($_FILES["profile_image"]["tmp_name"], $target_path)) {
             $updateImage = true;
         } else {
-            echo "Failed to upload image.";
-            exit;
+            showAlert('Failed to upload image.', 'danger', 'Error');
         }
     }
 
@@ -55,8 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (!$stmt) {
-        echo "Prepare failed: (" . $conn->errno . ") " . $conn->error;
-        exit;
+        showAlert('Database error: ' . $conn->error, 'danger', 'Error');
     }
 
     $stmt->execute();
@@ -67,8 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Fetch guardian_index for this student
         $stmt_g = $conn->prepare("SELECT guardian_index FROM students WHERE student_index = ?");
         if (!$stmt_g) {
-            echo "Prepare failed for guardian_index: (" . $conn->errno . ") " . $conn->error;
-            exit;
+            showAlert('Database error while fetching guardian info.', 'danger', 'Error');
         }
         $stmt_g->bind_param("i", $student_id);
         $stmt_g->execute();
@@ -101,41 +126,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Output HTML with styled alert
-    echo '<!DOCTYPE html>
-    <html>
-    <head>
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="../public/css/alert.css">
-    </head>
-    <body>
-        <div class="alert alert-success">
-            <div class="alert-content">
-                <div class="alert-title">Success!</div>
-                <div class="alert-message">Your profile has been saved successfully.</div>
-                <button class="alert-button" onclick="window.location.href=\'../public/edit-profile.php\'">Continue</button>
-            </div>
-        </div>
-    </body>
-    </html>';
-    exit;
+    showAlert('Your profile has been saved successfully.', 'success', 'Success!');
 } else {
-    // Handle invalid request method with error alert
-    echo '<!DOCTYPE html>
-    <html>
-    <head>
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="../public/css/alert.css">
-    </head>
-    <body>
-        <div class="alert alert-danger">
-            <div class="alert-content">
-                <div class="alert-title">Error</div>
-                <div class="alert-message">Invalid request method.</div>
-                <button class="alert-button" onclick="window.location.href=\'../public/edit-profile.php\'">Go Back</button>
-            </div>
-        </div>
-    </body>
-    </html>';
+    showAlert('Invalid request method.', 'danger', 'Error');
 }
 ?>

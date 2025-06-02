@@ -80,9 +80,12 @@
             // Create alert elements
             const alertDiv = document.createElement('div');
             alertDiv.className = `alert alert-${type}`;
+            alertDiv.style.opacity = '1';
+            alertDiv.style.display = 'flex';
 
             const alertContent = document.createElement('div');
             alertContent.className = 'alert-content';
+            alertContent.style.transform = 'scale(1)';
 
             const alertTitle = document.createElement('div');
             alertTitle.className = 'alert-title';
@@ -96,8 +99,11 @@
             alertButton.className = 'alert-button';
             alertButton.textContent = 'OK';
             alertButton.onclick = () => {
-                alertDiv.remove();
-                if (callback) callback();
+                alertDiv.classList.add('fade-out');
+                setTimeout(() => {
+                    alertDiv.remove();
+                    if (callback) callback();
+                }, 300);
             };
 
             // Assemble the alert
@@ -1206,6 +1212,7 @@
         // Submit the form
         async function submitForm() {
             if (!validateForm()) {
+                showAlert('Error', 'Please complete all required questions before submitting.', 'danger');
                 return;
             }
             

@@ -10,6 +10,41 @@
   <link rel="stylesheet" href="../css/manage-forms.css" />
   <link rel="stylesheet" href="../css/alert.css" />
   <title>CGCC</title>
+  <style>
+    .status-message {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 12px 24px;
+        border-radius: 4px;
+        background: white;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        z-index: 9999;
+        font-family: 'Poppins', sans-serif;
+        display: flex;
+        align-items: center;
+        min-width: 300px;
+        transform: translateX(120%);
+        transition: transform 0.3s ease-in-out;
+        border-left: 4px solid #316b50;
+    }
+
+    .status-message.show {
+        transform: translateX(0);
+    }
+
+    .status-message.success {
+        border-left-color: #316b50;
+    }
+
+    .status-message.error {
+        border-left-color: #dc3545;
+    }
+
+    .status-message.warning {
+        border-left-color: #ffc107;
+    }
+  </style>
 </head>
 
 <body>
@@ -599,13 +634,30 @@
 
       // Helper function to show status messages
       function showStatusMessage(message, type) {
+        // Remove any existing status messages
+        const existingStatus = document.querySelector('.status-message');
+        if (existingStatus) {
+            existingStatus.remove();
+        }
+
         const statusElement = document.createElement("div");
-        statusElement.className = `autosave-status show ${type}`;
+        statusElement.className = `status-message ${type}`;
         statusElement.textContent = message;
         document.body.appendChild(statusElement);
 
+        // Force reflow
+        statusElement.offsetHeight;
+
+        // Show the message
+        requestAnimationFrame(() => {
+            statusElement.classList.add('show');
+        });
+
         setTimeout(() => {
-          statusElement.remove();
+            statusElement.classList.remove('show');
+            setTimeout(() => {
+                statusElement.remove();
+            }, 300);
         }, 3000);
       }
     });
