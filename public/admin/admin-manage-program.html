@@ -9,7 +9,123 @@
     <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/manage-programs.css">
     <title>Manage Programs | CGCC</title>
+    <style>
+        .dept-tab-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            position: relative;
+        }
 
+        .dept-delete-btn {
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 50%;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .dept-delete-btn:hover {
+            background-color: #ffebee;
+            color: #d32f2f;
+        }
+
+        .dept-tab {
+            margin-right: 0;
+        }
+
+        .danger-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.3s;
+        }
+
+        .danger-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        .department-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 20px 0;
+            border: 1px solid #c0e8db;
+            border-radius: 4px;
+            background-color: #edfdf3;
+        }
+
+        .department-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid #c0e8db;
+            transition: background-color 0.2s;
+        }
+
+        .department-item:last-child {
+            border-bottom: none;
+        }
+
+        .department-item:hover {
+            background-color: #e8f5e9;
+        }
+
+        .department-info {
+            flex-grow: 1;
+        }
+
+        .department-code {
+            font-weight: 600;
+            color: #023702;
+            font-size: 0.95rem;
+        }
+
+        .department-title {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        .modal-description {
+            color: #f44336;
+            margin: 10px 0;
+            font-size: 0.9rem;
+            padding: 10px;
+            background-color: #ffebee;
+            border-radius: 4px;
+            border: 1px solid #ffcdd2;
+        }
+
+        #delete-dept-list .delete-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background-color 0.2s;
+        }
+
+        #delete-dept-list .delete-btn:hover {
+            background-color: #d32f2f;
+        }
+    </style>
 </head>
 
 <body>
@@ -54,6 +170,9 @@
                     </button>
                     <button id="add-program-btn" class="primary-btn">
                         <span>+</span> Add Program
+                    </button>
+                    <button id="delete-dept-btn" class="danger-btn">
+                        <span>🗑</span> Delete Department
                     </button>
                 </div>
                 <div class="search-box">
@@ -210,6 +329,23 @@
         </div>
     </div>
 
+    <!-- Delete Department Modal -->
+    <div id="delete-dept-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Delete Department</h2>
+            <p class="modal-description">Select a department to delete. This will also delete all associated programs and sections.</p>
+            
+            <div class="department-list" id="delete-dept-list">
+                <!-- Departments will be loaded here -->
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="cancel-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Set username from localStorage
@@ -238,6 +374,9 @@
             const addSectionBtn = document.getElementById('add-section-btn');
             const sectionsList = document.getElementById('sections-list');
             const sectionsProgramName = document.getElementById('sections-program-name');
+            const deleteDeptBtn = document.getElementById('delete-dept-btn');
+            const deleteDeptModal = document.getElementById('delete-dept-modal');
+            const deleteDeptList = document.getElementById('delete-dept-list');
 
             // State variables
             let departments = [];
@@ -289,6 +428,7 @@
                 }
             });
             addSectionBtn.addEventListener('click', addNewSection);
+            deleteDeptBtn.addEventListener('click', openDeleteDeptModal);
 
             // Initialize
             fetchCounselors().then(fetchDepartments).then(fetchPrograms);
@@ -401,6 +541,7 @@
                     tab.className = 'dept-tab';
                     tab.textContent = dept.dept_code;
                     tab.dataset.dept = dept.dept_index;
+                    
                     deptTabs.appendChild(tab);
 
                     tab.addEventListener('click', () => {
@@ -933,6 +1074,78 @@
                 });
             }
 
+            function openDeleteDeptModal() {
+                // Clear and populate the department list
+                deleteDeptList.innerHTML = '';
+                
+                if (departments.length === 0) {
+                    deleteDeptList.innerHTML = '<div class="no-results">No departments available to delete</div>';
+                    return;
+                }
+                
+                departments.forEach(dept => {
+                    const deptItem = document.createElement('div');
+                    deptItem.className = 'department-item';
+                    
+                    deptItem.innerHTML = `
+                        <div class="department-info">
+                            <div class="department-code">${dept.dept_code}</div>
+                            <div class="department-title">${dept.dept_title}</div>
+                        </div>
+                        <button class="action-btn delete-btn" data-id="${dept.dept_index}">Delete</button>
+                    `;
+                    
+                    deleteDeptList.appendChild(deptItem);
+                });
+
+                // Add event listeners to delete buttons
+                document.querySelectorAll('#delete-dept-list .delete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const deptId = btn.dataset.id;
+                        if (deptId) {
+                            // Close the delete department modal
+                            deleteDeptModal.style.display = 'none';
+                            // Show the confirmation modal
+                            confirmDeleteDepartment(deptId);
+                        }
+                    });
+                });
+
+                deleteDeptModal.style.display = 'block';
+            }
+
+            function confirmDeleteDepartment(id) {
+                if (!id) {
+                    console.error("Invalid or missing ID for department deletion");
+                    return;
+                }
+                
+                // Store the ID and type
+                itemToDelete = {
+                    type: 'department',
+                    id: id
+                };
+                
+                document.getElementById('confirm-message').textContent =
+                    'Are you sure you want to delete this department? This will also delete all associated programs and sections.';
+                confirmModal.style.display = 'block';
+
+                // Clear previous listeners
+                const confirmOk = document.getElementById('confirm-ok');
+                confirmOk.onclick = null;
+                
+                // Add new listener
+                confirmOk.addEventListener('click', function confirmHandler() {
+                    deleteItem(itemToDelete.id, itemToDelete.type);
+                    // Remove this listener after use to prevent duplicates
+                    confirmOk.removeEventListener('click', confirmHandler);
+                    closeModal();
+                });
+
+                document.getElementById('confirm-cancel').onclick = closeModal;
+            }
+
             function deleteItem(id, type) {
                 if (!id || !type) {
                     console.error("Missing ID or type for deletion");
@@ -943,7 +1156,76 @@
 
                 console.log(`Attempting to delete ${type} with ID:`, id);
 
-                if (type === 'program') {
+                if (type === 'department') {
+                    // First get all programs in this department
+                    fetch(`../../backend/program/program.php?dept_id=${id}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data && data.length > 0) {
+                                // Delete each program and its sections
+                                const deletePromises = data.map(program => {
+                                    // First delete all sections for this program
+                                    return fetch(`../../backend/section/section.php?program_id=${program.program_index}`)
+                                        .then(response => response.json())
+                                        .then(sectionData => {
+                                            if (sectionData.sections && sectionData.sections.length > 0) {
+                                                const sectionDeletePromises = sectionData.sections.map(section =>
+                                                    fetch(`../../backend/section/section.php?id=${section.section_index}`, {
+                                                        method: 'DELETE',
+                                                        headers: {
+                                                            'Content-Type': 'application/json',
+                                                        }
+                                                    })
+                                                );
+                                                return Promise.all(sectionDeletePromises);
+                                            }
+                                            return Promise.resolve();
+                                        })
+                                        .then(() => {
+                                            // Then delete the program
+                                            return fetch(`../../backend/program/program.php?id=${program.program_index}`, {
+                                                method: 'DELETE',
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                }
+                                            });
+                                        });
+                                });
+                                return Promise.all(deletePromises);
+                            }
+                            return Promise.resolve();
+                        })
+                        .then(() => {
+                            // Finally delete the department
+                            return fetch(`../../backend/department/department.php?id=${id}`, {
+                                method: 'DELETE',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                }
+                            });
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                return response.json().then(err => { 
+                                    throw new Error(err.message || 'Unknown error'); 
+                                });
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data && data.success) {
+                                fetchDepartments().then(fetchPrograms);
+                                closeModal();
+                                alert('Department and all associated programs and sections deleted successfully');
+                            } else {
+                                throw new Error(data?.message || 'Operation failed');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error deleting department:', error);
+                            alert('Error: ' + error.message);
+                        });
+                } else if (type === 'program') {
                     // First delete all sections for this program
                     fetch(`../../backend/section/section.php?program_id=${id}`)
                         .then(response => response.json())
@@ -1029,11 +1311,13 @@
                 programModal.style.display = 'none';
                 sectionsModal.style.display = 'none';
                 confirmModal.style.display = 'none';
+                deleteDeptModal.style.display = 'none';
             }
 
             window.addEventListener('click', function(e) {
                 if (e.target === deptModal || e.target === programModal ||
-                    e.target === sectionsModal || e.target === confirmModal) {
+                    e.target === sectionsModal || e.target === confirmModal ||
+                    e.target === deleteDeptModal) {
                     closeModal();
                 }
             });

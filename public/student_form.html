@@ -461,6 +461,12 @@
         
         // Validate input based on subtype
         function validateSubtype(value, subtype) {
+            // Check for N/A variations first
+            const naVariations = ['n/a', 'n/a', 'na', 'NA', 'N/A', 'N/a'];
+            if (naVariations.includes(value.trim())) {
+                return [true, ''];
+            }
+
             switch (subtype) {
                 case 'number':
                     if (isNaN(value)) {
