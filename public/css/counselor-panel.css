@@ -6,8 +6,8 @@
     flex-direction: column;
     position: relative;
     z-index: 0;
-    height: 100vh;
     min-height: 100vh;
+    height: 100%;
     font-family: 'Poppins', sans-serif;
     color: rgb(2, 55, 2);
     box-shadow: 0.625rem -0.9375rem 0.9375rem -0.625rem rgba(2, 55, 2, 0.313);
