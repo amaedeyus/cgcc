@@ -11,6 +11,7 @@ try {
                 c.last_name, 
                 u.email, 
                 c.status,
+                c.credentials,
                 GROUP_CONCAT(p.program_code) as program_codes,
                 GROUP_CONCAT(p.program_name) as program_names
               FROM counselors c
@@ -44,6 +45,7 @@ try {
             'last_name' => $row['last_name'],
             'email' => $row['email'],
             'status' => $row['status'],
+            'credentials' => $row['credentials'],
             'programs' => $programs
         ];
     }

@@ -32,17 +32,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     // Format names to formal case
     $counselor['first_name'] = toFormalCase($counselor['first_name']);
     $counselor['last_name'] = toFormalCase($counselor['last_name']);
-    $counselor['guardian_name'] = toFormalCase($counselor['guardian_name']);
 
     // Set default email if not available
     if (empty($counselor['email'])) {
         $counselor['email'] = strtolower($counselor['first_name'] . '_' . $counselor['last_name'] . '@dlsl.edu.ph');
     }
 
-    // Set default guardian name if not available
-    if (empty($counselor['guardian_name'])) {
-        $counselor['guardian_name'] = 'Jane ' . $counselor['last_name'];
-    }
 
     // Set default contact number if not available
     if (empty($counselor['contact_number'])) {
@@ -138,15 +133,12 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Format names to formal case
         $updated_counselor['first_name'] = toFormalCase($updated_counselor['first_name']);
         $updated_counselor['last_name'] = toFormalCase($updated_counselor['last_name']);
-        $updated_counselor['guardian_name'] = toFormalCase($updated_counselor['guardian_name']);
 
         // Set default values for the updated counselor data
         if (empty($updated_counselor['email'])) {
             $updated_counselor['email'] = strtolower($updated_counselor['first_name'] . '_' . $updated_counselor['last_name'] . '@dlsl.edu.ph');
         }
-        if (empty($updated_counselor['guardian_name'])) {
-            $updated_counselor['guardian_name'] = 'Jane ' . $updated_counselor['last_name'];
-        }
+
         if (empty($updated_counselor['contact_number'])) {
             $updated_counselor['contact_number'] = '09953011635';
         }

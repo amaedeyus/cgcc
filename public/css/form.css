@@ -38,6 +38,7 @@ form{
 form input[type="text"],
 input[type="email"],         
 input[type="url"],
+input[type="tel"], 
 form select{
     outline-color: #316b50;
     padding: 12px 15px;
@@ -48,11 +49,20 @@ form select{
     box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
 }
 
+input[type="text"][readonly],
+input[type="email"][readonly],         
+input[type="url"][readonly],
+input[type="tel"] {
+    color: #828e82; 
+    cursor: default;
+}
 
-input[type="text"][readonly],input[type="email"][readonly],         
-input[type="url"][readonly] {
-     color: #828e82; 
-     cursor:default
+
+
+input[type="tel"]::placeholder {
+    color: #999;
+    font-family: 'Poppins', sans-serif;
+    letter-spacing: normal;
 }
 
 input[type="radio"]{
