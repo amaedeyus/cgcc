@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/form.css">
+    <link rel="stylesheet" href="../css/alert.css">
     <style>
         .profile-section {
             display: flex;
@@ -144,10 +145,10 @@
                     counselorData = data.counselor;
                     displayCounselorData(data.counselor, data.assigned_program);
                 } else {
-                    showMessage('error', data.message || 'Failed to load profile data');
+                    showAlert('Error', data.message || 'Failed to load profile data', 'danger');
                 }
             } catch (error) {
-                showMessage('error', 'Network error: ' + error.message);
+                showAlert('Error', 'Network error: ' + error.message, 'danger');
             }
         }
 
@@ -226,7 +227,7 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showMessage('success', data.message);
+                    showAlert('Success', data.message, 'success');
                     // Update displayed data with returned counselor info
                     if (data.counselor) {
                         counselorData = data.counselor;
@@ -236,25 +237,53 @@
                             'default-profile.png';
                     }
                 } else {
-                    showMessage('error', data.message || 'Failed to update profile');
+                    showAlert('Error', data.message || 'Failed to update profile', 'danger');
                 }
             } catch (error) {
-                showMessage('error', 'Network error: ' + error.message);
+                showAlert('Error', 'Network error: ' + error.message, 'danger');
             }
         });
-        // Show message
-        function showMessage(type, message) {
-            const messageContainer = document.getElementById('message-container');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${type}`;
-            messageDiv.textContent = message;
-            messageContainer.innerHTML = '';
-            messageContainer.appendChild(messageDiv);
 
-            // Clear message after 5 seconds
-            setTimeout(() => {
-                messageDiv.remove();
-            }, 5000);
+        function showAlert(title, message, type = 'warning', callback = null) {
+            // Remove any existing alerts
+            const existingAlert = document.querySelector('.alert');
+            if (existingAlert) existingAlert.remove();
+
+            // Create alert elements
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.style.opacity = '1';
+            alertDiv.style.display = 'flex';
+
+            const alertContent = document.createElement('div');
+            alertContent.className = 'alert-content';
+            alertContent.style.transform = 'scale(1)';
+
+            const alertTitle = document.createElement('div');
+            alertTitle.className = 'alert-title';
+            alertTitle.textContent = title;
+
+            const alertMessage = document.createElement('div');
+            alertMessage.className = 'alert-message';
+            alertMessage.textContent = message;
+
+            const alertButton = document.createElement('button');
+            alertButton.className = 'alert-button';
+            alertButton.textContent = 'OK';
+            alertButton.onclick = () => {
+                alertDiv.classList.add('fade-out');
+                setTimeout(() => {
+                    alertDiv.remove();
+                    if (callback) callback();
+                }, 300);
+            };
+
+            alertContent.appendChild(alertTitle);
+            alertContent.appendChild(alertMessage);
+            alertContent.appendChild(alertButton);
+            alertDiv.appendChild(alertContent);
+
+            document.body.appendChild(alertDiv);
         }
     </script>
 </body>
