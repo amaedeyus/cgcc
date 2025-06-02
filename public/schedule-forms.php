@@ -40,7 +40,7 @@ if ($student_index) {
             f.form_name,
             CASE WHEN fr.response_index IS NOT NULL THEN 1 ELSE 0 END as has_responded
         FROM forms f
-        LEFT JOIN form_responses fr ON f.form_index = fr.form_index 
+        LEFT JOIN responses fr ON f.form_index = fr.form_index 
             AND fr.student_index = ?
         WHERE f.is_required = 1 AND f.is_active = 1
     ");
