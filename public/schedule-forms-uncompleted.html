@@ -37,70 +37,87 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // No need to set studentId here; backend will use session
-            fetch(`../../backend/users/check_forms.php`)
+            // First check if profile is complete
+            fetch(`../../backend/users/check_profile_completion.php`)
                 .then(response => response.json())
                 .then(data => {
-                    if (data.status === 'error') {
-                        document.getElementById('forms-container').innerHTML = `
-                            <div class="alert alert-danger">${data.message}</div>
-                        `;
+                    if (!data.is_complete) {
+                        alert('Please complete your profile information first.');
+                        window.location.href = "edit-profile.php";
                         return;
                     }
 
-                    const container = document.getElementById('forms-container');
-                    
-                    if (data.required_forms.length === 0) {
-                        container.innerHTML = `
-                            <div class="alert alert-success">
-                                No forms required at this time. You may proceed with scheduling.
-                            </div>
-                            <a href="schedule.html" class="btn-primary">Schedule Appointment</a>
-                        `;
-                        return;
-                    }
+                    // Continue with form check if profile is complete
+                    fetch(`../../backend/users/check_forms.php`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'error') {
+                                document.getElementById('forms-container').innerHTML = `
+                                    <div class="alert alert-danger">${data.message}</div>
+                                `;
+                                return;
+                            }
 
-                    let html = `<p>You need to complete the following forms before scheduling an appointment:</p>`;
-                    html += `<ul class="form-list">`;
-                    
-                    data.required_forms.forEach(form => {
-                        const isCompleted = data.completed_forms.includes(form.form_index);
-                        html += `
-                            <li class="${isCompleted ? 'form-completed' : ''}">
-                                <a href="../student_form.html?id=${form.form_index}" class="form-link">
-                                    <div class="form-title">${form.form_name}</div>
-                                </a>
-                                <span class="status-badge ${isCompleted ? 'status-completed' : 'status-pending'}">
-                                    ${isCompleted ? 'Done' : 'Pending'}
-                                </span>
-                            </li>
-                        `;
-                    });
-                    
-                    html += `</ul>`;
-                    
-                    const allCompleted = data.required_forms.length === data.completed_forms.length;
-                    if (allCompleted) {
-                        html += `
-                            <div class="alert alert-success">
-                                All required forms completed! You may now schedule an appointment.
-                            </div>
-                            <a href="schedule.html" class="btn-primary">Schedule Appointment</a>
-                        `;
-                    } else {
-                        html += `
-                            <div class="alert alert-warning">
-                                Please complete all required forms before scheduling.
-                            </div>
-                        `;
-                    }
-                    
-                    container.innerHTML = html;
+                            const container = document.getElementById('forms-container');
+                            
+                            if (data.required_forms.length === 0) {
+                                container.innerHTML = `
+                                    <div class="alert alert-success">
+                                        No forms required at this time. You may proceed with scheduling.
+                                    </div>
+                                    <a href="schedule.html" class="btn-primary">Schedule Appointment</a>
+                                `;
+                                return;
+                            }
+
+                            let html = `<p>You need to complete the following forms before scheduling an appointment:</p>`;
+                            html += `<ul class="form-list">`;
+                            
+                            data.required_forms.forEach(form => {
+                                const isCompleted = data.completed_forms.includes(form.form_index);
+                                html += `
+                                    <li class="${isCompleted ? 'form-completed' : ''}">
+                                        <a href="../student_form.html?id=${form.form_index}" class="form-link">
+                                            <div class="form-title">${form.form_name}</div>
+                                        </a>
+                                        <span class="status-badge ${isCompleted ? 'status-completed' : 'status-pending'}">
+                                            ${isCompleted ? 'Done' : 'Pending'}
+                                        </span>
+                                    </li>
+                                `;
+                            });
+                            
+                            html += `</ul>`;
+                            
+                            const allCompleted = data.required_forms.length === data.completed_forms.length;
+                            if (allCompleted) {
+                                html += `
+                                    <div class="alert alert-success">
+                                        All required forms completed! You may now schedule an appointment.
+                                    </div>
+                                    <a href="schedule.html" class="btn-primary">Schedule Appointment</a>
+                                `;
+                            } else {
+                                html += `
+                                    <div class="alert alert-warning">
+                                        Please complete all required forms before scheduling.
+                                    </div>
+                                `;
+                            }
+                            
+                            container.innerHTML = html;
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            document.getElementById('forms-container').innerHTML = `
+                                <div class="alert alert-danger">An error occurred while loading form data.</div>
+                            `;
+                        });
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     document.getElementById('forms-container').innerHTML = `
-                        <div class="alert alert-danger">An error occurred while loading form data.</div>
+                        <div class="alert alert-danger">An error occurred while checking profile completion.</div>
                     `;
                 });
         });

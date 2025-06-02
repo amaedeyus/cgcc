@@ -2,6 +2,7 @@
 session_start();
 
 require "../backend/connect.php";  // include the database connection
+require_once "../backend/users/check_profile_completion.php";
 
 $student_index = $_SESSION['student_index'] ?? null;
 $student = [];
@@ -55,6 +56,10 @@ foreach ($counselingForms as $form) {
         break;
     }
 }
+
+// Check profile completion
+$profileStatus = checkProfileCompletion($conn, $_SESSION['student_index']);
+$isProfileComplete = $profileStatus['is_complete'];
 ?>
 
 <!DOCTYPE html>
@@ -165,6 +170,7 @@ foreach ($counselingForms as $form) {
 
 <script>
 const allRequiredFormsCompleted = <?= $allRequiredFormsCompleted ? 'true' : 'false' ?>;
+const isProfileComplete = <?= $isProfileComplete ? 'true' : 'false' ?>;
 
 function toggleDropdown(id){
     const content = document.getElementById(id);
@@ -172,11 +178,32 @@ function toggleDropdown(id){
 }
 
 function goToPage(){
-    if (allRequiredFormsCompleted){
-        window.location.href = "schedule-forms-completed.php";
-    } else{
-        window.location.href = "schedule-forms-uncompleted.html";
-    }
+    // Check profile completion first
+    fetch('../backend/users/check_profile_completion.php', {
+        method: 'GET',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (!data.is_complete) {
+            alert('Please complete your profile information first.');
+            window.location.href = "edit-profile.php";
+            return;
+        }
+        
+        // If profile is complete, check forms completion
+        if (allRequiredFormsCompleted){
+            window.location.href = "schedule-forms-completed.php";
+        } else {
+            window.location.href = "schedule-forms-uncompleted.html";
+        }
+    })
+    .catch(error => {
+        console.error('Error checking profile completion:', error);
+        alert('Error checking profile status. Please try again.');
+    });
 }
 </script>
 
