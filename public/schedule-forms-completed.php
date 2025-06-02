@@ -133,9 +133,7 @@ if ($student_index) {
 <div class="counselor-panel">
     <img src="image.php?file=<?= urlencode($counselor['image_path']) ?>" alt="Counselor Photo" class="counselor-photo">
 
-
-    <h2><?= htmlspecialchars($counselor['first_name'] . ' ' . $counselor['last_name']) ?></h2>
-    <p><strong>Credentials:</strong> <?= htmlspecialchars($counselor['credentials']) ?></p>
+    <h2><?= htmlspecialchars($counselor['first_name'] . ' ' . $counselor['last_name'] . (!empty($counselor['credentials']) ? ', ' . $counselor['credentials'] : '')) ?></h2>
     <p><strong>Email:</strong> <a href="mailto:<?= htmlspecialchars($counselor['email']) ?>"><?= htmlspecialchars($counselor['email']) ?></a></p>
     <?php if (!empty($counselor['calendar_link'])): ?>
     <p><a href="<?= htmlspecialchars($counselor['calendar_link']) ?>" target="_blank" class="calendar-link">📅 Schedule an Appointment</a></p>
