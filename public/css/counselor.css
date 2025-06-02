@@ -1,0 +1,178 @@
+@import 'shared.css';
+
+/* Counselor-specific styles */
+.counselor-info {
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 10px rgba(2, 61, 2, 0.2);
+}
+
+.counselor-info h2 {
+    color: rgb(2, 55, 2);
+    margin-bottom: 15px;
+}
+
+.counselor-info p {
+    margin: 5px 0;
+    color: #333;
+}
+
+.counselor-schedule {
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(2, 61, 2, 0.2);
+}
+
+.schedule-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.schedule-header h3 {
+    color: rgb(2, 55, 2);
+    margin: 0;
+}
+
+.schedule-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.schedule-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background-color: #edfdf3;
+    border-radius: 8px;
+    border: 1px solid #c0e8db;
+}
+
+.schedule-item:last-child {
+    border-bottom: none;
+}
+
+.schedule-time {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.schedule-status {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+}
+
+.status-available {
+    color: #2e7d32;
+    font-weight: 600;
+}
+
+.status-booked {
+    color: #c62828;
+    font-weight: 600;
+}
+
+/* Action buttons */
+.action-btns {
+    display: flex;
+    gap: 8px;
+}
+
+.action-btn {
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    border: none;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.edit-btn {
+    background-color: #4fbd9c;
+    color: white;
+}
+
+.edit-btn:hover {
+    background-color: #249a76;
+}
+
+.delete-btn {
+    background-color: #f44336;
+    color: white;
+}
+
+.delete-btn:hover {
+    background-color: #d32f2f;
+}
+
+.view-schedule-btn {
+    background-color: #2196F3;
+    color: white;
+}
+
+.view-schedule-btn:hover {
+    background-color: #1976D2;
+}
+
+.view-student-btn {
+    background-color: #9C27B0;
+    color: white;
+}
+
+.view-student-btn:hover {
+    background-color: #7B1FA2;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .schedule-header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+    
+    .schedule-item {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+    
+    .action-btns {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+
+.page-left {
+    grid-column: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 0;
+    height: 100vh;
+    min-height: 100vh;
+    font-family: 'Poppins', sans-serif;
+    color: rgb(2, 55, 2);
+    box-shadow: 0.625rem -0.9375rem 0.9375rem -0.625rem rgba(2, 55, 2, 0.313);
+    user-select: none;
+    padding: 2rem 1rem;
+    justify-content: space-between;
+    font-size: 1rem;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+.logout-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 1rem 0;
+    margin-top: auto;
+} 

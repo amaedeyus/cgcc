@@ -115,6 +115,14 @@
                     // Update the page with student data
                     const student = data.student;
 
+                    // Format name to formal case (first letter capitalized, rest lowercase)
+                    function toFormalCase(name) {
+                        if (!name) return '';
+                        return name.toLowerCase().split(' ').map(word => 
+                            word.charAt(0).toUpperCase() + word.slice(1)
+                        ).join(' ');
+                    }
+
                     // Existing code that assigns guardian info
                     let guardianName = student.guardian_fullname;
                     let guardianContact = student.guardian_contact;
@@ -122,18 +130,20 @@
 
                     // If guardian info is empty or missing, assign default values
                     if (!guardianName || guardianName.trim() === '') {
-                        guardianName = `Jane ${student.last_name || ''}`.trim();
+                        guardianName = toFormalCase(`Jane ${student.last_name || ''}`.trim());
+                    } else {
+                        guardianName = toFormalCase(guardianName);
                     }
                     if (!guardianContact || guardianContact.trim() === '') {
-                        guardianContact = '0912345678';
+                        guardianContact = '09123456789';
                     }
                     if (!studentEmail || studentEmail.trim() === '') {
-                        studentEmail = `${student.last_name || ''}_${student.last_name || ''}@dlsl.edu.ph`.trim();
+                        studentEmail = `${student.first_name.toLowerCase() || ''}_${student.last_name.toLowerCase() || ''}@dlsl.edu.ph`.trim();
                     }
                     // Set the values in the input fields
                     document.getElementById('guardian').value = guardianName;
                     document.getElementById('guardian-contact').value = guardianContact;
-                    document.getElementById('guardian-contact').value = studentEmail;
+                    document.getElementById('email').value = studentEmail;
                     document.getElementById('profile-picture').src = student.image_path;
                     document.getElementById('student-number').value = student.student_number;
                     document.getElementById('first-name').value = student.first_name;
@@ -142,10 +152,8 @@
                     document.getElementById('section').value = student.section_name;
                     document.getElementById('department').value = student.dept_code;
                     document.getElementById('program').value = student.program_code;
-                    document.getElementById('email').value = student.student_email;
                     document.getElementById('contact-number').value = student.contact_number;
-                    document.getElementById('guardian').value = student.guardian_fullname;
-                    document.getElementById('guardian-contact').value = student.guardian_contact;
+
 
                     // Update responses
                     const responsesList = document.getElementById('responses-list');

@@ -1,0 +1,309 @@
+/* Grid Layout */
+.grid-body {
+    display: grid;
+    grid-template-columns: .3fr 1fr;
+    grid-template-rows: 1fr;
+    grid-column-gap: 0px;
+    grid-row-gap: 0px;
+    font-size: 1rem;
+}
+
+/* Left Sidebar Styles */
+.page-left {
+    grid-column: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 0;
+    height: 100vh;
+    min-height: 100vh;
+    font-family: 'Poppins', sans-serif;
+    color: rgb(2, 55, 2);
+    box-shadow: 0.625rem -0.9375rem 0.9375rem -0.625rem rgba(2, 55, 2, 0.313);
+    user-select: none;
+    padding: 2rem 1rem;
+    justify-content: space-between;
+    font-size: 1rem;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+.page-left::before {
+    content: "";
+    background-image: url("../Media/lasalle.png");
+    background-repeat: repeat;
+    background-position: top left;
+    opacity: 0.3;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+/* Profile Section */
+.profile {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    font-size: 1.25rem;
+    color: rgb(2, 55, 2);
+    gap: 0.3125rem;
+}
+
+.profile-picture {
+    background-image: url("../Media/user.jpg");
+    background-size: cover;
+    background-position: center;
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50%;
+}
+
+.edit {
+    margin-left: -0.3906rem;
+    font-size: 0.875rem;
+}
+
+.edit a {
+    color: rgb(2, 55, 2);
+    text-decoration: none;
+}
+
+.edit a:hover {
+    text-decoration: underline;
+    color: rgb(36, 154, 118);
+}
+
+/* Sidebar Navigation */
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    margin-left: 1.5625rem;
+    gap: 1.5625rem;
+    margin-top: 2rem;
+    font-size: 1rem;
+}
+
+.sidebar-nav a {
+    text-decoration: none;
+    color: rgb(2, 55, 2);
+    font-size: 1rem;
+}
+
+.sidebar-nav a.active {
+    font-weight: bold;
+    color: rgb(36, 154, 118); 
+}
+
+.sidebar-nav a:hover {
+    color: rgb(36, 154, 118);
+    cursor: pointer;
+}
+
+.sidebar-nav .nav-link.active {
+    font-weight: bold;
+    color: rgb(36, 154, 118);
+}
+
+/* Logout Button */
+.logout-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 1rem 0;
+    margin-top: auto;
+}
+
+.logout-btn {
+    width: 100%;
+    background-color: #4fbd9c;
+    color: white;
+    border: none;
+    padding: 0.5rem 0.9375rem;
+    border-radius: 0.3125rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s;
+}
+
+.logout-btn:hover {
+    background-color: rgb(36, 154, 118);
+}
+
+/* Right Content Area */
+.page-right {
+    padding: 4.375rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    font-size: 1rem;
+}
+
+/* Common Button Styles */
+.button-class {
+    background-color: #4fbd9c;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 15px 30px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    text-align: center;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.2;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    width: 100%;
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+.button-class:hover {
+    background-color: rgb(36, 154, 118);
+    transform: scale(1.01);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Common Table Styles */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background-color: #4fbd9c;
+    color: white;
+}
+
+th {
+    padding: 15px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-bottom: 2px solid #249a76;
+}
+
+tbody tr {
+    border-bottom: 1px solid #edfdf3;
+    transition: background-color 0.2s;
+}
+
+tbody tr:hover {
+    background-color: #edfdf3;
+}
+
+td {
+    padding: 15px;
+    font-size: 0.9rem;
+    color: #023702;
+}
+
+/* Common Form Styles */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+    font-size: 0.9rem;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group select {
+    width: 95%;
+    padding: 10px;
+    border: 1px solid #c0e8db;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    transition: border-color 0.3s;
+    background-color: #edfdf3;
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="email"]:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #4fbd9c;
+}
+
+/* Common Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    overflow: auto;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    width: 50%;
+    max-width: 600px;
+    position: relative;
+}
+
+.close-btn {
+    position: absolute;
+    right: 25px;
+    top: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #aaa;
+    cursor: pointer;
+}
+
+.close-btn:hover {
+    color: #333;
+}
+
+/* Common Responsive Styles */
+@media (max-width: 1024px) {
+    .grid-body {
+        grid-template-columns: 200px 1fr;
+    }
+    
+    .modal-content {
+        width: 70%;
+    }
+}
+
+@media (max-width: 768px) {
+    .grid-body {
+        grid-template-columns: 1fr;
+    }
+    
+    .page-left {
+        display: none;
+    }
+    
+    .modal-content {
+        width: 90%;
+        margin: 20% auto;
+    }
+    
+    .page-right {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .button-class {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+} 

@@ -9,6 +9,12 @@ if (!isset($_SESSION['counselor_index'])) {
 
 $counselor_index = $_SESSION['counselor_index'];
 
+// Function to format name to formal case
+function toFormalCase($name) {
+    if (empty($name)) return '';
+    return ucwords(strtolower($name));
+}
+
 // Handle different request methods
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     // Fetch counselor info for display
@@ -23,23 +29,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $result = $stmt->get_result();
     $counselor = $result->fetch_assoc();
 
-    // Fetch assigned programs
+    // Format names to formal case
+    $counselor['first_name'] = toFormalCase($counselor['first_name']);
+    $counselor['last_name'] = toFormalCase($counselor['last_name']);
+    $counselor['guardian_name'] = toFormalCase($counselor['guardian_name']);
+
+    // Set default email if not available
+    if (empty($counselor['email'])) {
+        $counselor['email'] = strtolower($counselor['first_name'] . '_' . $counselor['last_name'] . '@dlsl.edu.ph');
+    }
+
+    // Set default guardian name if not available
+    if (empty($counselor['guardian_name'])) {
+        $counselor['guardian_name'] = 'Jane ' . $counselor['last_name'];
+    }
+
+    // Set default contact number if not available
+    if (empty($counselor['contact_number'])) {
+        $counselor['contact_number'] = '09953011635';
+    }
+
+    // Fetch assigned program (only one program per counselor)
     $program_stmt = $conn->prepare("
-        SELECT program_index, program_name 
+        SELECT program_index, program_code, program_name 
         FROM programs 
         WHERE counselor_index = ?
+        LIMIT 1
     ");
     $program_stmt->bind_param("i", $counselor_index);
     $program_stmt->execute();
     $program_result = $program_stmt->get_result();
-    $assigned_programs = $program_result->fetch_all(MYSQLI_ASSOC);
+    $assigned_program = $program_result->fetch_assoc();
+
+    // Format program name to formal case
+    if ($assigned_program) {
+        $assigned_program['program_name'] = toFormalCase($assigned_program['program_name']);
+    }
 
     // Return JSON response
     header('Content-Type: application/json');
     echo json_encode([
         'success' => true,
         'counselor' => $counselor,
-        'assigned_programs' => $assigned_programs
+        'assigned_program' => $assigned_program
     ]);
     exit;
 } 
@@ -49,7 +81,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     $calendar_link = $data['calendar_link'] ?? '';
     $credentials = $data['credentials'] ?? '';
-    $contact_number = $data['contact_number'] ?? '';
+    $contact_number = $data['contact_number'] ?? '09953011635'; // Default contact number
     
     // Handle base64 image upload if present
     $image_path = null;
@@ -68,24 +100,18 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $web_path = '../../backend/public/Media/uploads/counselors/' . $new_filename;
         
         if (file_put_contents($upload_path, $image_base64)) {
-            $image_path = $web_path; // Use web-accessible path instead of filesystem path
+            $image_path = $web_path;
         }
     }
     
     // Update counselor info
-    $update_sql = "UPDATE counselors SET calendar_link = ?, credentials = ?";
-    $params = [$calendar_link, $credentials];
-    $types = "ss";
+    $update_sql = "UPDATE counselors SET calendar_link = ?, credentials = ?, contact_number = ?";
+    $params = [$calendar_link, $credentials, $contact_number];
+    $types = "sss";
     
     if ($image_path) {
         $update_sql .= ", image_path = ?";
         $params[] = $image_path;
-        $types .= "s";
-    }
-    
-    if ($contact_number) {
-        $update_sql .= ", contact_number = ?";
-        $params[] = $contact_number;
         $types .= "s";
     }
     
@@ -108,6 +134,22 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute();
         $result = $stmt->get_result();
         $updated_counselor = $result->fetch_assoc();
+
+        // Format names to formal case
+        $updated_counselor['first_name'] = toFormalCase($updated_counselor['first_name']);
+        $updated_counselor['last_name'] = toFormalCase($updated_counselor['last_name']);
+        $updated_counselor['guardian_name'] = toFormalCase($updated_counselor['guardian_name']);
+
+        // Set default values for the updated counselor data
+        if (empty($updated_counselor['email'])) {
+            $updated_counselor['email'] = strtolower($updated_counselor['first_name'] . '_' . $updated_counselor['last_name'] . '@dlsl.edu.ph');
+        }
+        if (empty($updated_counselor['guardian_name'])) {
+            $updated_counselor['guardian_name'] = 'Jane ' . $updated_counselor['last_name'];
+        }
+        if (empty($updated_counselor['contact_number'])) {
+            $updated_counselor['contact_number'] = '09953011635';
+        }
         
         header('Content-Type: application/json');
         echo json_encode([
