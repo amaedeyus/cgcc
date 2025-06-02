@@ -126,7 +126,7 @@ if ($student_index) {
             <a href="contact.html">Contact</a>
             <a href="about-mental-health.html">About Mental Health</a>
             <a href="faq.html">FAQ</a>
-        </nav
+        </nav>
     </header>
 
     <?php if (!empty($counselor)): ?>

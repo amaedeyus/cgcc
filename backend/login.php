@@ -7,12 +7,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email    = $_POST['email']    ?? null;
     $password = $_POST['password'] ?? null;
 
+    error_log("Login attempt started for email: " . $email);
+
     if (!$email || !$password) {
+        error_log("Login failed: Missing email or password");
         echo "<script>alert('Please enter both email and password.'); window.history.back();</script>";
         exit();
     }
 
-    // 1) Explicitly alias the counselor’s name columns so they don’t collide with anything else:
+    // 1) Explicitly alias the counselor's name columns so they don't collide with anything else:
     $query = "
         SELECT 
             u.user_index,
@@ -31,17 +34,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         WHERE u.email = ?
     ";
 
+    error_log("Executing query for email: " . $email);
+
     $stmt = $conn->prepare($query);
+    if (!$stmt) {
+        error_log("Query preparation failed: " . $conn->error);
+        echo "<script>alert('Database error occurred. Please try again.'); window.history.back();</script>";
+        exit();
+    }
+
     $stmt->bind_param("s", $email);
-    $stmt->execute();
+    if (!$stmt->execute()) {
+        error_log("Query execution failed: " . $stmt->error);
+        echo "<script>alert('Database error occurred. Please try again.'); window.history.back();</script>";
+        exit();
+    }
+
     $result = $stmt->get_result();
+    error_log("Query returned " . $result->num_rows . " rows");
 
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
+        
+        // Debug information
+        error_log("User found in database:");
+        error_log("User index: " . $row['user_index']);
+        error_log("User type: " . $row['type']);
+        error_log("Student index: " . ($row['student_index'] ?? 'null'));
+        error_log("Counselor index: " . ($row['counselor_index'] ?? 'null'));
 
         $hashed_password = $row['password'];
+        error_log("Stored hashed password: " . $hashed_password);
+        error_log("Attempting to verify password...");
 
         if (password_verify($password, $hashed_password)) {
+            error_log("Password verification successful");
+            
             // Common session data:
             $_SESSION['user_index'] = $row['user_index'];
             $_SESSION['email']      = $row['email'];
@@ -49,40 +77,63 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             // 2) Based on u.type, pull from the correct alias:
             if ($row['type'] === 'student') {
+                if (!$row['student_index']) {
+                    error_log("Error: Student type but no student_index found");
+                    echo "<script>alert('Account error: Student record not found.'); window.history.back();</script>";
+                    exit();
+                }
                 $_SESSION['student_index'] = $row['student_index'];
                 $_SESSION['first_name']    = $row['student_first_name'] ?? 'Student';
                 $_SESSION['last_name']     = $row['student_last_name']  ?? '';
+                
+                error_log("Student session set - Index: " . $_SESSION['student_index']);
             }
             elseif ($row['type'] === 'counselor') {
+                if (!$row['counselor_index']) {
+                    error_log("Error: Counselor type but no counselor_index found");
+                    echo "<script>alert('Account error: Counselor record not found.'); window.history.back();</script>";
+                    exit();
+                }
                 $_SESSION['counselor_index'] = $row['counselor_index'];
                 $_SESSION['first_name']      = $row['counselor_first_name'] ?? 'Counselor';
                 $_SESSION['last_name']       = $row['counselor_last_name']  ?? '';
+                
+                error_log("Counselor session set - Index: " . $_SESSION['counselor_index']);
             }
             else { // admin or any other unexpected type
                 $_SESSION['first_name'] = 'Admin';
                 $_SESSION['last_name']  = '';
+                error_log("Admin session set");
             }
 
             $_SESSION['full_name'] = trim($_SESSION['first_name'] . ' ' . $_SESSION['last_name']);  
 
+            error_log("Final session state: " . print_r($_SESSION, true));
+
             // 3) Finally, redirect according to type:
             if ($row['type'] === 'admin') {
+                error_log("Redirecting to admin page");
                 header("Location: ../public/admin/admin-manage-forms.html");
             }
             elseif ($row['type'] === 'counselor'){
+                error_log("Redirecting to counselor page");
                 header("Location: ../public/counselor/first-year.php");
             }
             else {
+                error_log("Redirecting to student page");
                 header("Location: ../public/main.php");
             }
             exit();
         }
         else {
+            error_log("Password verification failed for email: " . $email);
+            error_log("Input password: " . $password);
             echo "<script>alert('Invalid email or password.'); window.history.back();</script>";
             exit();
         }
     }
     else {
+        error_log("No user found with email: " . $email);
         echo "<script>alert('Invalid email or password.'); window.history.back();</script>";
         exit();
     }
