@@ -172,7 +172,11 @@ function toggleDropdown(id){
 }
 
 function goToPage(){
-    window.location.href = "schedule-forms.php";
+    if (allRequiredFormsCompleted){
+        window.location.href = "schedule-forms-completed.php";
+    } else{
+        window.location.href = "schedule-forms-uncompleted.html";
+    }
 }
 </script>
 
