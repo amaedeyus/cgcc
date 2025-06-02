@@ -45,7 +45,7 @@ if ($student_index) {
     <link rel="stylesheet" href="css/main-page.css?v=<?= time() ?>">
     <title>CGCC</title>
     <style>
-        .counselor-panel {
+    .counselor-panel {
     margin: 50px auto;
     padding: 30px;
     max-width: 600px;

@@ -126,10 +126,18 @@ input[type="text"] {
     border-radius: 6px;
     font-family: inherit;
     box-sizing: border-box;
-    max-width: 100%;
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="date"],
+input[type="url"],
+input[type="search"],
+select {
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .text-input,
