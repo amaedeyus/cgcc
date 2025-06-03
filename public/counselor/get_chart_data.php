@@ -7,6 +7,7 @@ $department = $_GET['department'] ?? '';
 $program = $_GET['program'] ?? '';
 $section = $_GET['section'] ?? '';
 $year = $_GET['year'] ?? '';
+$academic_year = $_GET['academic_year'] ?? '';
 
 $data = [];
 if (!empty($formName)) {
@@ -44,6 +45,12 @@ if (!empty($formName)) {
             $params[] = $year;
             $types .= "s";
         }
+        if (!empty($academic_year)) {
+            $where .= " AND r.academic_year = ? AND f.academic_year = ?";
+            $params[] = $academic_year;
+            $params[] = $academic_year;
+            $types .= "ss";
+        }
 
         if (!empty($program)) {
             // Group by section
@@ -56,6 +63,7 @@ if (!empty($formName)) {
                 LEFT JOIN sections sec ON s.section_index = sec.section_index
                 LEFT JOIN programs p ON sec.program_index = p.program_index
                 LEFT JOIN departments d ON p.dept_index = d.dept_index
+                LEFT JOIN forms f ON r.form_index = f.form_index
                 WHERE $where
                 GROUP BY sec.section_name
             ";
@@ -71,6 +79,7 @@ if (!empty($formName)) {
                 LEFT JOIN sections sec ON s.section_index = sec.section_index
                 LEFT JOIN programs p ON sec.program_index = p.program_index
                 LEFT JOIN departments d ON p.dept_index = d.dept_index
+                LEFT JOIN forms f ON r.form_index = f.form_index
                 WHERE $where
                 GROUP BY p.program_name
             ";
@@ -86,6 +95,7 @@ if (!empty($formName)) {
                 LEFT JOIN sections sec ON s.section_index = sec.section_index
                 LEFT JOIN programs p ON sec.program_index = p.program_index
                 LEFT JOIN departments d ON p.dept_index = d.dept_index
+                LEFT JOIN forms f ON r.form_index = f.form_index
                 WHERE $where
                 GROUP BY d.dept_title
             ";
@@ -101,6 +111,7 @@ if (!empty($formName)) {
                 LEFT JOIN sections sec ON s.section_index = sec.section_index
                 LEFT JOIN programs p ON sec.program_index = p.program_index
                 LEFT JOIN departments d ON p.dept_index = d.dept_index
+                LEFT JOIN forms f ON r.form_index = f.form_index
                 WHERE $where
                 GROUP BY s.year_level
             ";
