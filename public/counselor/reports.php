@@ -186,6 +186,7 @@ if (!empty($counselor['credentials'])) {
                                 $types .= "s";
                             }
 
+                            // Simple count query (NO GROUP BY)
                             $sql = "
                                 SELECT COUNT(*) AS total
                                 FROM responses r
@@ -195,13 +196,12 @@ if (!empty($counselor['credentials'])) {
                                 LEFT JOIN departments d ON p.dept_index = d.dept_index
                                 WHERE $where
                             ";
-
                             $stmt = $conn->prepare($sql);
                             $stmt->bind_param($types, ...$params);
                             $stmt->execute();
                             $result = $stmt->get_result();
                             $row = $result->fetch_assoc();
-                            $totalResponses = $row['total'];
+                            $totalResponses = (isset($row['total']) ? $row['total'] : 0);
                             $stmt->close();
                         }
                     }
@@ -365,11 +365,17 @@ if (!empty($counselor['credentials'])) {
         fetch(`get_chart_data.php?${params.toString()}`)
             .then(response => response.json())
             .then(data => {
+                const canvas = document.getElementById('responseChart');
+                if (!canvas) return; // No chart to draw on
+                const ctx = canvas.getContext('2d');
                 if (data.labels && data.values) {
-                    const ctx = document.getElementById('responseChart').getContext('2d');
                     let chartTitle = 'Response Distribution by Department';
                     if (data.groupedBy === 'program') {
                         chartTitle = 'Response Distribution by Program';
+                    } else if (data.groupedBy === 'section') {
+                        chartTitle = 'Response Distribution by Section';
+                    } else if (data.groupedBy === 'year') {
+                        chartTitle = 'Response Distribution by Year';
                     }
                     new Chart(ctx, {
                         type: 'pie',

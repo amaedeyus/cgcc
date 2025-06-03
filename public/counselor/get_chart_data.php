@@ -45,8 +45,8 @@ if (!empty($formName)) {
             $types .= "s";
         }
 
-        // If program is selected, group by section; else if department, group by program; else, group by department
         if (!empty($program)) {
+            // Group by section
             $sql = "
                 SELECT 
                     sec.section_name AS label,
@@ -61,6 +61,7 @@ if (!empty($formName)) {
             ";
             $groupedBy = 'section';
         } else if (!empty($department)) {
+            // Group by program
             $sql = "
                 SELECT 
                     p.program_name AS label,
@@ -74,7 +75,8 @@ if (!empty($formName)) {
                 GROUP BY p.program_name
             ";
             $groupedBy = 'program';
-        } else {
+        } else if (!empty($year) && empty($department) && empty($program) && empty($section)) {
+            // Group by department (filtered by year)
             $sql = "
                 SELECT 
                     d.dept_title AS label,
@@ -88,6 +90,21 @@ if (!empty($formName)) {
                 GROUP BY d.dept_title
             ";
             $groupedBy = 'department';
+        } else {
+            // Only form is selected: group by year
+            $sql = "
+                SELECT 
+                    s.year_level AS label,
+                    COUNT(r.response_index) AS count
+                FROM responses r
+                LEFT JOIN students s ON r.student_index = s.student_index
+                LEFT JOIN sections sec ON s.section_index = sec.section_index
+                LEFT JOIN programs p ON sec.program_index = p.program_index
+                LEFT JOIN departments d ON p.dept_index = d.dept_index
+                WHERE $where
+                GROUP BY s.year_level
+            ";
+            $groupedBy = 'year';
         }
 
         $stmt = $conn->prepare($sql);
@@ -106,7 +123,11 @@ $labels = [];
 $values = [];
 
 foreach ($data as $item) {
-    $labels[] = $item['label'];
+    if ($groupedBy === 'year') {
+        $labels[] = "Year " . $item['label'];
+    } else {
+        $labels[] = $item['label'];
+    }
     $values[] = $item['count'];
 }
 
