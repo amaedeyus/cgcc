@@ -20,6 +20,49 @@ if (!empty($formName)) {
     $form_index = $row['form_index'] ?? null;
 
     if ($form_index) {
+        // If section is selected, show responded vs not responded
+        if (!empty($section)) {
+            // Get total students in the section
+            $sqlTotal = "SELECT COUNT(*) as total FROM students WHERE section_index = ?";
+            $stmt = $conn->prepare($sqlTotal);
+            $stmt->bind_param("i", $section);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $row = $result->fetch_assoc();
+            $totalStudents = $row['total'] ?? 0;
+            $stmt->close();
+
+            // Get number of students who responded to the form in this section (with academic year filter if set)
+            $sqlResponded = "
+                SELECT COUNT(DISTINCT r.student_index) as responded
+                FROM responses r
+                LEFT JOIN students s ON r.student_index = s.student_index
+                LEFT JOIN forms f ON r.form_index = f.form_index
+                WHERE r.form_index = ? AND s.section_index = ?";
+            $types = "ii";
+            $params = [$form_index, $section];
+            if (!empty($academic_year)) {
+                $sqlResponded .= " AND r.academic_year = ? AND f.academic_year = ?";
+                $types .= "ss";
+                $params[] = $academic_year;
+                $params[] = $academic_year;
+            }
+            $stmt = $conn->prepare($sqlResponded);
+            $stmt->bind_param($types, ...$params);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $row = $result->fetch_assoc();
+            $responded = $row['responded'] ?? 0;
+            $stmt->close();
+
+            $notResponded = max(0, $totalStudents - $responded);
+            echo json_encode([
+                'labels' => ['Responded', 'Not Responded'],
+                'values' => [$responded, $notResponded],
+                'groupedBy' => 'section_response'
+            ]);
+            exit;
+        }
         // Build the WHERE clause and parameters dynamically
         $where = "r.form_index = ?";
         $params = [$form_index];

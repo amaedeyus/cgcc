@@ -433,6 +433,8 @@ if (!empty($counselor['credentials'])) {
                         chartTitle = 'Response Distribution by Section';
                     } else if (data.groupedBy === 'year') {
                         chartTitle = 'Response Distribution by Year';
+                    } else if (data.groupedBy === 'section_response') {
+                        chartTitle = 'Response Distribution by Section (Responded vs Not Responded)';
                     }
                     new Chart(ctx, {
                         type: 'pie',
