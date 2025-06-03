@@ -199,13 +199,14 @@
     margin: 0 auto;
 }
 
-.schedule, .update {
+.schedule, .update, .view {
     display: flex;
     width: 50%;
     justify-content: center;
 }
+
 .button-class {
-     background-color: #4fbd9c;
+    background-color: #4fbd9c;
     color: white;
     border: none;
     border-radius: 20px;

@@ -37,7 +37,7 @@ if (!$student_id) {
 try {
     // Get all required and active forms
     $query = "
-        SELECT f.form_index, f.form_name, f.description 
+        SELECT f.form_index, f.form_name, f.description, f.academic_year 
         FROM forms f
         WHERE f.is_active = '1' AND f.is_required = 1
     ";
@@ -61,13 +61,14 @@ try {
             WHERE form_index = ? 
             AND student_index = ?
             AND is_autosave = 0
+            AND academic_year = ?
         ");
         
         if (!$stmt) {
             throw new Exception("Prepare failed: " . $conn->error);
         }
         
-        $stmt->bind_param("ii", $form['form_index'], $student_id);
+        $stmt->bind_param("iis", $form['form_index'], $student_id, $form['academic_year']);
         $stmt->execute();
         $result = $stmt->get_result();
         $row = $result->fetch_assoc();

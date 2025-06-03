@@ -14,6 +14,14 @@ if (!$counselorId || empty($data['first_name']) || empty($data['last_name']) || 
 try {
     $conn->begin_transaction();
     
+    // First, check if status is being changed to inactive
+    $checkStmt = $conn->prepare("SELECT status FROM counselors WHERE counselor_index = ?");
+    $checkStmt->bind_param("i", $counselorId);
+    $checkStmt->execute();
+    $result = $checkStmt->get_result();
+    $currentStatus = $result->fetch_assoc()['status'];
+    $checkStmt->close();
+
     // Update counselor info
     $stmt = $conn->prepare("UPDATE counselors c
                            JOIN users u ON c.user_index = u.user_index
@@ -31,8 +39,16 @@ try {
     if ($stmt->affected_rows === 0) {
         throw new Exception("No counselor found with that ID or no changes made");
     }
-    
     $stmt->close();
+
+    // If status is being changed to inactive, nullify program_index in programs table
+    if ($currentStatus !== 'inactive' && $data['status'] === 'inactive') {
+        $updateProgramsStmt = $conn->prepare("UPDATE programs SET counselor_index = NULL WHERE counselor_index = ?");
+        $updateProgramsStmt->bind_param("i", $counselorId);
+        $updateProgramsStmt->execute();
+        $updateProgramsStmt->close();
+    }
+    
     $conn->commit();
     
     echo json_encode(['success' => true]);

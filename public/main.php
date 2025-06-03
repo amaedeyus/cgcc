@@ -25,9 +25,9 @@ $firstName = isset($_SESSION['first_name']) ? $_SESSION['first_name'] : 'Guest';
 
 // Fetch all active forms
 $formsQuery = "
-    SELECT f.form_index, f.form_name, f.is_required, 
+    SELECT f.form_index, f.form_name, f.is_required, f.academic_year, 
            (SELECT COUNT(*) FROM responses r 
-            WHERE r.form_index = f.form_index AND r.student_index = ? AND r.is_autosave = 0) as has_responded
+            WHERE r.form_index = f.form_index AND r.student_index = ? AND r.is_autosave = 0 AND r.academic_year = f.academic_year) as has_responded
     FROM forms f
     WHERE f.is_active = '1'
     ORDER BY f.is_required DESC, f.form_name ASC
@@ -164,7 +164,7 @@ $isProfileComplete = $profileStatus['is_complete'];
                     Edit Profile Information
                 </button>
             </div>
-            <div class="view-responses">
+            <div class="view">
                 <button class="button-class" onclick="window.location.href='student-view-response.html?id=<?= $student_index ?>'">
                     View My Responses
                 </button>
