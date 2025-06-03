@@ -8,24 +8,55 @@ $method = $_SERVER['REQUEST_METHOD'];
 try {
     switch ($method) {
         case 'GET':
-            $stmt = $conn->prepare("
-                SELECT 
-                    p.program_index,
-                    p.program_code,
-                    p.program_name,
-                    p.counselor_index,
-                    d.dept_index,
-                    d.dept_code,
-                    d.dept_title,
-                    (SELECT COUNT(*) FROM sections WHERE program_index = p.program_index) as section_count
-                FROM programs p
-                JOIN departments d ON p.dept_index = d.dept_index
-                ORDER BY p.program_name
-            ");
+            // Check if dept_index is provided
+            $dept_index = isset($_GET['dept_index']) ? (int)$_GET['dept_index'] : null;
+
+            // Base query
+            $query = "SELECT p.program_index, p.program_code, p.program_name, p.dept_index, d.dept_code 
+                      FROM programs p
+                      JOIN departments d ON p.dept_index = d.dept_index
+                      WHERE 1=1";
+
+            $params = [];
+            $types = "";
+
+            // Add department filter if provided
+            if ($dept_index !== null) {
+                $query .= " AND p.dept_index = ?";
+                $params[] = $dept_index;
+                $types .= "i";
+            }
+
+            // Order by department code and program code
+            $query .= " ORDER BY d.dept_code, p.program_code";
+
+            // Prepare and execute the query
+            $stmt = $conn->prepare($query);
+
+            if (!empty($params)) {
+                $stmt->bind_param($types, ...$params);
+            }
+
             $stmt->execute();
             $result = $stmt->get_result();
-            $programs = $result->fetch_all(MYSQLI_ASSOC);
-            
+
+            if (!$result) {
+                http_response_code(500);
+                echo json_encode(['error' => 'Failed to fetch programs']);
+                exit;
+            }
+
+            $programs = [];
+            while ($row = $result->fetch_assoc()) {
+                $programs[] = [
+                    'program_index' => $row['program_index'],
+                    'program_code' => $row['program_code'],
+                    'program_name' => $row['program_name'],
+                    'dept_index' => $row['dept_index'],
+                    'dept_code' => $row['dept_code']
+                ];
+            }
+
             echo json_encode($programs);
             break;
             

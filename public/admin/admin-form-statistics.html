@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="../Media/cgcc2.png" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/base.css" />
+    <link rel="stylesheet" href="../css/manage-forms.css" /> <!-- Keeping this for general layout/sidebar styles -->
+    <link rel="stylesheet" href="../css/alert.css" />
+    <title>CGCC - Form Statistics</title>
+    <style>
+        /* Specific styles for the statistics page */
+        .statistics-container {
+            padding: 2rem;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 0.2rem 0.5rem rgba(0, 0, 0, 0.1);
+        }
+
+        .filters-section {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #023702;
+            font-weight: 500;
+        }
+
+        .filter-group select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 0.5rem;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .form-stats {
+            margin-bottom: 2rem;
+        }
+
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #4fbd9c;
+        }
+
+        .form-title {
+            font-size: 1.5rem;
+            color: #023702;
+            margin: 0;
+        }
+
+        .form-meta {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .question-stats {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 0.5rem;
+        }
+
+        .question-header {
+            margin-bottom: 1rem;
+        }
+
+        .question-text {
+            font-weight: 500;
+            color: #023702;
+            margin-bottom: 0.5rem;
+        }
+
+        .question-meta {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .choices-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .choices-table th,
+        .choices-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .choices-table th {
+            background: #4fbd9c;
+            color: white;
+            font-weight: 500;
+        }
+
+        .choices-table tr:hover {
+            background: #f1f1f1;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 1rem;
+            background: #e9ecef;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #4fbd9c;
+            transition: width 0.3s ease;
+        }
+
+        .section-header {
+            font-size: 1.2rem;
+            color: #023702;
+            margin: 2rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #4fbd9c;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        .loading::after {
+            content: "...";
+            animation: dots 1.5s infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: "."; }
+            40% { content: ".."; }
+            60%, 100% { content: "..."; }
+        }
+
+        #clearFiltersBtn {
+            background-color: #f44336; /* Red color for clear */
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        #clearFiltersBtn:hover {
+            background-color: #d32f2f;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <img src="../Media/cgcc.png" alt="cgcc-logo" class="logo-img" />
+            College Guidance and Counseling Center
+        </div>
+    </header>
+
+    <div class="grid-body">
+        <div class="left-bg"></div>
+        <div class="page-left">
+            <div class="profile">
+                <div class="profile-picture"></div>
+                <span id="user-name"></span>
+            </div>
+            <div class="sidebar-nav">
+                <a href="admin-manage-forms.html" class="nav-link">Manage Forms</a>
+                <a href="admin-manage-counselor.html" class="nav-link">Manage Counselors</a>
+                <a href="admin-manage-program.html" class="nav-link">Manage Programs</a>
+                <a href="admin-archived-forms.html" class="nav-link">Archived Forms</a>
+                <a href="admin-form-statistics.html" class="nav-link active">Form Statistics</a>
+            </div>
+
+            <div class="logout-wrapper">
+                <form method="POST" action="../../backend/logout.php">
+                    <button type="submit" class="logout-btn">Log Out</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="page-right">
+            <div class="header-section">
+                <h1>Form Statistics</h1>
+                <p>View and analyze form response statistics</p>
+            </div>
+
+            <div class="statistics-container">
+                <div class="filters-section">
+                    <div class="filter-group">
+                        <label for="formFilter">Form</label>
+                        <select id="formFilter">
+                            <option value="">All Forms</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="departmentFilter">Department</label>
+                        <select id="departmentFilter">
+                            <option value="">All Departments</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="programFilter">Program</label>
+                        <select id="programFilter">
+                            <option value="">All Programs</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="sectionFilter">Section</label>
+                        <select id="sectionFilter">
+                            <option value="">All Sections</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="academicYearFilter">Academic Year</label>
+                        <select id="academicYearFilter">
+                            <option value="">All Years</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="yearLevelFilter">Year Level</label>
+                        <select id="yearLevelFilter">
+                            <option value="">All Year Levels</option>
+                            <option value="1">1st Year</option>
+                            <option value="2">2nd Year</option>
+                            <option value="3">3rd Year</option>
+                            <option value="4">4th Year</option>
+                            <option value="5">5th Year</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <button id="clearFiltersBtn" class="btn btn-secondary" style="margin-top: 1.5rem;">Clear Filters</button>
+                    </div>
+                </div>
+
+                <div id="statisticsContent">
+                    <!-- Statistics will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Assume username is stored in localStorage
+        const userName = localStorage.getItem("username") || "Admin";
+        document.getElementById("user-name").innerText = userName;
+
+        // Initialize variables
+        let currentFilters = {
+            form_index: '',
+            dept_index: '',
+            program_index: '',
+            section_index: '',
+            academic_year: '',
+            year_level: ''
+        };
+
+         // Function to show styled alert (copied from admin-manage-forms.html)
+        function showAlert(title, message, type = 'warning') {
+            // Remove any existing alerts
+            const existingAlert = document.querySelector('.alert');
+            if (existingAlert) {
+                existingAlert.remove();
+            }
+
+            // Create alert elements
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.style.zIndex = '9999';
+
+            const alertContent = document.createElement('div');
+            alertContent.className = 'alert-content';
+
+            const alertTitle = document.createElement('div');
+            alertTitle.className = 'alert-title';
+            alertTitle.textContent = title;
+            alertTitle.style.color = type === 'success' ? '#316b50' :
+                                   type === 'danger' ? '#dc3545' :
+                                   type === 'warning' ? '#ffc107' : '#316b50';
+
+            const alertMessage = document.createElement('div');
+            alertMessage.className = 'alert-message';
+            alertMessage.textContent = message;
+
+            const alertButton = document.createElement('button');
+            alertButton.className = 'alert-button';
+            alertButton.textContent = 'OK';
+            alertButton.style.backgroundColor = type === 'success' ? '#316b50' :
+                                              type === 'danger' ? '#dc3545' :
+                                              type === 'warning' ? '#ffc107' : '#316b50';
+            alertButton.style.color = type === 'warning' ? '#000' : '#fff';
+            alertButton.onclick = () => {
+                alertDiv.classList.add('fade-out');
+                setTimeout(() => alertDiv.remove(), 300);
+            };
+
+            // Assemble the alert
+            alertContent.appendChild(alertTitle);
+            alertContent.appendChild(alertMessage);
+            alertContent.appendChild(alertButton);
+            alertDiv.appendChild(alertContent);
+
+            // Add to document
+            document.body.appendChild(alertDiv);
+
+            // Add fade-in animation
+            setTimeout(() => alertDiv.style.opacity = '1', 10);
+        }
+
+        // Load initial data
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadFilters();
+            await loadStatistics();
+
+            // Add event listeners for all filters
+            document.getElementById('formFilter').addEventListener('change', handleFilterChange);
+            document.getElementById('departmentFilter').addEventListener('change', handleFilterChange);
+            document.getElementById('programFilter').addEventListener('change', handleFilterChange);
+            document.getElementById('sectionFilter').addEventListener('change', handleFilterChange);
+            document.getElementById('academicYearFilter').addEventListener('change', handleFilterChange);
+            document.getElementById('yearLevelFilter').addEventListener('change', handleFilterChange);
+        });
+
+        // Handle filter changes
+        async function handleFilterChange(event) {
+            const filter = event.target.id.replace('Filter', '');
+            const value = event.target.value;
+
+            // Map frontend filter names to backend names
+            const filterMap = {
+                'form': 'form_index',
+                'department': 'dept_index',
+                'program': 'program_index',
+                'section': 'section_index',
+                'academicYear': 'academic_year',
+                'yearLevel': 'year_level'
+            };
+
+            const backendFilterName = filterMap[filter];
+            if (backendFilterName) {
+                // Only set the filter if it has a non-empty value
+                if (value && value !== '') {
+                    currentFilters[backendFilterName] = value;
+                } else {
+                    // Remove the filter if it's empty
+                    delete currentFilters[backendFilterName];
+                }
+                console.log('Filter changed:', backendFilterName, 'New value:', value);
+            }
+
+            // Update dependent filters
+            if (filter === 'department') {
+                console.log('Updating programs for department:', value);
+                // Reset program and section filters when department changes
+                delete currentFilters.program_index;
+                delete currentFilters.section_index;
+                document.getElementById('programFilter').value = ''; // Reset dropdown
+                document.getElementById('sectionFilter').value = ''; // Reset dropdown
+                await updateProgramFilter(value);
+            } else if (filter === 'program') {
+                console.log('Updating sections for program:', value);
+                // Reset section filter when program changes
+                delete currentFilters.section_index;
+                document.getElementById('sectionFilter').value = ''; // Reset dropdown
+                await updateSectionFilter(value);
+            } else if (filter === 'yearLevel') {
+                console.log('Year level changed, updating sections if program is selected');
+                const programFilter = document.getElementById('programFilter');
+                // Always update section filter when year level changes
+                // The updateSectionFilter function will handle filtering by program if one is selected
+                await updateSectionFilter(programFilter.value);
+            } else if (filter === 'section') {
+                console.log('Section selected, updating parent filters');
+                if (value) {
+                    // Get section details to update parent filters
+                    try {
+                        console.log(`Attempting to fetch section details for section_index=${value}`);
+                        const response = await fetch(`http://localhost/cgcc/backend/sections/section.php?section_index=${value}`, {
+                            credentials: 'include'
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+
+                        const sections = await response.json();
+                        console.log('Received section details:', sections);
+
+                        if (Array.isArray(sections) && sections.length > 0) {
+                            const section = sections[0];
+                            console.log('Found section:', section);
+                            
+                            // Update year level
+                            const yearLevelFilter = document.getElementById('yearLevelFilter');
+                            console.log('Setting yearLevelFilter value to:', section.year_level);
+                            yearLevelFilter.value = section.year_level;
+                            currentFilters.year_level = section.year_level;
+                            console.log('yearLevelFilter new value:', yearLevelFilter.value);
+
+                            // Update program
+                            const programFilter = document.getElementById('programFilter');
+                            console.log('Setting programFilter value to:', section.program_index);
+                            programFilter.value = section.program_index;
+                            currentFilters.program_index = section.program_index;
+                            console.log('programFilter new value:', programFilter.value);
+
+                            // Update department using the dept_index from the section details
+                            const departmentFilter = document.getElementById('departmentFilter');
+                            console.log('Setting departmentFilter value to:', section.dept_index);
+                            departmentFilter.value = section.dept_index;
+                            currentFilters.dept_index = section.dept_index;
+                            console.log('departmentFilter new value:', departmentFilter.value);
+
+                            // IMPORTANT: After successfully updating parent filters based on section, ensure currentFilters are correct BEFORE loading statistics
+                            currentFilters.section_index = value; // Set section_index after successful fetch
+                            await loadStatistics(); // Load statistics ONLY after filters are updated
+
+                        } else {
+                            console.warn('No section details found for section_index:', value);
+                        }
+                    } catch (error) {
+                        console.error('Error updating parent filters:', error);
+                        showAlert('Error', 'Failed to update parent filters: ' + error.message, 'danger');
+                    }
+                } else {
+                    // Section filter cleared, reset parent filters
+                     console.log('Section filter cleared, resetting parent filters');
+                     document.getElementById('yearLevelFilter').value = '';
+                     delete currentFilters.year_level;
+                     document.getElementById('programFilter').value = '';
+                     delete currentFilters.program_index;
+                     document.getElementById('departmentFilter').value = '';
+                     delete currentFilters.dept_index;
+                }
+            }
+
+            await loadStatistics();
+        }
+
+        // Update program filter based on department
+        async function updateProgramFilter(deptIndex) {
+            console.log('updateProgramFilter called with deptIndex:', deptIndex);
+            const programFilter = document.getElementById('programFilter');
+            // Keep the 'All Programs' option
+            programFilter.innerHTML = '<option value="">All Programs</option>';
+            programFilter.disabled = true; // Disable while loading
+
+            try {
+                // Only include dept_index parameter if it has a value
+                const url = deptIndex
+                    ? `http://localhost/cgcc/backend/program/program.php?dept_index=${deptIndex}`
+                    : 'http://localhost/cgcc/backend/program/program.php';
+
+                console.log('Fetching programs from:', url);
+                const response = await fetch(url, {
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const programs = await response.json();
+                console.log('Received programs:', programs);
+
+                if (Array.isArray(programs)) {
+                    programs.forEach(program => {
+                        const option = document.createElement('option');
+                        option.value = program.program_index;
+                        option.textContent = `${program.program_code} - ${program.program_name}`;
+                        programFilter.appendChild(option);
+                    });
+                } else {
+                    console.error('Invalid programs data:', programs);
+                     showAlert('Error', 'Received invalid data for programs.', 'danger');
+                }
+            } catch (error) {
+                console.error('Error loading programs:', error);
+                showAlert('Error', 'Failed to load programs: ' + error.message, 'danger');
+            } finally {
+                 programFilter.disabled = false; // Re-enable filter
+            }
+        }
+
+        // Update section filter based on program and year level
+        async function updateSectionFilter(programIndex) {
+            console.log('updateSectionFilter called with programIndex:', programIndex);
+            const sectionFilter = document.getElementById('sectionFilter');
+            const yearLevelFilter = document.getElementById('yearLevelFilter');
+            // Keep the 'All Sections' option
+            sectionFilter.innerHTML = '<option value="">All Sections</option>';
+            sectionFilter.disabled = true; // Disable while loading
+
+            try {
+                // Get the selected year level
+                const yearLevel = yearLevelFilter.value;
+                console.log('Current year level:', yearLevel);
+
+                // Build URL with program_index and year_level if available
+                const params = new URLSearchParams();
+                if (programIndex) {
+                    params.append('program_index', programIndex);
+                }
+                if (yearLevel) {
+                    params.append('year_level', yearLevel);
+                }
+
+                const url = `http://localhost/cgcc/backend/sections/section.php${params.toString() ? '?' + params.toString() : ''}`;
+                console.log('Fetching sections from:', url);
+
+                const response = await fetch(url, {
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const sections = await response.json();
+                console.log('Received sections:', sections);
+
+                if (Array.isArray(sections)) {
+                    sections.forEach(section => {
+                        const option = document.createElement('option');
+                        option.value = section.section_index;
+                        option.textContent = `${section.year_level} - ${section.section_name}`;
+                        sectionFilter.appendChild(option);
+                    });
+                } else {
+                    console.error('Invalid sections data:', sections);
+                    showAlert('Error', 'Received invalid data for sections.', 'danger');
+                }
+            } catch (error) {
+                console.error('Error loading sections:', error);
+                showAlert('Error', 'Failed to load sections: ' + error.message, 'danger');
+            } finally {
+                sectionFilter.disabled = false; // Re-enable filter
+            }
+        }
+
+        // Load filter options (forms, departments, academic years)
+        async function loadFilters() {
+             // Disable filters while loading
+            document.getElementById('formFilter').disabled = true;
+            document.getElementById('departmentFilter').disabled = true;
+            document.getElementById('programFilter').disabled = true;
+            document.getElementById('sectionFilter').disabled = true;
+            document.getElementById('academicYearFilter').disabled = true;
+            document.getElementById('yearLevelFilter').disabled = true;
+
+
+            try {
+                // Load forms
+                const formsResponse = await fetch('http://localhost/cgcc/backend/forms/form.php', {
+                    credentials: 'include'
+                });
+                const forms = await formsResponse.json();
+                const formFilter = document.getElementById('formFilter');
+                 // Keep the 'All Forms' option
+                formFilter.innerHTML = '<option value="">All Forms</option>';
+                forms.forEach(form => {
+                    // Only include active forms in the statistics filter
+                    if (form.is_active === '1') {
+                        const option = document.createElement('option');
+                        option.value = form.form_index;
+                        option.textContent = form.form_name;
+                        formFilter.appendChild(option);
+                    }
+                });
+
+                // Load departments
+                const deptResponse = await fetch('http://localhost/cgcc/backend/department/department.php', {
+                    credentials: 'include'
+                });
+                const departments = await deptResponse.json();
+                const deptFilter = document.getElementById('departmentFilter');
+                 // Keep the 'All Departments' option
+                deptFilter.innerHTML = '<option value="">All Departments</option>';
+                departments.forEach(dept => {
+                    const option = document.createElement('option');
+                    option.value = dept.dept_index;
+                    option.textContent = `${dept.dept_code} - ${dept.dept_title}`; // Use dept_title for display
+                    deptFilter.appendChild(option);
+                });
+
+                // Load academic years
+                const yearsResponse = await fetch('http://localhost/cgcc/backend/forms/get_academic_years.php', {
+                    credentials: 'include'
+                });
+                const years = await yearsResponse.json();
+                const yearFilter = document.getElementById('academicYearFilter');
+                 // Keep the 'All Years' option
+                yearFilter.innerHTML = '<option value="">All Years</option>';
+                if (Array.isArray(years)) {
+                    years.forEach(year => {
+                        const option = document.createElement('option');
+                        option.value = year;
+                        option.textContent = year;
+                        yearFilter.appendChild(option);
+                    });
+                } else {
+                     console.error('Invalid academic years data:', years);
+                     showAlert('Error', 'Received invalid data for academic years.', 'danger');
+                }
+
+
+                // Add event listeners AFTER populating options
+                formFilter.addEventListener('change', handleFilterChange);
+                deptFilter.addEventListener('change', handleFilterChange);
+                document.getElementById('programFilter').addEventListener('change', handleFilterChange); // Add listener to programFilter
+                document.getElementById('sectionFilter').addEventListener('change', handleFilterChange); // Add listener to sectionFilter
+                yearFilter.addEventListener('change', handleFilterChange);
+                document.getElementById('yearLevelFilter').addEventListener('change', handleFilterChange);
+
+                // Load initial programs and sections (empty)
+                console.log('Loading initial programs and sections');
+                await updateProgramFilter(''); // Load all programs initially (or none if backend handles empty deptIndex)
+                await updateSectionFilter(''); // Load all sections initially (or none if backend handles empty programIndex)
+
+
+            } catch (error) {
+                console.error('Error loading filters:', error);
+                showAlert('Error', 'Failed to load filter options: ' + error.message, 'danger');
+            } finally {
+                // Re-enable filters after loading
+                document.getElementById('formFilter').disabled = false;
+                document.getElementById('departmentFilter').disabled = false;
+                // Program and Section re-enabled in their update functions
+                document.getElementById('academicYearFilter').disabled = false;
+                document.getElementById('yearLevelFilter').disabled = false;
+            }
+        }
+
+        // Load statistics
+        async function loadStatistics() {
+            const content = document.getElementById('statisticsContent');
+            content.innerHTML = '<div class="loading">Loading statistics</div>';
+
+            try {
+                // Get filter values directly from the select elements to ensure latest state
+                const filters = {
+                    form_index: document.getElementById('formFilter')?.value || '',
+                    dept_index: document.getElementById('departmentFilter')?.value || '',
+                    program_index: document.getElementById('programFilter')?.value || '',
+                    section_index: document.getElementById('sectionFilter')?.value || '',
+                    academic_year: document.getElementById('academicYearFilter')?.value || '',
+                    year_level: document.getElementById('yearLevelFilter')?.value || ''
+                };
+
+                console.log('Current filter values:', filters);
+
+                // Build URL with only non-empty values
+                const params = new URLSearchParams();
+                Object.entries(filters).forEach(([key, value]) => {
+                    if (value !== '') { // Only append if the value is not an empty string
+                        params.append(key, value);
+                        console.log(`Adding parameter: ${key}=${value}`);
+                    }
+                });
+
+                // Construct the final URL. URLSearchParams.toString() adds '&' between parameters.
+                // We manually add '?' only if there are parameters.
+                const url = `http://localhost/cgcc/backend/report/form_statistics.php${params.toString() ? '?' + params.toString() : ''}`;
+
+                console.log('Fetching statistics from URL:', url);
+
+                // Fetch data using the constructed URL
+                const response = await fetch(url, {
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('HTTP error:', response.status, errorText);
+                    // Try parsing as JSON even if response is not ok, as backend might return errors as JSON
+                    try {
+                        const errorJson = JSON.parse(errorText);
+                        throw new Error(`HTTP error! status: ${response.status}, details: ${errorJson.error || errorText}`);
+                    } catch (e) {
+                        throw new Error(`HTTP error! status: ${response.status}, details: ${errorText}`);
+                    }
+                }
+
+                const data = await response.json();
+                console.log('Received statistics data:', data);
+
+                // Check for backend errors included in the response
+                if (data.debug && data.debug.errors && data.debug.errors.length > 0) {
+                    console.error('Backend errors:', data.debug.errors);
+                    // Display backend errors to the user
+                    const backendErrorMsg = data.debug.errors.join('. ');
+                    showAlert('Backend Error', 'Details: ' + backendErrorMsg, 'danger');
+                }
+
+                if (!data.statistics || data.statistics.length === 0) {
+                    content.innerHTML = '<div class="no-data">No statistics available for the selected filters</div>';
+                    return;
+                }
+
+                // Rest of the rendering code remains the same...
+                content.innerHTML = data.statistics.map(form => `
+                    <div class="form-stats">
+                        <div class="form-header">
+                            <h2 class="form-title">${form.form_name}</h2>
+                            <div class="form-meta">
+                                Total Submissions: ${form.total_submissions}
+                            </div>
+                        </div>
+
+                        ${groupQuestionsBySection(form.questions).map(section => `
+                            <div class="section-group">
+                                <h3 class="section-header">${section.title}</h3>
+                                ${section.questions.map(question => `
+                                    <div class="question-stats">
+                                        <div class="question-header">
+                                            <div class="question-text">${question.question_text}</div>
+                                            <div class="question-meta">
+                                                Type: ${question.type}
+                                                ${question.total_answers !== null ? `| Total Answers: ${question.total_answers}` : ''}
+                                            </div>
+                                        </div>
+                                        <table class="choices-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Choice</th>
+                                                    <th>Count</th>
+                                                    <th>Percentage</th>
+                                                    <th>Distribution</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                ${question.choices.map(choice => `
+                                                    <tr>
+                                                        <td>${choice.choice_text}</td>
+                                                        <td>${choice.selection_count}</td>
+                                                        <td>${choice.selection_percentage}%</td>
+                                                        <td style="width: 30%">
+                                                            <div class="progress-bar">
+                                                                <div class="progress-fill" style="width: ${choice.selection_percentage}%"></div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                `).join('')}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `).join('')}
+                    </div>
+                `).join('');
+
+
+            } catch (error) {
+                console.error('Error loading statistics:', error);
+                content.innerHTML = '<div class="no-data">Error loading statistics. Please try again.</div>';
+                 // Display the error message to the user
+                showAlert('Error', 'Failed to load statistics: ' + error.message, 'danger');
+            }
+        }
+
+        // Group questions by section
+        function groupQuestionsBySection(questions) {
+            const sections = {};
+            questions.forEach(question => {
+                // Use "Unassigned Section" if section_title is empty or null
+                const sectionTitle = question.section && question.section !== '' ? question.section : 'Unassigned Section';
+                 // Use a fallback order for unassigned sections, perhaps a large number
+                const sectionOrder = question.section_order !== null ? question.section_order : 9999;
+
+                // Use the determined title as the key for grouping
+                const sectionKey = sectionTitle;
+
+
+                if (!sections[sectionKey]) {
+                    sections[sectionKey] = {
+                        title: sectionTitle,
+                        order: sectionOrder, // Use this for sorting sections
+                        questions: []
+                    };
+                }
+                sections[sectionKey].questions.push(question);
+            });
+
+            // Sort sections by their order
+            const sortedSections = Object.values(sections).sort((a, b) => a.order - b.order);
+
+            // Sort questions within each section by their index (assuming question_index provides order within a section)
+            sortedSections.forEach(section => {
+                section.questions.sort((a, b) => {
+                    // Assuming question_index is a good enough proxy for order within a section
+                    return (a.question_index || 0) - (b.question_index || 0);
+                });
+            });
+
+            return sortedSections;
+        }
+
+        // Add event listener for the clear filters button
+        document.getElementById('clearFiltersBtn').addEventListener('click', async () => {
+            console.log('Clear Filters button clicked.');
+            // Reset all filter dropdowns to their default value
+            document.getElementById('formFilter').value = '';
+            document.getElementById('departmentFilter').value = '';
+            document.getElementById('programFilter').value = '';
+            document.getElementById('sectionFilter').value = '';
+            document.getElementById('academicYearFilter').value = '';
+            document.getElementById('yearLevelFilter').value = '';
+
+            // Clear the currentFilters object
+            currentFilters = {
+                form_index: '',
+                dept_index: '',
+                program_index: '',
+                section_index: '',
+                academic_year: '',
+                year_level: ''
+            };
+            console.log('Current filters cleared:', currentFilters);
+
+            // Reload the statistics
+            await loadStatistics();
+
+            // Also manually trigger updates for dependent filters (program and section)
+            // This ensures the dropdowns repopulate based on no department/program selected
+            await updateProgramFilter('');
+            await updateSectionFilter('');
+        });
+    </script>
+</body>
+
+</html>
