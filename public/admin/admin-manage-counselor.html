@@ -11,6 +11,38 @@
     <link rel="stylesheet" href="../css/alert.css">
     <title>Manage Counselors | CGCC</title>
 </head>
+<style>
+    .print-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 8px 15px;
+    background-color: #4fbc9c;
+    color: white !important;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    width: 100px;
+    text-align: center;
+    z-index: 9999;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.print-btn a {
+    color: white !important;
+    text-decoration: none;
+}
+
+.print-btn:hover {
+    background: #3d8b40;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+</style>
 
 <body>
     <header>
@@ -21,6 +53,7 @@
     </header>
 
     <div class="grid-body">
+         
         <div class="left-bg"></div>
         <div class="page-left">
             <div class="profile">
@@ -81,6 +114,8 @@
             </div>
         </div>
     </div>
+
+    <button type="reset" class="print-btn" onClick="window.location.href='../../tcpdf6/examples/counselor-record.php'">Print</button>
 
     <!-- Add/Edit Counselor Modal -->
     <div id="counselor-modal" class="modal">
