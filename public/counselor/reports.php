@@ -45,7 +45,8 @@ if (!empty($counselor['credentials'])) {
     <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/record.css?v=<?= time() ?>">
     <link rel="icon" type="image/png" href="../Media/cgcc2.png" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <title>Report Summary</title>
 </head>
 
@@ -207,8 +208,10 @@ if (!empty($counselor['credentials'])) {
                     }
                     ?>
                     <?php if ($totalResponses > 0): ?>
-                        <canvas id="responseChart" width="400" height="400"></canvas>
-                        <p>Total Responses for "<strong><?= htmlspecialchars($_GET['forms'] ?? '') ?></strong>": <strong><?= $totalResponses ?></strong></p>
+                        <div class="chart-center-container">
+                            <canvas id="responseChart" width="450" height="450"></canvas>
+                        </div>
+                        <p style="text-align:center;">Total Responses for "<strong><?= htmlspecialchars($_GET['forms'] ?? '') ?></strong>": <strong><?= $totalResponses ?></strong></p>
                     <?php elseif (!empty($_GET['forms'])): ?>
                         <p>No responses found for "<strong><?= htmlspecialchars($_GET['forms'] ?? '') ?></strong>".</p>
                     <?php else: ?>
@@ -391,7 +394,7 @@ if (!empty($counselor['credentials'])) {
                             }]
                         },
                         options: {
-                            responsive: true,
+                            responsive: false,
                             plugins: {
                                 legend: {
                                     position: 'right',
@@ -399,9 +402,22 @@ if (!empty($counselor['credentials'])) {
                                 title: {
                                     display: true,
                                     text: chartTitle
+                                },
+                                datalabels: {
+                                    color: '#222',
+                                    font: {
+                                        weight: 'bold',
+                                        size: 14
+                                    },
+                                    formatter: (value, context) => {
+                                        const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                        const percent = total ? (value / total * 100) : 0;
+                                        return percent.toFixed(1) + '%';
+                                    }
                                 }
                             }
-                        }
+                        },
+                        plugins: [ChartDataLabels]
                     });
                 } else {
                     console.error('Invalid data format');
@@ -411,5 +427,14 @@ if (!empty($counselor['credentials'])) {
     });
 </script>
 
+<style>
+    .chart-center-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        margin: 30px 0 10px 0;
+    }
+</style>
 
 </html>
