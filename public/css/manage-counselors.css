@@ -33,7 +33,8 @@
 .page-left::before {
     content: "";
     background-image: url("../Media/lasalle.png");
-    background-repeat: repeat;
+    background-repeat: no-repeat;
+    background-size: cover;
     background-position: top left;
     opacity: 0.3;
     position: absolute;
