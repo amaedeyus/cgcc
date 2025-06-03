@@ -45,19 +45,50 @@ if (!empty($formName)) {
             $types .= "s";
         }
 
-        // Correct join path: students -> sections -> programs -> departments
-        $sql = "
-            SELECT 
-                d.dept_title AS department,
-                COUNT(r.response_index) AS count
-            FROM responses r
-            LEFT JOIN students s ON r.student_index = s.student_index
-            LEFT JOIN sections sec ON s.section_index = sec.section_index
-            LEFT JOIN programs p ON sec.program_index = p.program_index
-            LEFT JOIN departments d ON p.dept_index = d.dept_index
-            WHERE $where
-            GROUP BY d.dept_title
-        ";
+        // If program is selected, group by section; else if department, group by program; else, group by department
+        if (!empty($program)) {
+            $sql = "
+                SELECT 
+                    sec.section_name AS label,
+                    COUNT(r.response_index) AS count
+                FROM responses r
+                LEFT JOIN students s ON r.student_index = s.student_index
+                LEFT JOIN sections sec ON s.section_index = sec.section_index
+                LEFT JOIN programs p ON sec.program_index = p.program_index
+                LEFT JOIN departments d ON p.dept_index = d.dept_index
+                WHERE $where
+                GROUP BY sec.section_name
+            ";
+            $groupedBy = 'section';
+        } else if (!empty($department)) {
+            $sql = "
+                SELECT 
+                    p.program_name AS label,
+                    COUNT(r.response_index) AS count
+                FROM responses r
+                LEFT JOIN students s ON r.student_index = s.student_index
+                LEFT JOIN sections sec ON s.section_index = sec.section_index
+                LEFT JOIN programs p ON sec.program_index = p.program_index
+                LEFT JOIN departments d ON p.dept_index = d.dept_index
+                WHERE $where
+                GROUP BY p.program_name
+            ";
+            $groupedBy = 'program';
+        } else {
+            $sql = "
+                SELECT 
+                    d.dept_title AS label,
+                    COUNT(r.response_index) AS count
+                FROM responses r
+                LEFT JOIN students s ON r.student_index = s.student_index
+                LEFT JOIN sections sec ON s.section_index = sec.section_index
+                LEFT JOIN programs p ON sec.program_index = p.program_index
+                LEFT JOIN departments d ON p.dept_index = d.dept_index
+                WHERE $where
+                GROUP BY d.dept_title
+            ";
+            $groupedBy = 'department';
+        }
 
         $stmt = $conn->prepare($sql);
         $stmt->bind_param($types, ...$params);
@@ -75,7 +106,7 @@ $labels = [];
 $values = [];
 
 foreach ($data as $item) {
-    $labels[] = $item['department'];
+    $labels[] = $item['label'];
     $values[] = $item['count'];
 }
 
@@ -91,5 +122,6 @@ if (!$data) {
 
 echo json_encode([
     'labels' => $labels,
-    'values' => $values
+    'values' => $values,
+    'groupedBy' => $groupedBy
 ]);

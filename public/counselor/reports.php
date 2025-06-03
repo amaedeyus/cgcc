@@ -367,12 +367,16 @@ if (!empty($counselor['credentials'])) {
             .then(data => {
                 if (data.labels && data.values) {
                     const ctx = document.getElementById('responseChart').getContext('2d');
+                    let chartTitle = 'Response Distribution by Department';
+                    if (data.groupedBy === 'program') {
+                        chartTitle = 'Response Distribution by Program';
+                    }
                     new Chart(ctx, {
                         type: 'pie',
                         data: {
                             labels: data.labels,
                             datasets: [{
-                                label: 'Responses by Department',
+                                label: chartTitle,
                                 data: data.values,
                                 backgroundColor: [
                                     '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'
@@ -388,7 +392,7 @@ if (!empty($counselor['credentials'])) {
                                 },
                                 title: {
                                     display: true,
-                                    text: 'Response Distribution by Department'
+                                    text: chartTitle
                                 }
                             }
                         }
