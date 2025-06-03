@@ -154,9 +154,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $stmt->bind_param($types, ...$params);
         if ($stmt->execute()) {
+            // Check if is_active was set to -1 and update archived_at accordingly
+            if ($isActive === '-1') {
+                // Manually set archived_at = NOW()
+                $archiveStmt = $conn->prepare("UPDATE forms SET archived_at = NOW() WHERE form_index = ?");
+                $archiveStmt->bind_param("i", $formId);
+                $archiveStmt->execute();
+                $archiveStmt->close();
+            } elseif ($isActive !== null && $isActive !== '-1') {
+                // Optionally clear archived_at if form is un-archived
+                $archiveStmt = $conn->prepare("UPDATE forms SET archived_at = NULL WHERE form_index = ?");
+                $archiveStmt->bind_param("i", $formId);
+                $archiveStmt->execute();
+                $archiveStmt->close();
+            }
+        
             if ($stmt->affected_rows > 0) {
                 echo json_encode([
-                    'success' => true, 
+                    'success' => true,
                     'message' => 'Form updated successfully',
                     'updates' => [
                         'is_active' => $isActive,
@@ -170,13 +185,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $checkStmt->bind_param("i", $formId);
                 $checkStmt->execute();
                 $checkStmt->store_result();
-                
+        
                 if ($checkStmt->num_rows === 0) {
                     http_response_code(404);
                     echo json_encode(['error' => 'Form not found']);
                 } else {
                     echo json_encode([
-                        'success' => true, 
+                        'success' => true,
                         'message' => 'No changes made (values already set)',
                         'updates' => [
                             'is_active' => $isActive,
@@ -187,10 +202,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 $checkStmt->close();
             }
-        } else {
-            throw new Exception('Execution failed: ' . $stmt->error);
+            $stmt->close();
         }
-        $stmt->close();
     } catch (Exception $e) {
         http_response_code(500);
         echo json_encode(['error' => 'Server error', 'message' => $e->getMessage()]);

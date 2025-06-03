@@ -44,6 +44,25 @@
     .status-message.warning {
         border-left-color: #ffc107;
     }
+
+    .form-card .academic-year {
+        margin: 2px 0;
+        font-size: 0.9em;
+    }
+
+    .form-card .academic-year-label {
+        font-weight: bold;
+    }
+
+    .form-card .timestamp {
+        margin: 2px 0;
+        font-size: 0.9em;
+    }
+
+    .form-card a {
+        margin-top: 15px;
+        display: inline-block;
+    }
   </style>
 </head>
 
@@ -345,8 +364,10 @@
               /\n/g,
               " "
             )}</p>
-            <p class="academic-year">Academic Year: ${form.academic_year || "Not set"
+            <p class="academic-year"><span class="academic-year-label">Academic Year:</span> ${form.academic_year || "Not set"
             }</p>
+            <p class="academic-year"><span class="academic-year-label">Created:</span> ${form.created_at ? form.created_at.split(' ')[0] : "Not available"}</p>
+            <p class="academic-year"><span class="academic-year-label">Last Updated:</span> ${form.updated_at ? form.updated_at.split(' ')[0] : "Not available"}</p>
             <a href="http://localhost/cgcc/public/admin/formbuilder.html?id=${form.form_index
             }">Open Form</a>
         `;

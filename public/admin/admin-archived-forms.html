@@ -10,6 +10,55 @@
   <link rel="stylesheet" href="../css/manage-forms.css" />
   <link rel="stylesheet" href="../css/alert.css" />
   <title>CGCC - Archived Forms</title>
+  <style>
+    .status-message {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 12px 24px;
+        border-radius: 4px;
+        background: white;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        z-index: 9999;
+        font-family: 'Poppins', sans-serif;
+        display: flex;
+        align-items: center;
+        min-width: 300px;
+        transform: translateX(120%);
+        transition: transform 0.3s ease-in-out;
+        border-left: 4px solid #316b50;
+    }
+
+    .status-message.show {
+        transform: translateX(0);
+    }
+
+    .status-message.success {
+        border-left-color: #316b50;
+    }
+
+    .status-message.error {
+        border-left-color: #dc3545;
+    }
+
+    .status-message.warning {
+        border-left-color: #ffc107;
+    }
+
+    .form-card .academic-year {
+        margin: 2px 0;
+        font-size: 0.9em;
+    }
+
+    .form-card .academic-year-label {
+        font-weight: bold;
+    }
+
+    .form-card a {
+        margin-top: 15px;
+        display: inline-block;
+    }
+  </style>
 </head>
 
 <body>
@@ -204,6 +253,9 @@
             <div class="${statusClass}"></div>
             <h3>${form.form_name}</h3>
             <p class="form-description">${truncatedDescription.replace(/\n/g, " ")}</p>
+            <p class="academic-year"><span class="academic-year-label">Created:</span> ${form.created_at ? form.created_at.split(' ')[0] : "Not available"}</p>
+            <p class="academic-year"><span class="academic-year-label">Last Updated:</span> ${form.updated_at ? form.updated_at.split(' ')[0] : "Not available"}</p>
+            <p class="academic-year"><span class="academic-year-label">Archived At:</span> ${form.archived_at ? form.archived_at.split(' ')[0] : "Not available"}</p>
             <a href="http://localhost/cgcc/public/admin/formbuilder.html?id=${form.form_index}">View Form</a>
           `;
 

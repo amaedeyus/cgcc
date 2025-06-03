@@ -139,6 +139,13 @@ try {
     $choiceInsert->close();
     $subQuestionInsert->close();
 
+
+    // Trigger update to the forms table to update `updated_at`
+    $stmtUpdateForm = $conn->prepare("UPDATE forms SET updated_at = NOW() WHERE form_index = ?");
+    $stmtUpdateForm->bind_param("i", $formId);
+    $stmtUpdateForm->execute();
+    $stmtUpdateForm->close();
+    
     $conn->commit();
 
     // Now take snapshot with updated indexes

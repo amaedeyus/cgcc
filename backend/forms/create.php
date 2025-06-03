@@ -45,7 +45,7 @@ try {
     $description = $data['description'] ?? '';
     $academicYear = $data['academic_year'] ?? '';
     
-    $stmt = $conn->prepare("INSERT INTO forms (form_name, description, academic_year) VALUES (?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO forms (form_name, description, created_at, academic_year) VALUES (?, ?, NOW(), ?)");
     if (!$stmt) throw new Exception("Insert form prepare failed: " . $conn->error);
 
     $stmt->bind_param("sss", $formName, $description, $academicYear);
