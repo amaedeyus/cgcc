@@ -101,7 +101,11 @@ if (!empty($counselor['credentials'])) {
                             <option value="">Select Forms</option>
                             <?php
                             $currentForms = $_GET['forms'] ?? '';
+                            $selectedAY = $_GET['academic_year'] ?? '';
                             $sql = "SELECT form_index, form_name FROM forms";
+                            if (!empty($selectedAY)) {
+                                $sql .= " WHERE academic_year = '" . $conn->real_escape_string($selectedAY) . "'";
+                            }
                             $result = $conn->query($sql);
                             while ($row = $result->fetch_assoc()) {
                                 $selected = ($row['form_name'] === $currentForms) ? 'selected' : '';
@@ -109,8 +113,19 @@ if (!empty($counselor['credentials'])) {
                             }
                             ?>
                         </select>
-
-                        <select name="year" id="year" onchange="updateFilters()">
+                        <select name="academic_year" id="academic_year" onchange="updateAcademicYear()">
+                            <option value="">Select Academic Year</option>
+                            <?php
+                            $currentAY = $_GET['academic_year'] ?? '';
+                            $sql = "SELECT DISTINCT academic_year FROM forms ORDER BY academic_year DESC";
+                            $result = $conn->query($sql);
+                            while ($row = $result->fetch_assoc()) {
+                                $selected = ($row['academic_year'] === $currentAY) ? 'selected' : '';
+                                echo '<option value="' . htmlspecialchars($row['academic_year']) . '" ' . $selected . '>' . htmlspecialchars($row['academic_year']) . '</option>';
+                            }
+                            ?>
+                        </select>
+                        <select name="year" id="year" onchange="updateFilters()" disabled>
                             <option value="">Select Year</option>
                             <?php
                             $currentYear = $_GET['year'] ?? '';
@@ -120,8 +135,7 @@ if (!empty($counselor['credentials'])) {
                             }
                             ?>
                         </select>
-
-                        <select name="department" id="department" onchange="updateFilters()">
+                        <select name="department" id="department" onchange="updateFilters()" disabled>
                             <option value="">Select Department</option>
                             <?php
                             $currentDept = $_GET['department'] ?? '';
@@ -133,11 +147,9 @@ if (!empty($counselor['credentials'])) {
                             }
                             ?>
                         </select>
-
                         <select name="program" id="program" onchange="updateFilters()" disabled>
                             <option value="">Select a department first</option>
                         </select>
-
                         <select name="section" id="section" onchange="updateFilters()" disabled>
                             <option value="">-- Select Section --</option>
                         </select>
@@ -152,6 +164,7 @@ if (!empty($counselor['credentials'])) {
                         $department = $_GET['department'] ?? '';
                         $program = $_GET['program'] ?? '';
                         $section = $_GET['section'] ?? '';
+                        $academicYear = $_GET['academic_year'] ?? '';
 
                         // Fetch the corresponding form_index from the 'forms' table
                         $stmt = $conn->prepare("SELECT form_index FROM forms WHERE form_name = ?");
@@ -186,6 +199,12 @@ if (!empty($counselor['credentials'])) {
                                 $params[] = $year;
                                 $types .= "s";
                             }
+                            if (!empty($academicYear)) {
+                                $where .= " AND r.academic_year = ? AND f.academic_year = ?";
+                                $params[] = $academicYear;
+                                $params[] = $academicYear;
+                                $types .= "ss";
+                            }
 
                             // Simple count query (NO GROUP BY)
                             $sql = "
@@ -195,6 +214,7 @@ if (!empty($counselor['credentials'])) {
                                 LEFT JOIN sections sec ON s.section_index = sec.section_index
                                 LEFT JOIN programs p ON sec.program_index = p.program_index
                                 LEFT JOIN departments d ON p.dept_index = d.dept_index
+                                LEFT JOIN forms f ON r.form_index = f.form_index
                                 WHERE $where
                             ";
                             $stmt = $conn->prepare($sql);
@@ -250,7 +270,7 @@ if (!empty($counselor['credentials'])) {
 
     function getYearLevelFromURL() {
         const year = document.getElementById('year').value;
-        return year ? parseInt(year) : 1;
+        return year ? parseInt(year) : '';
     }
 
     document.getElementById('department').addEventListener('change', function() {
@@ -261,6 +281,7 @@ if (!empty($counselor['credentials'])) {
     document.getElementById('program').addEventListener('change', function() {
         const programCode = this.value;
         const sectionSelect = document.getElementById('section');
+        const yearLevel = getYearLevelFromURL();
 
         if (!programCode) {
             sectionSelect.innerHTML = '<option value="">Select Section</option>';
@@ -268,14 +289,17 @@ if (!empty($counselor['credentials'])) {
             return;
         }
 
-        const yearLevel = getYearLevelFromURL();
+        let url = `get_sections.php?program_code=${programCode}`;
+        if (yearLevel) {
+            url += `&year_level=${yearLevel}`;
+        }
 
-        fetch(`get_sections.php?program_code=${programCode}&year_level=${yearLevel}`)
+        fetch(url)
             .then(response => response.json())
             .then(data => {
                 sectionSelect.innerHTML = '<option value="">Select Section</option>';
                 data.forEach(section => {
-                    sectionSelect.innerHTML += `<option value="${section.section_index}">${section.section_name}</option>`;
+                    sectionSelect.innerHTML += `<option value=\"${section.section_index}\">${section.section_name}</option>`;
                 });
                 sectionSelect.disabled = false;
             })
@@ -285,12 +309,31 @@ if (!empty($counselor['credentials'])) {
             });
     });
 
+    function updateAcademicYear() {
+        // When academic year changes, clear the form selection and reload filters
+        document.getElementById('forms').selectedIndex = 0;
+        updateFilters();
+    }
+
     function updateFilters() {
         const forms = document.getElementById("forms").value;
         const dept = document.getElementById("department").value;
         const prog = document.getElementById("program").value;
         const sec = document.getElementById("section").value;
         const year = document.getElementById("year").value;
+        const academicYear = document.getElementById("academic_year").value;
+
+        // Enable/disable year and department based on form selection
+        document.getElementById('year').disabled = !forms;
+        document.getElementById('department').disabled = !forms;
+        if (!forms) {
+            document.getElementById('year').selectedIndex = 0;
+            document.getElementById('department').selectedIndex = 0;
+            document.getElementById('program').selectedIndex = 0;
+            document.getElementById('program').disabled = true;
+            document.getElementById('section').selectedIndex = 0;
+            document.getElementById('section').disabled = true;
+        }
 
         const url = new URL(window.location.href);
         url.searchParams.set('forms', forms);
@@ -298,6 +341,7 @@ if (!empty($counselor['credentials'])) {
         url.searchParams.set('program', prog);
         url.searchParams.set('section', sec);
         url.searchParams.set('year', year);
+        url.searchParams.set('academic_year', academicYear);
         url.searchParams.set('page', 1);
 
         window.location.href = url;
@@ -324,8 +368,11 @@ if (!empty($counselor['credentials'])) {
                         progSelect.value = selectedProg;
 
                         const yearLevel = selectedYear || getYearLevelFromURL();
-
-                        fetch(`get_sections.php?program_code=${selectedProg}&year_level=${yearLevel}`)
+                        let url = `get_sections.php?program_code=${selectedProg}`;
+                        if (yearLevel) {
+                            url += `&year_level=${yearLevel}`;
+                        }
+                        fetch(url)
                             .then(response => response.json())
                             .then(data => {
                                 secSelect.innerHTML = '<option value="">-- Select Section --</option>';
@@ -346,6 +393,11 @@ if (!empty($counselor['credentials'])) {
                 }
             }, 100);
         }
+
+        // On page load, enable/disable year and department based on form selection
+        const forms = document.getElementById("forms").value;
+        document.getElementById('year').disabled = !forms;
+        document.getElementById('department').disabled = !forms;
     });
 
     document.addEventListener("DOMContentLoaded", function () {
@@ -354,6 +406,7 @@ if (!empty($counselor['credentials'])) {
         const progSelected = "<?= htmlspecialchars($_GET['program'] ?? '') ?>";
         const secSelected = "<?= htmlspecialchars($_GET['section'] ?? '') ?>";
         const yearSelected = "<?= htmlspecialchars($_GET['year'] ?? '') ?>";
+        const academicYearSelected = "<?= htmlspecialchars($_GET['academic_year'] ?? '') ?>";
 
         if (!formSelected) return;
 
@@ -362,7 +415,8 @@ if (!empty($counselor['credentials'])) {
             department: deptSelected,
             program: progSelected,
             section: secSelected,
-            year: yearSelected
+            year: yearSelected,
+            academic_year: academicYearSelected
         });
 
         fetch(`get_chart_data.php?${params.toString()}`)
@@ -379,6 +433,8 @@ if (!empty($counselor['credentials'])) {
                         chartTitle = 'Response Distribution by Section';
                     } else if (data.groupedBy === 'year') {
                         chartTitle = 'Response Distribution by Year';
+                    } else if (data.groupedBy === 'section_response') {
+                        chartTitle = 'Response Distribution by Section (Responded vs Not Responded)';
                     }
                     new Chart(ctx, {
                         type: 'pie',
