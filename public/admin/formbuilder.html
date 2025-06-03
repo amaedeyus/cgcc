@@ -4,16 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Builder | CGCC</title>
+    <title>Question Builder</title>
     <!-- Bootstrap CSS -->  
     <link rel="icon" type="image/png" href="../Media/cgcc2.png" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/formbuilder.css">
-    <link rel="stylesheet" href="../css/alert.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
 
 </head>
 
@@ -216,126 +213,159 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
 
     <script>
-        // Alert functions
-        function showAlert(title, message, type = 'warning') {
-            // Remove any existing alerts
-            const existingAlert = document.querySelector('.alert');
-            if (existingAlert) {
-                existingAlert.remove();
+
+
+        // Function to update question preview
+        function updatePreview(questionCard) {
+            const questionText = questionCard.find('.question-text').val().trim() || 'Untitled Question';
+            const questionType = questionCard.find('.question-type').val(); // get type
+            const questionData = {
+                type: questionType,
+                options: [],
+                rows: []
+            };
+            const isRequired = questionCard.find('.required-switch').is(':checked');
+
+            // Update question text and required indicator
+            questionCard.find('.preview-question-text').text(questionText);
+            questionCard.find('.preview-required-text').toggleClass('d-none', !isRequired);
+
+            // Generate preview HTML based on question type
+            let previewHtml = '';
+
+            switch (questionType) {
+                // In the updatePreview function:
+                case 'short':
+                    const subtype = questionCard.find('.question-subtype').val() || 'text';
+                    let inputType = 'text';
+                    let placeholder = 'Your answer';
+                    
+                    switch(subtype) {
+                        case 'email':
+                            inputType = 'email';
+                            placeholder = 'example@domain.com';
+                            break;
+                        case 'phone':
+                            inputType = 'phone';
+                            placeholder = '09xxxxxxxxxx';
+                            break;
+                        case 'number':
+                            inputType = 'number';
+                            placeholder = '123';
+                            break;
+                    }
+                    
+                    previewHtml = `<input type="${inputType}" class="form-control" placeholder="${placeholder}">`;
+                    break;
+                case 'paragraph':
+                    previewHtml = '<textarea class="form-control" rows="3" placeholder="Your answer"></textarea>';
+                    break;
+                case 'multiple':
+                case 'checkbox':
+                    const options = [];
+                    questionCard.find('.option-input').each(function () {
+                        const val = $(this).val().trim();
+                        if (val) options.push(val);
+                    });
+
+                    previewHtml += '<div>';
+                    options.forEach((opt, idx) => {
+                        const inputType = questionType === 'multiple' ? 'radio' : 'checkbox';
+                        previewHtml += `
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="${inputType}" disabled>
+                                    <label class="form-check-label">${opt}</label>
+                                </div>`;
+                    });
+                    previewHtml += '</div>';
+                    break;
+                case 'dropdown':
+                    const dropdownOptions = [];
+                    questionCard.find('.option-input').each(function () {
+                        const val = $(this).val().trim();
+                        if (val) dropdownOptions.push(val);
+                    });
+
+                    previewHtml += '<select class="form-select" disabled><option>Select an option</option>';
+                    dropdownOptions.forEach(opt => {
+                        previewHtml += `<option>${opt}</option>`;
+                    });
+                    previewHtml += '</select>';
+                    break;
+                case 'grid':
+                    const gridOptions = [], gridRows = [];
+                    questionCard.find('.option-input').each(function () {
+                        const val = $(this).val().trim();
+                        if (val) gridOptions.push(val);
+                    });
+                    questionCard.find('.grid-row-input').each(function () {
+                        const val = $(this).val().trim();
+                        if (val) gridRows.push(val);
+                    });
+
+                    previewHtml += '<table class="table">';
+                    previewHtml += '<thead><tr><th></th>';
+                    gridOptions.forEach(opt => {
+                        previewHtml += `<th>${opt}</th>`;
+                    });
+                    previewHtml += '</tr></thead><tbody>';
+                    gridRows.forEach(row => {
+                        previewHtml += `<tr><th>${row}</th>`;
+                        for (let i = 0; i < gridOptions.length; i++) {
+                            previewHtml += '<td><input type="radio" disabled></td>';
+                        }
+                        previewHtml += '</tr>';
+                    });
+                    previewHtml += '</tbody></table>';
+                    break;
+                case 'date':
+                    previewHtml = '<input type="date" class="form-control">';
+                    break;
+                case 'display':
+                    previewHtml = '<div class="text-muted">(Display text only - no input)</div>';
+                    break;
+                default:
+                    previewHtml = '';
             }
 
-            // Create alert elements
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type}`;
-            alertDiv.style.zIndex = '9999';
+            questionCard.find('.preview-content').html(previewHtml);
+        }
 
-            const alertContent = document.createElement('div');
-            alertContent.className = 'alert-content';
-
-            const alertTitle = document.createElement('div');
-            alertTitle.className = 'alert-title';
-            alertTitle.textContent = title;
-            alertTitle.style.color = type === 'success' ? '#316b50' : 
-                                   type === 'danger' ? '#dc3545' : 
-                                   type === 'warning' ? '#ffc107' : '#316b50';
-
-            const alertMessage = document.createElement('div');
-            alertMessage.className = 'alert-message';
-            alertMessage.textContent = message;
-
-            const alertButton = document.createElement('button');
-            alertButton.className = 'alert-button';
-            alertButton.textContent = 'OK';
-            alertButton.style.backgroundColor = type === 'success' ? '#316b50' : 
-                                              type === 'danger' ? '#dc3545' : 
-                                              type === 'warning' ? '#ffc107' : '#316b50';
-            alertButton.style.color = type === 'warning' ? '#000' : '#fff';
-            alertButton.onclick = () => {
-                alertDiv.classList.add('fade-out');
-                setTimeout(() => alertDiv.remove(), 300);
+        function generateNewOptionElement(questionCard) {
+            const questionType = questionCard.find('.question-type').val(); // get type
+            const questionData = {
+                type: questionType,
+                options: [],
+                rows: []
             };
+            const inputType = questionType === 'multiple' ? 'radio' : 'checkbox';
 
-            // Assemble the alert
-            alertContent.appendChild(alertTitle);
-            alertContent.appendChild(alertMessage);
-            alertContent.appendChild(alertButton);
-            alertDiv.appendChild(alertContent);
-
-            // Add to document
-            document.body.appendChild(alertDiv);
-
-            // Add fade-in animation
-            setTimeout(() => alertDiv.style.opacity = '1', 10);
+            return `
+        <div class="option-row mb-2 d-flex align-items-center">
+            <div class="form-check me-2">
+                <input class="form-check-input" type="${inputType}" disabled>
+            </div>
+            <input type="text" class="form-control option-input" placeholder="Option ${getNewOptionIndex(questionCard)}">
+            <button type="button" class="btn btn-sm btn-outline-danger ms-2 delete-option"><i class="fas fa-trash"></i></button>
+        </div>`;
         }
 
-        function styledConfirm(message) {
-            return new Promise((resolve) => {
-                // Remove any existing alerts
-                const existingAlert = document.querySelector('.alert');
-                if (existingAlert) {
-                    existingAlert.remove();
-                }
 
-                // Create alert elements
-                const alertDiv = document.createElement('div');
-                alertDiv.className = 'alert alert-warning';
-                alertDiv.style.zIndex = '9999';
 
-                const alertContent = document.createElement('div');
-                alertContent.className = 'alert-content';
+        function togglePreviewMode(questionCard) {
+            const isPreview = questionCard.find('.preview-mode').hasClass('d-none');
 
-                const alertTitle = document.createElement('div');
-                alertTitle.className = 'alert-title';
-                alertTitle.textContent = 'Confirm Action';
-                alertTitle.style.color = '#ffc107';
-
-                const alertMessage = document.createElement('div');
-                alertMessage.className = 'alert-message';
-                alertMessage.textContent = message;
-
-                const buttonContainer = document.createElement('div');
-                buttonContainer.style.display = 'flex';
-                buttonContainer.style.gap = '10px';
-                buttonContainer.style.justifyContent = 'center';
-
-                const cancelButton = document.createElement('button');
-                cancelButton.className = 'alert-button';
-                cancelButton.textContent = 'Cancel';
-                cancelButton.style.backgroundColor = '#6c757d';
-                cancelButton.style.color = '#fff';
-                cancelButton.onclick = () => {
-                    alertDiv.classList.add('fade-out');
-                    setTimeout(() => alertDiv.remove(), 300);
-                    resolve(false);
-                };
-
-                const confirmButton = document.createElement('button');
-                confirmButton.className = 'alert-button';
-                confirmButton.textContent = 'Confirm';
-                confirmButton.style.backgroundColor = '#ffc107';
-                confirmButton.style.color = '#000';
-                confirmButton.onclick = () => {
-                    alertDiv.classList.add('fade-out');
-                    setTimeout(() => alertDiv.remove(), 300);
-                    resolve(true);
-                };
-
-                // Assemble the alert
-                buttonContainer.appendChild(cancelButton);
-                buttonContainer.appendChild(confirmButton);
-                alertContent.appendChild(alertTitle);
-                alertContent.appendChild(alertMessage);
-                alertContent.appendChild(buttonContainer);
-                alertDiv.appendChild(alertContent);
-
-                // Add to document
-                document.body.appendChild(alertDiv);
-
-                // Add fade-in animation
-                setTimeout(() => alertDiv.style.opacity = '1', 10);
-            });
+            if (isPreview) {
+                updatePreview(questionCard);
+                questionCard.find('.edit-mode').addClass('d-none');
+                questionCard.find('.preview-mode').removeClass('d-none');
+                questionCard.find('.toggle-preview').text('Edit');
+            } else {
+                questionCard.find('.preview-mode').addClass('d-none');
+                questionCard.find('.edit-mode').removeClass('d-none');
+                questionCard.find('.toggle-preview').text('Preview');
+            }
         }
-
         $(document).ready(function () {
             // Initialize variables
             let nextSectionId = 2;
@@ -1210,7 +1240,7 @@
                                     <input class="form-check-input" type="${questionType === 'multiple' ? 'radio' : 'checkbox'}" disabled>
                                 </div>
                                 <input type="text" class="form-control option-input" placeholder="Option 1">
-                                <button type="button" class="btn btn-sm btn-outline-danger ms-2 remove-option">
+                                <button type="button" class="btn btn-outline-danger ms-2 remove-option">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
@@ -1562,9 +1592,10 @@
                     form_index: formId ? parseInt(formId) : null,
                     form_name: $('#form-title').val().trim(),
                     description: $('#form-description').val().trim(),
-                    academic_year: $('#academic-year').val().trim(),
+                    academic_year: $('#academic-year').val().trim(), // Add this line
                     sections: []
                 };
+                
 
                 $('.section-card').each(function () {
                     const $section = $(this);
@@ -1581,7 +1612,7 @@
                         const questionData = {
                             question: $question.find('.question-text').val().trim(),
                             type: type,
-                            subtype: type === 'short' ? $question.find('.question-subtype').val() : null,
+                            subtype: type === 'short' ? $question.find('.question-subtype').val() : null, // Only include subtype for short answers
                             required: $question.find('.required-switch').is(':checked'),
                             options: [],
                             rows: []
@@ -1620,7 +1651,9 @@
                         },
                         body: JSON.stringify(formData),
                         credentials: 'include'
+                        
                     });
+                    console.log("Sending form data to backend:", JSON.parse(JSON.stringify(formData)));
 
                     if (!response.ok) {
                         throw new Error(`Failed to ${method === 'POST' ? 'create' : 'update'} form`);
@@ -1628,38 +1661,29 @@
 
                     const result = await response.json();
 
-                    showAlert(
-                        'Success!',
-                        `Form ${formId ? 'updated' : 'created'} successfully!`,
-                        'success'
-                    );
+                    alert(`Form ${formId ? 'updated' : 'created'} successfully!`);
 
                     if (!formId && result.form_index) {
                         window.history.replaceState(null, '', `?id=${result.form_index}`);
-                        $('#save-form').text('Save Form');
-                        $('#floating-save-btn').find('span').text('Save Form');
+                        $('#save-form').text('Save Form'); // Update button text after creation
                     }
 
                 } catch (error) {
                     console.error('Error saving form:', error);
-                    showAlert(
-                        'Error',
-                        'Failed to save form. Please try again.',
-                        'danger'
-                    );
+                    alert('Failed to save form. Please try again.');
                 }
             };
 
             // Form validation
             function validateForm() {
                 if (!$('#form-title').val().trim()) {
-                    showAlert('Error', 'Please enter a form title', 'danger');
+                    alert('Please enter a form title');
                     return false;
                 }
 
                 const academicYear = $('#academic-year').val().trim();
                 if (!academicYear || !/^\d{4}-\d{4}$/.test(academicYear)) {
-                    showAlert('Error', 'Please enter a valid academic year in YYYY-YYYY format', 'danger');
+                    alert('Please enter a valid academic year in YYYY-YYYY format');
                     return false;
                 }
 
@@ -1671,7 +1695,7 @@
                 });
 
                 if (!hasQuestions) {
-                    showAlert('Error', 'At least one question is required', 'danger');
+                    alert('At least one question is required');
                     return false;
                 }
 
@@ -1750,11 +1774,12 @@
                 saveState();
             });
 
+            // Delete section
             // Delete section with confirmation
-            $(document).on('click', '.delete-section', async function () {
+            $(document).on('click', '.delete-section', function () {
                 const section = $(this).closest('.section-card');
                 if ($('.section-card').length <= 1) {
-                    showAlert('Error', 'You must have at least one section', 'danger');
+                    alert('You must have at least one section');
                     return;
                 }
 
@@ -1762,25 +1787,14 @@
                 const sectionTitle = section.find('.section-title-input').val().trim() || 'Untitled Section';
 
                 // Show confirmation dialog
-                const confirmed = await styledConfirm(`Are you sure you want to delete the section "${sectionTitle}"? This will also delete all questions within it.`);
-                
-                if (confirmed) {
+                if (confirm(`Are you sure you want to delete the section "${sectionTitle}"? This will also delete all questions within it.`)) {
                     section.remove();
                     saveState();
-                }
-            });
 
-            // Delete question with confirmation
-            $(document).on('click', '.delete-question', async function (e) {
-                e.stopPropagation();
-                const questionCard = $(this).closest('.question-card');
-                const questionText = questionCard.find('.question-text').val().trim() || 'Untitled Question';
-                
-                const confirmed = await styledConfirm(`Are you sure you want to delete this question: "${questionText}"?`);
-                
-                if (confirmed) {
-                    questionCard.remove();
-                    saveState();
+                    // Optional: Show a brief feedback message
+                    const feedback = $('<div class="alert alert-warning save-feedback">Section deleted</div>');
+                    $('body').append(feedback);
+                    setTimeout(() => feedback.remove(), 3000);
                 }
             });
 
@@ -1906,6 +1920,13 @@
                 saveState();
             });
 
+            // Delete question
+            $(document).on('click', '.delete-question', function (e) {
+                e.stopPropagation();
+                $(this).closest('.question-card').remove();
+                saveState();
+            });
+
             // Toggle question preview/edit
             $(document).on('click', '.toggle-preview', function (e) {
                 e.stopPropagation();
@@ -1964,37 +1985,14 @@
             });
 
             // Remove option from question
-            $(document).on('click', '.remove-option', async function (e) {
+            $(document).on('click', '.remove-option', function (e) {
                 e.stopPropagation();
                 if ($(this).closest('.options-container').find('.option-row').length <= 1) {
-                    showAlert('Error', 'You must have at least one option', 'danger');
+                    alert('You must have at least one option');
                     return;
                 }
-                
-                const optionText = $(this).closest('.option-row').find('.option-input').val().trim() || 'Untitled Option';
-                const confirmed = await styledConfirm(`Are you sure you want to delete the option "${optionText}"?`);
-                
-                if (confirmed) {
-                    $(this).closest('.option-row').remove();
-                    saveState();
-                }
-            });
-
-            // Remove row from grid question
-            $(document).on('click', '.remove-grid-row', async function (e) {
-                e.stopPropagation();
-                if ($(this).closest('.grid-rows-container').find('.grid-row').length <= 1) {
-                    showAlert('Error', 'You must have at least one row', 'danger');
-                    return;
-                }
-                
-                const rowText = $(this).closest('.grid-row').find('.grid-row-input').val().trim() || 'Untitled Row';
-                const confirmed = await styledConfirm(`Are you sure you want to delete the row "${rowText}"?`);
-                
-                if (confirmed) {
-                    $(this).closest('.grid-row').remove();
-                    saveState();
-                }
+                $(this).closest('.option-row').remove();
+                saveState();
             });
 
             // Add row to grid question
@@ -2020,6 +2018,17 @@
                     saveState();
                 });
 
+                saveState();
+            });
+
+            // Remove row from grid question
+            $(document).on('click', '.remove-grid-row', function (e) {
+                e.stopPropagation();
+                if ($(this).closest('.grid-rows-container').find('.grid-row').length <= 1) {
+                    alert('You must have at least one row');
+                    return;
+                }
+                $(this).closest('.grid-row').remove();
                 saveState();
             });
 

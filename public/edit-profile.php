@@ -256,7 +256,6 @@ for ($y = 1; $y <= 4; $y++) {
 }
 ?>
 
-
         </div>
 
         <label for="dept_index">Department</label>
