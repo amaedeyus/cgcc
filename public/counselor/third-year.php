@@ -71,6 +71,7 @@ if (!empty($counselor['credentials'])) {
                 <a href="second-year.php">➤ Second Year</a>
                 <a href="third-year.php" class="active">➤ Third Year</a>
                 <a href="fourth-year.php">➤ Fourth Year</a>
+                <a href="reports.php">➤ Reports</a>
             </div>
 
             <div class="logout-wrapper">
