@@ -348,58 +348,64 @@ class FormStatistics {
                          $divisor = $totalAnswersForQuestion;
                      }
 
-                     $choicesQuery = "WITH filtered_responses AS (
-                         SELECT DISTINCT r.response_index
-                         FROM responses r
-                         JOIN students st ON r.student_index = st.student_index
-                         JOIN sections s ON st.section_index = s.section_index
-                         JOIN programs p ON s.program_index = p.program_index
-                         JOIN departments d ON p.dept_index = d.dept_index
-                         WHERE r.form_index = ?
-                         AND (r.is_autosave = 0 OR r.is_autosave IS NULL)
-                         $studentFilterSQL
-                     )
-                     SELECT 
-                         c.choice_text,
-                         COUNT(DISTINCT a.response_index) as selection_count,
-                         COALESCE(ROUND((COUNT(DISTINCT a.response_index) / CAST(
-                             (SELECT COUNT(DISTINCT response_index) FROM filtered_responses)
-                             AS DECIMAL(10,2))) * 100, 2), 0.00) as selection_percentage
-                     FROM choices c
-                     LEFT JOIN answers a ON c.choice_index = a.choice_index
-                     LEFT JOIN filtered_responses fr ON a.response_index = fr.response_index
-                     WHERE c.main_question_index = ?
-                     GROUP BY c.choice_text
-                     ORDER BY selection_count DESC";
+                     $choicesQuery = "SELECT 
+                                         c.choice_text,
+                                         COUNT(DISTINCT r.response_index) as selection_count,
+                                         COALESCE(ROUND((COUNT(DISTINCT r.response_index) / CAST(? AS DECIMAL(10,2))) * 100, 2), 0.00) as selection_percentage
+                                     FROM choices c
+                                     LEFT JOIN answers a ON c.choice_index = a.choice_index
+                                     LEFT JOIN responses r ON a.response_index = r.response_index
+                                     LEFT JOIN students st ON r.student_index = st.student_index
+                                     LEFT JOIN sections s ON st.section_index = s.section_index
+                                     LEFT JOIN programs p ON s.program_index = p.program_index
+                                     LEFT JOIN departments d ON p.dept_index = d.dept_index
+                                     WHERE c.main_question_index = ?
+                                     AND r.form_index = ?
+                                     AND (r.is_autosave = 0 OR r.is_autosave IS NULL)
+                                     $studentFilterSQL
+                                     GROUP BY c.choice_text
+                                     ORDER BY selection_count DESC";
 
-            $stmt = $this->conn->prepare($choicesQuery);
+                    // Log the query and parameters for debugging
+                    error_log("Choices Query: " . $choicesQuery);
+                    error_log("Query Parameters: " . json_encode([
+                        'divisor' => $divisor,
+                        'question_index' => $question['main_question_index'],
+                        'form_index' => $form['form_index'],
+                        'student_params' => $studentParams,
+                        'student_types' => $studentTypes,
+                        'student_filter_sql' => $studentFilterSQL
+                    ]));
+
+                    $stmt = $this->conn->prepare($choicesQuery);
                     if (!$stmt) {
                         $debug['errors'][] = "Error preparing choices query for regular question: " . $this->conn->error;
                         continue;
                     }
 
-                    // Add form_index and question_index to params
+                    // Add divisor, question index, and form index to params
                     $params = [
-                        $form['form_index'],  // for filtered_responses CTE
-                        $question['main_question_index']  // for main WHERE clause
+                        $divisor,
+                        $question['main_question_index'],
+                        $form['form_index']
                     ];
-                    $types = 'ii';
-                    
+                    $types = 'dii';
                     if (!empty($studentParams)) {
                         $params = array_merge($params, $studentParams);
                         $types .= $studentTypes;
                     }
-                    
-                    $stmt->bind_param($types, ...$params);
-            $stmt->execute();
-            $choicesResult = $stmt->get_result();
 
+                    $stmt->bind_param($types, ...$params);
+                    $stmt->execute();
+                    $choicesResult = $stmt->get_result();
+
+                    // Log the results for debugging
                     $choices = [];
-            while ($choice = $choicesResult->fetch_assoc()) {
+                    while ($choice = $choicesResult->fetch_assoc()) {
+                        error_log("Choice Result: " . json_encode($choice));
                         $choices[] = [
                             'choice_text' => $choice['choice_text'],
                             'selection_count' => (int)$choice['selection_count'],
-                            // Percentage is calculated in SQL now
                             'selection_percentage' => (float)$choice['selection_percentage']
                         ];
                     }
