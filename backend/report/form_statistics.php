@@ -348,41 +348,29 @@ class FormStatistics {
                          $divisor = $totalAnswersForQuestion;
                      }
 
-                     $choicesQuery = "SELECT 
-                     c.choice_text,
-                     COUNT(DISTINCT r.response_index) as selection_count,
-                     (SELECT COUNT(DISTINCT a.answer_index)
-                      FROM answers a
-                      JOIN responses r2 ON a.response_index = r2.response_index
-                      WHERE a.main_question_index = ?
-                        AND (r2.is_autosave = 0 OR r2.is_autosave IS NULL)
-                        $studentFilterSQL
-                     ) as total_answers_for_question,
-                     COALESCE(ROUND((COUNT(DISTINCT r.response_index) / CAST(
-                         CASE WHEN (
-                             SELECT COUNT(DISTINCT a.answer_index)
-                             FROM answers a
-                             JOIN responses r2 ON a.response_index = r2.response_index
-                             WHERE a.main_question_index = ?
-                               AND (r2.is_autosave = 0 OR r2.is_autosave IS NULL)
-                               $studentFilterSQL
-                         ) > 0 THEN (
-                             SELECT COUNT(DISTINCT a.answer_index)
-                             FROM answers a
-                             JOIN responses r2 ON a.response_index = r2.response_index
-                             WHERE a.main_question_index = ?
-                               AND (r2.is_autosave = 0 OR r2.is_autosave IS NULL)
-                               $studentFilterSQL
-                         ) ELSE 1 END AS DECIMAL(10,2))
-                     ) * 100, 2), 0.00) as selection_percentage
-                 FROM choices c
-                 LEFT JOIN answers a ON c.choice_index = a.choice_index
-                 LEFT JOIN responses r ON a.response_index = r.response_index
-                 WHERE c.main_question_index = ?
-                 AND (r.is_autosave = 0 OR r.is_autosave IS NULL)
-                 $studentFilterSQL
-                 GROUP BY c.choice_text
-                 ORDER BY selection_count DESC";
+                     $choicesQuery = "WITH filtered_responses AS (
+                         SELECT DISTINCT r.response_index
+                         FROM responses r
+                         JOIN students st ON r.student_index = st.student_index
+                         JOIN sections s ON st.section_index = s.section_index
+                         JOIN programs p ON s.program_index = p.program_index
+                         JOIN departments d ON p.dept_index = d.dept_index
+                         WHERE r.form_index = ?
+                         AND (r.is_autosave = 0 OR r.is_autosave IS NULL)
+                         $studentFilterSQL
+                     )
+                     SELECT 
+                         c.choice_text,
+                         COUNT(DISTINCT a.response_index) as selection_count,
+                         COALESCE(ROUND((COUNT(DISTINCT a.response_index) / CAST(
+                             (SELECT COUNT(DISTINCT response_index) FROM filtered_responses)
+                             AS DECIMAL(10,2))) * 100, 2), 0.00) as selection_percentage
+                     FROM choices c
+                     LEFT JOIN answers a ON c.choice_index = a.choice_index
+                     LEFT JOIN filtered_responses fr ON a.response_index = fr.response_index
+                     WHERE c.main_question_index = ?
+                     GROUP BY c.choice_text
+                     ORDER BY selection_count DESC";
 
             $stmt = $this->conn->prepare($choicesQuery);
                     if (!$stmt) {
@@ -390,15 +378,17 @@ class FormStatistics {
                         continue;
                     }
 
-                    // Add divisor and question index to params
+                    // Add form_index and question_index to params
                     $params = [
-                        $question['main_question_index'], // for subquery 1
-                        $question['main_question_index'], // for subquery 2
-                        $question['main_question_index'], // for subquery 3
+                        $form['form_index'],  // for filtered_responses CTE
                         $question['main_question_index']  // for main WHERE clause
                     ];
+                    $types = 'ii';
                     
-                    $types = 'iiii';
+                    if (!empty($studentParams)) {
+                        $params = array_merge($params, $studentParams);
+                        $types .= $studentTypes;
+                    }
                     
                     $stmt->bind_param($types, ...$params);
             $stmt->execute();
